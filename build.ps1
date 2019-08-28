@@ -16,7 +16,8 @@ Param(
 
 $Solution =  "$(Get-Item -Path *.sln | Select-Object -First 1)"
 $PackageProjects = @(
-	".\src\Csg.Data.ListQuery\Csg.Data.ListQuery.csproj"
+	".\src\Csg.Data.ListQuery\Csg.Data.ListQuery.csproj",
+	".\src\Csg.Data.ListQuery.Abstractions\Csg.Data.ListQuery.Abstractions.csproj"
 )
 $PublishProjects = @(
 	#".\src\Web\Web.csproj"
