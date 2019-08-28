@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+    <EnableCsgDevRestoreSources>true</EnableCsgDevRestoreSources>
+    <EnableCsgInternalRestoreSources>false</EnableCsgInternalRestoreSources>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PackageIconUrl>https://csgstorpub.blob.core.windows.net/images/csg-square-64.png</PackageIconUrl>
+    <PackageProjectUrl></PackageProjectUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
+    <Owner>CSG</Owner>
+    <Authors>CSG</Authors>
+    <Copyright>2019 Cornerstone Solutions Group</Copyright>
+  </PropertyGroup>
+</Project>

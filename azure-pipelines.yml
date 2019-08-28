@@ -1,0 +1,36 @@
+name: $(Rev:rrrrr)
+pool:
+  name: CSG OnPrem VS2019
+trigger:
+- master
+- rel/*
+steps:
+- task: PowerShell@1
+  displayName: 'Build'
+  inputs:
+    scriptName: build.ps1
+    arguments: '-BuildNumber $(Build.BuildNumber) -NoTest'
+- task: DotNetCoreCLI@2
+  displayName: 'Test'
+  inputs:
+    command: test
+    projects: 'tests\**\*UnitTests.csproj'
+    arguments: '--no-build --configuration Release'
+    verbosityPack: Minimal
+# - task: PublishBuildArtifacts@1
+#   displayName: 'Publish Artifact: WebApp'
+#   inputs:
+#     PathtoPublish: src/Csg.Data.ListQuery.Api/bin/Release/netcoreapp2.2/publish
+#     ArtifactName: WebApp
+- powershell: |
+   $BuildNumber=$env:BUILD_BUILDNUMBER
+   [xml]$xml = Get-Content .\version.props
+   $versionPrefix = $xml.Project.PropertyGroup.VersionPrefix
+   $versionSuffix = $xml.Project.PropertyGroup.VersionSuffix[0]
+   if ($versionSuffix) {
+   Write-Output "##vso[build.updatebuildnumber]$versionPrefix-$versionSuffix-$BuildNumber"
+   } else {
+   Write-Output "##vso[build.updatebuildnumber]$versionPrefix-final-$BuildNumber"
+   }
+  displayName: 'Set Build Number'
+  condition: succeededOrFailed()
