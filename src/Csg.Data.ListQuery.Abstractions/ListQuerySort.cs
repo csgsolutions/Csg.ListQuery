@@ -11,7 +11,7 @@ namespace Csg.Data.ListQuery.Abstractions
         /// <summary>
         /// Gets or sets the column name.
         /// </summary>
-        public string FieldName { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets a value that indicates if the column is sorted descending.

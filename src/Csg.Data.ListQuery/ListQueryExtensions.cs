@@ -124,7 +124,7 @@ namespace Csg.Data.ListQuery
             {
                 foreach (var column in listQuery.QueryDefinition.Sorts)
                 {
-                    if (listQuery.Validations.TryGetValue(column.FieldName, out ListQueryFilterConfiguration config) && config.IsSortable == true)
+                    if (listQuery.Validations.TryGetValue(column.Name, out ListQueryFilterConfiguration config) && config.IsSortable == true)
                     {
                         queryBuilder.OrderBy.Add(new Sql.SqlOrderColumn()
                         {
@@ -134,13 +134,13 @@ namespace Csg.Data.ListQuery
                     }
                     else if (listQuery.ShouldValidate)
                     {
-                        throw new Exception($"The sort field '{column.FieldName}' does not exist.");
+                        throw new Exception($"The sort field '{column.Name}' does not exist.");
                     }
                     else
                     {
                         queryBuilder.OrderBy.Add(new Sql.SqlOrderColumn()
                         {
-                            ColumnName = column.FieldName,
+                            ColumnName = column.Name,
                             SortDirection = column.SortDescending ? Sql.DbSortDirection.Descending : Sql.DbSortDirection.Ascending
                         });
                     }
