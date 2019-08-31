@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Csg.Data.ListQuery.Abstractions;
 
@@ -6,20 +7,32 @@ namespace Csg.Data.ListQuery
 {
     public static class ListQueryExtensions
     {
-        public static IListQuery Validate<TValidation>(this IListQuery listQuery) where TValidation : class, new()
+        public static IListQuery ValidateWith<TValidation>(this IListQuery listQuery) where TValidation : class, new()
         {
-            return Validate(listQuery, typeof(TValidation));
+            return ValidateWith(listQuery, typeof(TValidation));
         }
 
-        public static IListQuery Validate(this IListQuery listQuery, Type validationType)
+        public static IListQuery ValidateWith(this IListQuery listQuery, Type validationType)
         {
             listQuery.ShouldValidate = true;
 
-            var properties = Internal.ReflectionHelper.GetConfigurationFromTypeProperties(validationType);
+            var properties = Internal.ReflectionHelper.GetListPropertyInfo(validationType);
 
             foreach (var property in properties)
             {
                 listQuery.Validations.Add(property);
+            }
+
+            return listQuery;
+        }
+
+        public static IListQuery ValidateWith(this IListQuery listQuery, IEnumerable<ListPropertyInfo> fields)
+        {
+            listQuery.ShouldValidate = true;
+
+            foreach (var field in fields)
+            {
+                listQuery.Validations.Add(field.Name, field);
             }
 
             return listQuery;
@@ -74,7 +87,7 @@ namespace Csg.Data.ListQuery
 
             foreach (var filter in listQuery.QueryDefinition.Filters)
             {
-                var hasConfig = listQuery.Validations.TryGetValue(filter.Name, out ListQueryFilterConfiguration validationField);
+                var hasConfig = listQuery.Validations.TryGetValue(filter.Name, out ListPropertyInfo validationField);
 
                 if (listQuery.Handlers.TryGetValue(filter.Name, out ListQueryFilterHandler handler))
                 {
@@ -102,7 +115,7 @@ namespace Csg.Data.ListQuery
             {
                 foreach (var column in listQuery.QueryDefinition.Selections)
                 {
-                    if (listQuery.Validations.TryGetValue(column, out ListQueryFilterConfiguration config))
+                    if (listQuery.Validations.TryGetValue(column, out ListPropertyInfo config))
                     {
                         queryBuilder.SelectColumns.Add(new Sql.SqlColumn(queryBuilder.Root, config.Name));
                     }
@@ -120,11 +133,11 @@ namespace Csg.Data.ListQuery
 
         public static void ApplySort(IListQuery listQuery, IDbQueryBuilder queryBuilder)
         {
-            if (listQuery.QueryDefinition.Sorts != null)
+            if (listQuery.QueryDefinition.Sort != null)
             {
-                foreach (var column in listQuery.QueryDefinition.Sorts)
+                foreach (var column in listQuery.QueryDefinition.Sort)
                 {
-                    if (listQuery.Validations.TryGetValue(column.Name, out ListQueryFilterConfiguration config) && config.IsSortable == true)
+                    if (listQuery.Validations.TryGetValue(column.Name, out ListPropertyInfo config) && config.IsSortable == true)
                     {
                         queryBuilder.OrderBy.Add(new Sql.SqlOrderColumn()
                         {
@@ -157,6 +170,17 @@ namespace Csg.Data.ListQuery
             ApplySort(listQuery, query);
 
             return query;
+        }
+
+        public async static System.Threading.Tasks.Task<ListQueryResult<T>> GetResultAsync<T>(this Csg.Data.ListQuery.IListQuery query)
+        {
+            var stmt = query.Build().Render();
+            var data = await Dapper.SqlMapper.QueryAsync<T>(query.QueryBuilder.Connection, stmt.CommandText, stmt.Parameters, query.QueryBuilder.Transaction); 
+
+            return new ListQueryResult<T>()
+            {
+                Data = data
+            };
         }
     }
 

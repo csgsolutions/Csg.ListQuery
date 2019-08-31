@@ -1,7 +1,8 @@
 ﻿namespace Csg.Data.ListQuery.Abstractions
 {
-    // Summary:
-    //     Represents the operator to be applied in a binary comparison.
+    /// <summary>
+    /// Represents the operator to be applied in a comparison.
+    /// </summary>
     public enum GenericOperator
     {
         Equal = 0,

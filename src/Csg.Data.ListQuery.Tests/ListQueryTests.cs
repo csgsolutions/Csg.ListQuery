@@ -17,7 +17,7 @@ namespace Csg.Data.ListQuery.Tests
         public void Test_ListQuery_BuildThrowsExceptionWhenNoConfig()
         {
             IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("Person", new Mock.MockConnection());
-            var request = new QueryDefinition();
+            var request = new ListQueryDefinition();
 
             request.Filters = new List<ListQueryFilter>(new ListQueryFilter[] {
                 new ListQueryFilter() { Name = "FirstName", Operator = GenericOperator.Equal, Value = "Bob" }
@@ -36,7 +36,7 @@ namespace Csg.Data.ListQuery.Tests
             var expectedSql = "SELECT [t0].[FirstName],[t0].[LastName] FROM [dbo].[Person] AS [t0] WHERE (([t0].[FirstName]=@p0));";
             //                 SELECT [t0].[FirstName],[t0].[LastName] FROM [dbo].[Person] AS [t0] WHERE (([t0].[FirstName]=@p0));
             IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
-            var request = new QueryDefinition();
+            var request = new ListQueryDefinition();
 
             request.Selections = new string[] { "FirstName", "LastName" };
             request.Filters = new List<ListQueryFilter>(new ListQueryFilter[] {
@@ -58,7 +58,7 @@ namespace Csg.Data.ListQuery.Tests
             var expectedSql = "SELECT [t0].[FirstName],[t0].[LastName] FROM [dbo].[Person] AS [t0] WHERE (([t0].[FirstName]=@p0));";
             //                 SELECT [t0].[FirstName],[t0].[LastName] FROM [dbo].[Person] AS [t0] WHERE (([t0].[FirstName]=@p0));
             IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
-            var request = new QueryDefinition();
+            var request = new ListQueryDefinition();
 
             request.Selections = new string[] { "FirstName", "LastName" };
             request.Filters = new List<ListQueryFilter>(new ListQueryFilter[] {
@@ -66,7 +66,7 @@ namespace Csg.Data.ListQuery.Tests
             });
             
             var stmt = ListQuery.Create(query, request)
-                .Validate<Mock.Person>()
+                .ValidateWith<Mock.Person>()
                 //.AddFilterHandlers<Mock.PersonFilters>()
                 .Build()
                 .Render();
@@ -81,14 +81,14 @@ namespace Csg.Data.ListQuery.Tests
             var expectedSql = "SELECT * FROM [dbo].[Person] AS [t0] WHERE (([t0].[PersonID] IN (SELECT [t1].[PersonID] FROM [dbo].[PersonPhoneNumber] AS [t1] WHERE ([t1].[PhoneNumber] LIKE @p0) AND ([t1].[PersonID]=[t0].[PersonID]))));";
             //                 SELECT * FROM [dbo].[Person] AS [t0] WHERE (([t0].[PersonID] IN (SELECT [t1].[PersonID] FROM [dbo].[PersonPhoneNumber] AS [t1] WHERE ([t1].[PhoneNumber] LIKE @p0) AND ([t1].[PersonID]=[t0].[PersonID]))));
             IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());            
-            var request = new QueryDefinition();
+            var request = new ListQueryDefinition();
 
             request.Filters = new List<ListQueryFilter>(new ListQueryFilter[] {
                 new ListQueryFilter() { Name = "PhoneNumber", Operator = GenericOperator.Like, Value = "555" }
             });
 
             var stmt = ListQuery.Create(query, request)
-                .Validate<Mock.Person>()
+                .ValidateWith<Mock.Person>()
                 .AddFilterHandler("PhoneNumber", Mock.PersonFilters.PhoneNumber)
                 .Build()
                 .Render();
@@ -103,14 +103,14 @@ namespace Csg.Data.ListQuery.Tests
             var expectedSql = "SELECT * FROM [dbo].[Person] AS [t0] WHERE (([t0].[PersonID] IN (SELECT [t1].[PersonID] FROM [dbo].[PersonPhoneNumber] AS [t1] WHERE ([t1].[PhoneNumber] LIKE @p0) AND ([t1].[PersonID]=[t0].[PersonID]))));";
             //                 SELECT * FROM [dbo].[Person] AS [t0] WHERE (([t0].[PersonID] IN (SELECT [t1].[PersonID] FROM [dbo].[PersonPhoneNumber] AS [t1] WHERE ([t1].[PhoneNumber] LIKE @p0) AND ([t1].[PersonID]=[t0].[PersonID]))));
             IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
-            var request = new QueryDefinition();
+            var request = new ListQueryDefinition();
 
             request.Filters = new List<ListQueryFilter>(new ListQueryFilter[] {
                 new ListQueryFilter() { Name = "PhoneNumber", Operator = GenericOperator.Like, Value = "555" }
             });
 
             var stmt = ListQuery.Create(query, request)
-                .Validate<Mock.Person>()
+                .ValidateWith<Mock.Person>()
                 .AddFilterHandlers<Mock.PersonFilters>()
                 .Build()
                 .Render();

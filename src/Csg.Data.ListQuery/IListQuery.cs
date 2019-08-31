@@ -9,9 +9,9 @@ namespace Csg.Data.ListQuery
 
         IDictionary<string, ListQueryFilterHandler> Handlers { get; }
 
-        IDictionary<string, ListQueryFilterConfiguration> Validations { get; }
+        IDictionary<string, ListPropertyInfo> Validations { get; }
 
-        QueryDefinition QueryDefinition { get; }
+        ListQueryDefinition QueryDefinition { get; }
 
         bool ShouldValidate { get; set; }
     }

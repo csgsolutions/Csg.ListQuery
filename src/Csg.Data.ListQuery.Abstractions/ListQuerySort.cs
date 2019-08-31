@@ -11,11 +11,11 @@ namespace Csg.Data.ListQuery.Abstractions
         /// <summary>
         /// Gets or sets the column name.
         /// </summary>
-        public string Name { get; set; }
+        public virtual string Name { get; set; }
 
         /// <summary>
         /// Gets or sets a value that indicates if the column is sorted descending.
         /// </summary>
-        public bool SortDescending { get; set; }        
+        public virtual bool SortDescending { get; set; }        
     }
 }

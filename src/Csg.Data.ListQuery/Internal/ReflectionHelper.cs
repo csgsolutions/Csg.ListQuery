@@ -9,62 +9,79 @@ namespace Csg.Data.ListQuery.Internal
 {
     public static class ReflectionHelper
     {
-        private static System.Collections.Concurrent.ConcurrentDictionary<Type, Dictionary<string, ListQueryFilterConfiguration>> s_typeCache 
-            = new System.Collections.Concurrent.ConcurrentDictionary<Type, Dictionary<string, ListQueryFilterConfiguration>>();
+        private static System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, ListPropertyInfo>> s_typeCache 
+            = new System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, ListPropertyInfo>>();
 
-        public static IDictionary<string, ListQueryFilterConfiguration> GetConfigurationFromTypeProperties(Type type)
+        private static IDictionary<string, ListPropertyInfo> GetListPropertyInfoInternal(Type type)
         {
-            return s_typeCache.GetOrAdd(type, (t) =>
+            var schema = new Dictionary<string, ListPropertyInfo>(StringComparer.OrdinalIgnoreCase);
+            bool defaultFilterable = false;
+            bool defaultSortable = false;
+
+            if (type.TryGetAttribute(out FilterableAttribute filterableAttr))
             {
-                var schema = new Dictionary<string, ListQueryFilterConfiguration>(StringComparer.OrdinalIgnoreCase);
-                bool defaultFilterable = false;
-                bool defaultSortable = false;
+                defaultFilterable = filterableAttr.IsFilterable;
+            }
 
-                if (type.TryGetAttribute(out FilterableAttribute filterableAttr))
+            if (type.TryGetAttribute(out SortableAttribute sortableAttr))
+            {
+                defaultSortable = sortableAttr.IsSortable;
+            }
+
+            foreach (var property in type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+            {
+                var ci = new ListPropertyInfo();
+
+                ci.Name = property.Name;
+
+                // first see if the property has the DbType attribute, otherwise infer DbType from the property type
+                if (property.TryGetAttribute(out DbTypeAttribute dbTypeAttr))
                 {
-                    defaultFilterable = filterableAttr.IsFilterable;
+                    ci.DataType = dbTypeAttr.DbType;
+                    ci.DataTypeSize = dbTypeAttr.Size;
+                }
+                else
+                {
+                    ci.DataType = DbConvert.TypeToDbType(property.PropertyType);
                 }
 
-                if (type.TryGetAttribute(out SortableAttribute sortableAttr))
+                // if the property is decorated with StringLength or MaxLength, use that as the size.
+                if (!ci.DataTypeSize.HasValue && property.TryGetAttribute(out System.ComponentModel.DataAnnotations.StringLengthAttribute stringLengthAttr))
                 {
-                    defaultSortable = sortableAttr.IsSortable;
+                    ci.DataTypeSize = stringLengthAttr.MaximumLength;
+                }
+                else if (!ci.DataTypeSize.HasValue && property.TryGetAttribute(out System.ComponentModel.DataAnnotations.MaxLengthAttribute maxLengthAttr))
+                {
+                    ci.DataTypeSize = maxLengthAttr.Length;
                 }
 
-                foreach (var property in type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
-                {
-                    var ci = new ListQueryFilterConfiguration();
+                ci.IsFilterable = property.TryGetAttribute(out filterableAttr) ? filterableAttr.IsFilterable : defaultFilterable;
+                ci.IsSortable = property.TryGetAttribute(out sortableAttr) ? sortableAttr.IsSortable : defaultSortable;
 
-                    ci.Name = property.Name;
+                schema.Add(property.Name, ci);
+            }
 
-                    // first see if the property has the DbType attribute, otherwise infer DbType from the property type
-                    if (property.TryGetAttribute(out DbTypeAttribute dbTypeAttr))
-                    {
-                        ci.DataType = dbTypeAttr.DbType;
-                        ci.DataTypeSize = dbTypeAttr.Size;
-                    }
-                    else
-                    {
-                        ci.DataType = DbConvert.TypeToDbType(property.PropertyType);
-                    }
+            return schema;
+        }
 
-                    // if the property is decorated with StringLength or MaxLength, use that as the size.
-                    if (!ci.DataTypeSize.HasValue && property.TryGetAttribute(out System.ComponentModel.DataAnnotations.StringLengthAttribute stringLengthAttr))
-                    {
-                        ci.DataTypeSize = stringLengthAttr.MaximumLength;
-                    }
-                    else if (!ci.DataTypeSize.HasValue && property.TryGetAttribute(out System.ComponentModel.DataAnnotations.MaxLengthAttribute maxLengthAttr))
-                    {
-                        ci.DataTypeSize = maxLengthAttr.Length;
-                    }
+        public static IDictionary<string, ListPropertyInfo> GetListPropertyInfo(Type type, bool fromCache = true)
+        {
+            if (!fromCache)
+            {
+                return GetListPropertyInfoInternal(type);
+            }
 
-                    ci.IsFilterable = property.TryGetAttribute(out filterableAttr) ? filterableAttr.IsFilterable : defaultFilterable;
-                    ci.IsSortable = property.TryGetAttribute(out sortableAttr) ? sortableAttr.IsSortable : defaultSortable;
+            return s_typeCache.GetOrAdd(type, GetListPropertyInfoInternal);
+        }
 
-                    schema.Add(property.Name, ci);
-                }
+        public static void RemoveCachedType(Type type)
+        {
+            s_typeCache.TryRemove(type, out _);
+        }
 
-                return schema;
-            });
+        public static void ClearCachedTypes()
+        {
+            s_typeCache.Clear();
         }
     }
 }

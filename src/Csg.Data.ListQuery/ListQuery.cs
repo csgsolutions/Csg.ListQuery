@@ -8,11 +8,11 @@ using Csg.Data.ListQuery.Abstractions;
 
 namespace Csg.Data.ListQuery
 {
-    public delegate void ListQueryFilterHandler(Csg.Data.IDbQueryWhereClause where, ListQueryFilter value, ListQueryFilterConfiguration config);
+    public delegate void ListQueryFilterHandler(Csg.Data.IDbQueryWhereClause where, ListQueryFilter value, ListPropertyInfo config);
 
     public class ListQuery : IListQuery
     {
-        public static IListQuery Create(IDbQueryBuilder queryBuilder, QueryDefinition queryDefinition)
+        public static IListQuery Create(IDbQueryBuilder queryBuilder, ListQueryDefinition queryDefinition)
         {
             return new ListQuery()
             {
@@ -23,9 +23,9 @@ namespace Csg.Data.ListQuery
 
         protected IDbQueryBuilder QueryBuilder { get; set; }
 
-        protected QueryDefinition QueryDefinition { get; set; }
+        protected ListQueryDefinition QueryDefinition { get; set; }
 
-        protected IDictionary<string, ListQueryFilterConfiguration> Validations = new Dictionary<string, ListQueryFilterConfiguration>(StringComparer.OrdinalIgnoreCase);
+        protected IDictionary<string, ListPropertyInfo> Validations = new Dictionary<string, ListPropertyInfo>(StringComparer.OrdinalIgnoreCase);
 
         protected IDictionary<string, ListQueryFilterHandler> Handlers = new Dictionary<string, ListQueryFilterHandler>(StringComparer.OrdinalIgnoreCase);
 
@@ -35,11 +35,11 @@ namespace Csg.Data.ListQuery
 
         IDictionary<string, ListQueryFilterHandler> IListQuery.Handlers { get => this.Handlers; }
 
-        QueryDefinition IListQuery.QueryDefinition { get => this.QueryDefinition; }
+        ListQueryDefinition IListQuery.QueryDefinition { get => this.QueryDefinition; }
 
         bool IListQuery.ShouldValidate { get => this.ShouldValidate; set => this.ShouldValidate = value; }
 
-        IDictionary<string, ListQueryFilterConfiguration> IListQuery.Validations { get => this.Validations; }
+        IDictionary<string, ListPropertyInfo> IListQuery.Validations { get => this.Validations; }
     }
 
 }
