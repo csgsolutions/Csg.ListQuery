@@ -174,23 +174,7 @@ namespace Csg.Data.ListQuery
 
         public async static System.Threading.Tasks.Task<ListQueryResult<T>> GetResultAsync<T>(this Csg.Data.ListQuery.IListQuery query)
         {
-            var stmt = query.Build().Render();
-           
-            var parameters = new Dapper.DynamicParameters();
-            var cmd = new Dapper.CommandDefinition(stmt.CommandText,
-                commandType: System.Data.CommandType.Text,
-                parameters: parameters,
-                transaction: query.QueryBuilder.Transaction,
-                commandTimeout: query.QueryBuilder.CommandTimeout
-            );
-
-            foreach (var param in stmt.Parameters)
-            {
-                parameters.Add(param.ParameterName, param.Value, param.DbType, System.Data.ParameterDirection.Input, param.Size > 0 ? (int?)param.Size : null);
-            }
-
-            var data = await Dapper.SqlMapper.QueryAsync<T>(query.QueryBuilder.Connection, cmd);
-
+            var data = await query.Build().QueryAsync<T>();
 
             return new ListQueryResult<T>()
             {
