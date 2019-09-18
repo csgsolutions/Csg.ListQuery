@@ -9,12 +9,12 @@ namespace Csg.Data.ListQuery.Internal
 {
     public static class ReflectionHelper
     {
-        private static System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, ListPropertyInfo>> s_typeCache 
-            = new System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, ListPropertyInfo>>();
+        private static System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, ReflectedListPropertyInfo>> s_typeCache 
+            = new System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, ReflectedListPropertyInfo>>();
 
-        private static IDictionary<string, ListPropertyInfo> GetListPropertyInfoInternal(Type type)
+        private static IDictionary<string, ReflectedListPropertyInfo> GetListPropertyInfoInternal(Type type)
         {
-            var schema = new Dictionary<string, ListPropertyInfo>(StringComparer.OrdinalIgnoreCase);
+            var schema = new Dictionary<string, ReflectedListPropertyInfo>(StringComparer.OrdinalIgnoreCase);
             bool defaultFilterable = false;
             bool defaultSortable = false;
 
@@ -30,7 +30,7 @@ namespace Csg.Data.ListQuery.Internal
 
             foreach (var property in type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
             {
-                var ci = new ListPropertyInfo();
+                var ci = new ReflectedListPropertyInfo();
 
                 ci.Name = property.Name;
 
@@ -57,6 +57,7 @@ namespace Csg.Data.ListQuery.Internal
 
                 ci.IsFilterable = property.TryGetAttribute(out filterableAttr) ? filterableAttr.IsFilterable : defaultFilterable;
                 ci.IsSortable = property.TryGetAttribute(out sortableAttr) ? sortableAttr.IsSortable : defaultSortable;
+                ci.PropertyInfo = property;
 
                 schema.Add(property.Name, ci);
             }
@@ -64,7 +65,7 @@ namespace Csg.Data.ListQuery.Internal
             return schema;
         }
 
-        public static IDictionary<string, ListPropertyInfo> GetListPropertyInfo(Type type, bool fromCache = true)
+        public static IDictionary<string, ReflectedListPropertyInfo> GetListPropertyInfo(Type type, bool fromCache = true)
         {
             if (!fromCache)
             {

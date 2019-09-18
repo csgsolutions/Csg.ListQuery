@@ -27,4 +27,12 @@
         /// </summary>
         public bool? IsSortable { get; set; }
     }
+
+    public class ReflectedListPropertyInfo : ListPropertyInfo
+    {
+        /// <summary>
+        /// Gets or sets the property info inforation for the underlying field.
+        /// </summary>
+        public System.Reflection.PropertyInfo PropertyInfo { get; set; }
+    }
 }
