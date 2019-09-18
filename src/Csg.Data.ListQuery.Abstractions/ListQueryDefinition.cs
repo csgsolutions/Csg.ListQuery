@@ -15,7 +15,7 @@ namespace Csg.Data.ListQuery.Abstractions
         /// <summary>
         /// Gets or sets the zero-based index of the first record in the result set that will be returned.
         /// </summary>
-        public int StartIndex { get; set; }
+        public int Offset { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of records that will be returned in the result set.

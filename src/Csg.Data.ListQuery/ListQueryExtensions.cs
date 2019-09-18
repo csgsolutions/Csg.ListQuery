@@ -167,12 +167,12 @@ namespace Csg.Data.ListQuery
 
         public static void ApplyLimit(IListQuery listQuery, IDbQueryBuilder queryBuilder)
         {
-            if (listQuery.QueryDefinition.StartIndex > 0)
+            if (listQuery.QueryDefinition.Offset > 0)
             {
                 queryBuilder.PagingOptions = new Csg.Data.Sql.SqlPagingOptions()
                 {
                     Limit = listQuery.QueryDefinition.Limit,
-                    Offset = listQuery.QueryDefinition.StartIndex
+                    Offset = listQuery.QueryDefinition.Offset
                 };
             }                
         }

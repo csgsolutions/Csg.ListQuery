@@ -131,7 +131,7 @@ namespace Csg.Data.ListQuery.Tests
                new ListQuerySort(){ Name = "FirstName" }
             };
             request.Limit = 25;
-            request.StartIndex = 50;
+            request.Offset = 50;
 
             var stmt = ListQuery.Create(query, request)
                 .NoValidation()
