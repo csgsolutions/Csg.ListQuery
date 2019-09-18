@@ -118,5 +118,27 @@ namespace Csg.Data.ListQuery.Tests
             Assert.AreEqual(expectedSql, stmt.CommandText);
             Assert.AreEqual(1, stmt.Parameters.Count);
         }
+
+        [TestMethod]
+        public void Test_ListQuery_Paging()
+        {
+            var expectedSql = "SELECT * FROM [dbo].[Person] AS [t0] ORDER BY [FirstName] ASC OFFSET 50 ROWS FETCH NEXT 25 ROWS ONLY;";
+            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
+            var request = new ListQueryDefinition();
+
+            request.Sort = new List<ListQuerySort>()
+            {
+               new ListQuerySort(){ Name = "FirstName" }
+            };
+            request.Limit = 25;
+            request.StartIndex = 50;
+
+            var stmt = ListQuery.Create(query, request)
+                .NoValidation()
+                .Build()
+                .Render();
+
+            Assert.AreEqual(expectedSql, stmt.CommandText);
+        }
     }
 }

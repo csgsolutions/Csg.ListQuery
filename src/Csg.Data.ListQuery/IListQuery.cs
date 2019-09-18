@@ -15,5 +15,4 @@ namespace Csg.Data.ListQuery
 
         bool ShouldValidate { get; set; }
     }
-
 }

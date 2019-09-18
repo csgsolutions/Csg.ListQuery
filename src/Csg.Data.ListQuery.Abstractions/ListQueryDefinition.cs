@@ -11,5 +11,15 @@ namespace Csg.Data.ListQuery.Abstractions
         public virtual IEnumerable<ListQueryFilter> Filters { get; set; }
 
         public virtual IEnumerable<ListQuerySort> Sort { get; set; }
+
+        /// <summary>
+        /// Gets or sets the zero-based index of the first record in the result set that will be returned.
+        /// </summary>
+        public int StartIndex { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum number of records that will be returned in the result set.
+        /// </summary>
+        public int Limit { get; set; }
     }
 }

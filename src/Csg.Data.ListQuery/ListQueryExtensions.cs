@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Csg.Data.ListQuery.Abstractions;
 
@@ -83,29 +84,32 @@ namespace Csg.Data.ListQuery
 
         public static void ApplyFilters(IListQuery listQuery, IDbQueryBuilder queryBuilder)
         {
-            var where = new DbQueryWhereClause(queryBuilder.Root, Sql.SqlLogic.And);
-
-            foreach (var filter in listQuery.QueryDefinition.Filters)
+            if (listQuery.QueryDefinition.Filters != null)
             {
-                var hasConfig = listQuery.Validations.TryGetValue(filter.Name, out ListPropertyInfo validationField);
+                var where = new DbQueryWhereClause(queryBuilder.Root, Sql.SqlLogic.And);
 
-                if (listQuery.Handlers.TryGetValue(filter.Name, out ListQueryFilterHandler handler))
+                foreach (var filter in listQuery.QueryDefinition.Filters)
                 {
-                    handler(where, filter, validationField);
-                }
-                else if (hasConfig || !listQuery.ShouldValidate)
-                {
-                    where.AddFilter(filter.Name, filter.Operator ?? GenericOperator.Equal, filter.Value, validationField?.DataType ?? System.Data.DbType.String, validationField?.DataTypeSize);
-                }
-                else if (listQuery.ShouldValidate)
-                {
-                    throw new Exception($"No handler is defined for the filter '{filter.Name}'.");
-                }
-            }
+                    var hasConfig = listQuery.Validations.TryGetValue(filter.Name, out ListPropertyInfo validationField);
 
-            if (where.Filters.Count > 0)
-            {
-                queryBuilder.AddFilter(where.Filters);
+                    if (listQuery.Handlers.TryGetValue(filter.Name, out ListQueryFilterHandler handler))
+                    {
+                        handler(where, filter, validationField);
+                    }
+                    else if (hasConfig || !listQuery.ShouldValidate)
+                    {
+                        where.AddFilter(filter.Name, filter.Operator ?? GenericOperator.Equal, filter.Value, validationField?.DataType ?? System.Data.DbType.String, validationField?.DataTypeSize);
+                    }
+                    else if (listQuery.ShouldValidate)
+                    {
+                        throw new Exception($"No handler is defined for the filter '{filter.Name}'.");
+                    }
+                }
+
+                if (where.Filters.Count > 0)
+                {
+                    queryBuilder.AddFilter(where.Filters);
+                }
             }
         }
 
@@ -161,6 +165,18 @@ namespace Csg.Data.ListQuery
             }
         }
 
+        public static void ApplyLimit(IListQuery listQuery, IDbQueryBuilder queryBuilder)
+        {
+            if (listQuery.QueryDefinition.StartIndex > 0)
+            {
+                queryBuilder.PagingOptions = new Csg.Data.Sql.SqlPagingOptions()
+                {
+                    Limit = listQuery.QueryDefinition.Limit,
+                    Offset = listQuery.QueryDefinition.StartIndex
+                };
+            }                
+        }
+
         public static IDbQueryBuilder Build(this IListQuery listQuery)
         {
             var query = listQuery.QueryBuilder.Fork();
@@ -168,17 +184,16 @@ namespace Csg.Data.ListQuery
             ApplySelections(listQuery, query);
             ApplyFilters(listQuery, query);
             ApplySort(listQuery, query);
+            ApplyLimit(listQuery, query);
 
             return query;
         }
 
         public async static System.Threading.Tasks.Task<ListQueryResult<T>> GetResultAsync<T>(this Csg.Data.ListQuery.IListQuery query)
         {
-            var data = await query.Build().QueryAsync<T>();
-
             return new ListQueryResult<T>()
             {
-                Data = data
+                Data = await query.Build().QueryAsync<T>()
             };
         }
     }
