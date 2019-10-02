@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Csg.Data.ListQuery.Abstractions;
+using Csg.Data.Sql;
 
 namespace Csg.Data.ListQuery
 {
@@ -81,6 +82,34 @@ namespace Csg.Data.ListQuery
             listQuery.ShouldValidate = false;
             return listQuery;
         }
+
+        //public static IDbQueryBuilder CreateCacheKey(this IDbQueryBuilder builder, out string cacheKey, string prefix = "QueryBuilder:")
+        //{
+        //    cacheKey = builder.CreateCacheKey(prefix: prefix);
+        //    return builder;
+        //}
+
+        //public static string CreateCacheKey(this IDbQueryBuilder builder, string prefix = "QueryBuilder:")
+        //{
+        //    var hash = System.Security.Cryptography.SHA1.Create();
+        //    var stmt = builder.Render();
+        //    var buffer = System.Text.UTF8Encoding.UTF8.GetBytes(stmt.CommandText);
+
+        //    hash.TransformBlock(buffer, 0, buffer.Length, null, 0);
+
+        //    foreach (var par in stmt.Parameters)
+        //    {
+        //        buffer = System.Text.UTF8Encoding.UTF8.GetBytes(par.ParameterName);
+        //        hash.TransformBlock(buffer, 0, buffer.Length, null, 0);
+
+        //        buffer = System.Text.UTF8Encoding.UTF8.GetBytes(par.Value.ToString());
+        //        hash.TransformBlock(buffer, 0, buffer.Length, null, 0);
+        //    }
+
+        //    hash.TransformFinalBlock(buffer, 0, 0);
+
+        //    return string.Concat(prefix, Convert.ToBase64String(hash.Hash));
+        //}
 
         public static void ApplyFilters(IListQuery listQuery, IDbQueryBuilder queryBuilder)
         {
@@ -165,7 +194,7 @@ namespace Csg.Data.ListQuery
             }
         }
 
-        public static void ApplyLimit(IListQuery listQuery, IDbQueryBuilder queryBuilder)
+        public static void ApplyLimit(IListQuery listQuery, IDbQueryBuilder queryBuilder, bool getTotal = false)
         {
             if (listQuery.QueryDefinition.Offset > 0)
             {
@@ -177,23 +206,77 @@ namespace Csg.Data.ListQuery
             }                
         }
 
-        public static IDbQueryBuilder Build(this IListQuery listQuery)
+        public static IDbQueryBuilder Build(this IListQuery listQuery, bool ignoreLimit = false)
         {
             var query = listQuery.QueryBuilder.Fork();
 
             ApplySelections(listQuery, query);
             ApplyFilters(listQuery, query);
             ApplySort(listQuery, query);
-            ApplyLimit(listQuery, query);
+
+            if (!ignoreLimit)
+            {
+                ApplyLimit(listQuery, query);
+            }
 
             return query;
         }
 
+        //TODO: Move this into Csg.Data.Dapper
+        public static Dapper.CommandDefinition CreateDapperCommand(this Sql.SqlStatement statement, System.Data.IDbTransaction transaction = null, int? commandTimeout = null, Dapper.CommandFlags commandFlags = Dapper.CommandFlags.Buffered)
+        {
+            var parameters = new Dapper.DynamicParameters();
+            var cmd = new Dapper.CommandDefinition(statement.CommandText,
+                commandType: System.Data.CommandType.Text,
+                parameters: parameters,
+                transaction: transaction,
+                commandTimeout: commandTimeout,
+                flags: commandFlags
+            );
+
+            foreach (var param in statement.Parameters)
+            {
+                parameters.Add(param.ParameterName, param.Value, param.DbType, System.Data.ParameterDirection.Input, param.Size > 0 ? (int?)param.Size : null);
+            }
+
+            return cmd;
+        }
+
+        public static IDbQueryBuilder GetCountQuery(IListQuery query)
+        {
+            var countQuery = query.Build();
+
+            countQuery.PagingOptions = null;
+            countQuery.SelectColumns.Clear();
+            countQuery.SelectColumns.Add(new Sql.SqlRawColumn("COUNT(1)"));
+
+            return countQuery;           
+        }
+
         public async static System.Threading.Tasks.Task<ListQueryResult<T>> GetResultAsync<T>(this Csg.Data.ListQuery.IListQuery query)
         {
+            int? totalCount = null;
+            IEnumerable<T> data = null;
+
+            if (query.QueryDefinition.GetTotal)
+            {
+                var countQuery = GetCountQuery(query);
+                var cmd = new DbQueryBuilder[] { (DbQueryBuilder)countQuery, (DbQueryBuilder)query.Build() }.RenderBatch()
+                    .CreateDapperCommand(query.QueryBuilder.Transaction, query.QueryBuilder.CommandTimeout);
+
+                var batchReader = await Dapper.SqlMapper.QueryMultipleAsync(query.QueryBuilder.Connection, cmd);
+                totalCount = await batchReader.ReadFirstAsync<int>();
+                data = await batchReader.ReadAsync<T>();
+            }
+            else
+            {
+                data = await query.Build().QueryAsync<T>();
+            }
+
             return new ListQueryResult<T>()
             {
-                Data = await query.Build().QueryAsync<T>()
+                Data = data,
+                TotalCount = totalCount
             };
         }
     }

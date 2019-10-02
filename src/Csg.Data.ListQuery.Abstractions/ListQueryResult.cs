@@ -19,5 +19,7 @@ namespace Csg.Data.ListQuery.Abstractions
         }
 
         public virtual IEnumerable<T> Data { get; set; }
+
+        public int? TotalCount { get; set; }
     }
 }

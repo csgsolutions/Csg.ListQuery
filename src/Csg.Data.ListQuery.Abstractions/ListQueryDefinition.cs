@@ -4,12 +4,24 @@ using System.Text;
 
 namespace Csg.Data.ListQuery.Abstractions
 {
+    /// <summary>
+    /// Defines the selections, filters, and sort order of a query for a list of data.
+    /// </summary>
     public class ListQueryDefinition
     {
+        /// <summary>
+        /// Gets or sets the fields that will be returned.
+        /// </summary>
         public virtual IEnumerable<string> Selections { get; set; }
 
+        /// <summary>
+        /// Gets or sets the filters that will be applied.
+        /// </summary>
         public virtual IEnumerable<ListQueryFilter> Filters { get; set; }
 
+        /// <summary>
+        /// Gets or sets the sort columns that will be applied.
+        /// </summary>
         public virtual IEnumerable<ListQuerySort> Sort { get; set; }
 
         /// <summary>
@@ -21,5 +33,10 @@ namespace Csg.Data.ListQuery.Abstractions
         /// Gets or sets the maximum number of records that will be returned in the result set.
         /// </summary>
         public int Limit { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value that indicates if the total number of available rows in the result set should be returned when specifying the <see cref="Limit"/> option.
+        /// </summary>
+        public bool GetTotal { get; set; }
     }
 }
