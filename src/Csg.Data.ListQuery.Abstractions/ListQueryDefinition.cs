@@ -33,10 +33,5 @@ namespace Csg.Data.ListQuery.Abstractions
         /// Gets or sets the maximum number of records that will be returned in the result set.
         /// </summary>
         public int Limit { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value that indicates if the total number of available rows in the result set should be returned when specifying the <see cref="Limit"/> option.
-        /// </summary>
-        public bool GetTotal { get; set; }
     }
 }

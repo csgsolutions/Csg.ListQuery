@@ -9,50 +9,50 @@ namespace Csg.Data.ListQuery
 {
     public static class ListQueryExtensions
     {
-        public static IListQuery ValidateWith<TValidation>(this IListQuery listQuery) where TValidation : class, new()
+        public static IListQueryBuilder ValidateWith<TValidation>(this IListQueryBuilder listQuery) where TValidation : class, new()
         {
             return ValidateWith(listQuery, typeof(TValidation));
         }
 
-        public static IListQuery ValidateWith(this IListQuery listQuery, Type validationType)
+        public static IListQueryBuilder ValidateWith(this IListQueryBuilder listQuery, Type validationType)
         {
-            listQuery.ShouldValidate = true;
+            listQuery.Configuration.ShouldValidate = true;
 
             var properties = Internal.ReflectionHelper.GetListPropertyInfo(validationType);
 
             foreach (var property in properties)
             {
-                listQuery.Validations.Add(property.Key, property.Value);
+                listQuery.Configuration.Validations.Add(property.Key, property.Value);
             }
 
             return listQuery;
         }
 
-        public static IListQuery ValidateWith(this IListQuery listQuery, IEnumerable<ListPropertyInfo> fields)
+        public static IListQueryBuilder ValidateWith(this IListQueryBuilder listQuery, IEnumerable<ListPropertyInfo> fields)
         {
-            listQuery.ShouldValidate = true;
+            listQuery.Configuration.ShouldValidate = true;
 
             foreach (var field in fields)
             {
-                listQuery.Validations.Add(field.Name, field);
+                listQuery.Configuration.Validations.Add(field.Name, field);
             }
 
             return listQuery;
         }
 
-        public static IListQuery AddFilterHandler(this IListQuery listQuery, string name, ListQueryFilterHandler handler)
+        public static IListQueryBuilder AddFilterHandler(this IListQueryBuilder listQuery, string name, ListQueryFilterHandler handler)
         {
-            listQuery.Handlers.Add(name, handler);
+            listQuery.Configuration.Handlers.Add(name, handler);
 
             return listQuery;
         }
 
-        public static IListQuery AddFilterHandlers<THandlers>(this IListQuery listQuery) where THandlers : class, new()
+        public static IListQueryBuilder AddFilterHandlers<THandlers>(this IListQueryBuilder listQuery) where THandlers : class, new()
         {
             return AddFilterHandlers(listQuery, typeof(THandlers));
         }
 
-        public static IListQuery AddFilterHandlers(this IListQuery listQuery, Type handlersType)
+        public static IListQueryBuilder AddFilterHandlers(this IListQueryBuilder listQuery, Type handlersType)
         {
             var methods = handlersType.GetMethods(BindingFlags.Static | BindingFlags.Public);
 
@@ -65,21 +65,21 @@ namespace Csg.Data.ListQuery
                 //    method.Invoke(null, new object[] { where, filter, config });
                 //};
 
-                listQuery.Handlers.Add(method.Name, handler);
+                listQuery.Configuration.Handlers.Add(method.Name, handler);
             }
 
             return listQuery;
         }
         
-        public static IListQuery RemoveHandler(this IListQuery listQuery, string name)
+        public static IListQueryBuilder RemoveHandler(this IListQueryBuilder listQuery, string name)
         {
-            listQuery.Handlers.Remove(name);
+            listQuery.Configuration.Handlers.Remove(name);
             return listQuery;
         }
 
-        public static IListQuery NoValidation(this IListQuery listQuery)
+        public static IListQueryBuilder NoValidation(this IListQueryBuilder listQuery)
         {
-            listQuery.ShouldValidate = false;
+            listQuery.Configuration.ShouldValidate = false;
             return listQuery;
         }
 
@@ -111,25 +111,25 @@ namespace Csg.Data.ListQuery
         //    return string.Concat(prefix, Convert.ToBase64String(hash.Hash));
         //}
 
-        public static void ApplyFilters(IListQuery listQuery, IDbQueryBuilder queryBuilder)
+        public static void ApplyFilters(IListQueryBuilder listQuery, IDbQueryBuilder queryBuilder)
         {
-            if (listQuery.QueryDefinition.Filters != null)
+            if (listQuery.Configuration.QueryDefinition.Filters != null)
             {
                 var where = new DbQueryWhereClause(queryBuilder.Root, Sql.SqlLogic.And);
 
-                foreach (var filter in listQuery.QueryDefinition.Filters)
+                foreach (var filter in listQuery.Configuration.QueryDefinition.Filters)
                 {
-                    var hasConfig = listQuery.Validations.TryGetValue(filter.Name, out ListPropertyInfo validationField);
+                    var hasConfig = listQuery.Configuration.Validations.TryGetValue(filter.Name, out ListPropertyInfo validationField);
 
-                    if (listQuery.Handlers.TryGetValue(filter.Name, out ListQueryFilterHandler handler))
+                    if (listQuery.Configuration.Handlers.TryGetValue(filter.Name, out ListQueryFilterHandler handler))
                     {
                         handler(where, filter, validationField);
                     }
-                    else if (hasConfig || !listQuery.ShouldValidate)
+                    else if (hasConfig || !listQuery.Configuration.ShouldValidate)
                     {
                         where.AddFilter(filter.Name, filter.Operator ?? GenericOperator.Equal, filter.Value, validationField?.DataType ?? System.Data.DbType.String, validationField?.DataTypeSize);
                     }
-                    else if (listQuery.ShouldValidate)
+                    else if (listQuery.Configuration.ShouldValidate)
                     {
                         throw new Exception($"No handler is defined for the filter '{filter.Name}'.");
                     }
@@ -142,17 +142,17 @@ namespace Csg.Data.ListQuery
             }
         }
 
-        public static void ApplySelections(IListQuery listQuery, IDbQueryBuilder queryBuilder)
+        public static void ApplySelections(IListQueryBuilder listQuery, IDbQueryBuilder queryBuilder)
         {
-            if (listQuery.QueryDefinition.Selections != null)
+            if (listQuery.Configuration.QueryDefinition.Selections != null)
             {
-                foreach (var column in listQuery.QueryDefinition.Selections)
+                foreach (var column in listQuery.Configuration.QueryDefinition.Selections)
                 {
-                    if (listQuery.Validations.TryGetValue(column, out ListPropertyInfo config))
+                    if (listQuery.Configuration.Validations.TryGetValue(column, out ListPropertyInfo config))
                     {
                         queryBuilder.SelectColumns.Add(new Sql.SqlColumn(queryBuilder.Root, config.Name));
                     }
-                    else if (listQuery.ShouldValidate)
+                    else if (listQuery.Configuration.ShouldValidate)
                     {
                         throw new Exception($"The selection field '{column}' does not exist.");
                     }
@@ -164,13 +164,13 @@ namespace Csg.Data.ListQuery
             }
         }
 
-        public static void ApplySort(IListQuery listQuery, IDbQueryBuilder queryBuilder)
+        public static void ApplySort(IListQueryBuilder listQuery, IDbQueryBuilder queryBuilder)
         {
-            if (listQuery.QueryDefinition.Sort != null)
+            if (listQuery.Configuration.QueryDefinition.Sort != null)
             {
-                foreach (var column in listQuery.QueryDefinition.Sort)
+                foreach (var column in listQuery.Configuration.QueryDefinition.Sort)
                 {
-                    if (listQuery.Validations.TryGetValue(column.Name, out ListPropertyInfo config) && config.IsSortable == true)
+                    if (listQuery.Configuration.Validations.TryGetValue(column.Name, out ListPropertyInfo config) && config.IsSortable == true)
                     {
                         queryBuilder.OrderBy.Add(new Sql.SqlOrderColumn()
                         {
@@ -178,7 +178,7 @@ namespace Csg.Data.ListQuery
                             SortDirection = column.SortDescending ? Sql.DbSortDirection.Descending : Sql.DbSortDirection.Ascending
                         });
                     }
-                    else if (listQuery.ShouldValidate)
+                    else if (listQuery.Configuration.ShouldValidate)
                     {
                         throw new Exception($"The sort field '{column.Name}' does not exist.");
                     }
@@ -194,90 +194,87 @@ namespace Csg.Data.ListQuery
             }
         }
 
-        public static void ApplyLimit(IListQuery listQuery, IDbQueryBuilder queryBuilder, bool getTotal = false)
+        public static void ApplyLimit(IListQueryBuilder listQuery, IDbQueryBuilder queryBuilder, bool getTotal = false)
         {
-            if (listQuery.QueryDefinition.Offset > 0)
+            if (listQuery.Configuration.QueryDefinition.Offset > 0)
             {
                 queryBuilder.PagingOptions = new Csg.Data.Sql.SqlPagingOptions()
                 {
-                    Limit = listQuery.QueryDefinition.Limit,
-                    Offset = listQuery.QueryDefinition.Offset
+                    Limit = listQuery.Configuration.QueryDefinition.Limit,
+                    Offset = listQuery.Configuration.QueryDefinition.Offset
                 };
             }                
         }
 
-        public static IDbQueryBuilder Build(this IListQuery listQuery, bool ignoreLimit = false)
+        /// <summary>
+        /// Applies the given list query configuration and returns a <see cref="IDbQueryBuilder"/>.
+        /// </summary>
+        /// <param name="listQuery"></param>
+        /// <returns></returns>
+        public static IDbQueryBuilder Apply(this IListQueryBuilder listQuery)
         {
-            var query = listQuery.QueryBuilder.Fork();
+            var query = listQuery.Configuration.QueryBuilder.Fork();
 
             ApplySelections(listQuery, query);
             ApplyFilters(listQuery, query);
             ApplySort(listQuery, query);
-
-            if (!ignoreLimit)
-            {
-                ApplyLimit(listQuery, query);
-            }
-
+            ApplyLimit(listQuery, query);
+            
             return query;
         }
 
-        //TODO: Move this into Csg.Data.Dapper
-        public static Dapper.CommandDefinition CreateDapperCommand(this Sql.SqlStatement statement, System.Data.IDbTransaction transaction = null, int? commandTimeout = null, Dapper.CommandFlags commandFlags = Dapper.CommandFlags.Buffered)
+        public static IDbQueryBuilder GetCountQuery(IListQueryBuilder query)
         {
-            var parameters = new Dapper.DynamicParameters();
-            var cmd = new Dapper.CommandDefinition(statement.CommandText,
-                commandType: System.Data.CommandType.Text,
-                parameters: parameters,
-                transaction: transaction,
-                commandTimeout: commandTimeout,
-                flags: commandFlags
-            );
-
-            foreach (var param in statement.Parameters)
-            {
-                parameters.Add(param.ParameterName, param.Value, param.DbType, System.Data.ParameterDirection.Input, param.Size > 0 ? (int?)param.Size : null);
-            }
-
-            return cmd;
-        }
-
-        public static IDbQueryBuilder GetCountQuery(IListQuery query)
-        {
-            var countQuery = query.Build();
+            var countQuery = query.Apply();
 
             countQuery.PagingOptions = null;
             countQuery.SelectColumns.Clear();
             countQuery.SelectColumns.Add(new Sql.SqlRawColumn("COUNT(1)"));
+            countQuery.OrderBy.Clear();
 
             return countQuery;           
         }
 
-        public async static System.Threading.Tasks.Task<ListQueryResult<T>> GetResultAsync<T>(this Csg.Data.ListQuery.IListQuery query)
+        public static SqlStatementBatch Render(this Csg.Data.ListQuery.IListQueryBuilder builder, bool queryTotalWhenLimiting = true)
         {
-            int? totalCount = null;
-            IEnumerable<T> data = null;
-
-            if (query.QueryDefinition.GetTotal)
+            if (builder.Configuration.QueryDefinition.Limit > 0 && queryTotalWhenLimiting)
             {
-                var countQuery = GetCountQuery(query);
-                var cmd = new DbQueryBuilder[] { (DbQueryBuilder)countQuery, (DbQueryBuilder)query.Build() }.RenderBatch()
-                    .CreateDapperCommand(query.QueryBuilder.Transaction, query.QueryBuilder.CommandTimeout);
-
-                var batchReader = await Dapper.SqlMapper.QueryMultipleAsync(query.QueryBuilder.Connection, cmd);
-                totalCount = await batchReader.ReadFirstAsync<int>();
-                data = await batchReader.ReadAsync<T>();
+                var countQuery = GetCountQuery(builder);
+                return new DbQueryBuilder[] { (DbQueryBuilder)countQuery, (DbQueryBuilder)builder.Apply() }
+                    .RenderBatch();
             }
             else
             {
-                data = await query.Build().QueryAsync<T>();
+                var stmt = builder.Apply().Render();
+                return new SqlStatementBatch(1, stmt.CommandText, stmt.Parameters);
             }
+        }
 
-            return new ListQueryResult<T>()
+        public async static System.Threading.Tasks.Task<ListQueryResult<T>> GetResultAsync<T>(this Csg.Data.ListQuery.IListQueryBuilder builder, bool queryTotalWhenLimiting = true)
+        {
+            var stmt = builder.Render(queryTotalWhenLimiting);
+            var cmd = stmt.ToDapperCommand(builder.Configuration.QueryBuilder.Transaction, builder.Configuration.QueryBuilder.CommandTimeout);
+
+            if (stmt.Count == 1)
             {
-                Data = data,
-                TotalCount = totalCount
-            };
+                return new ListQueryResult<T>(await Dapper.SqlMapper.QueryAsync<T>(builder.Configuration.QueryBuilder.Connection, cmd));
+            }
+            else if (stmt.Count == 2)
+            {
+                using (var batchReader = await Dapper.SqlMapper.QueryMultipleAsync(builder.Configuration.QueryBuilder.Connection, cmd))
+                {
+
+                    return new ListQueryResult<T>()
+                    {
+                        TotalCount = await batchReader.ReadFirstAsync<int>(),
+                        Data = await batchReader.ReadAsync<T>()
+                    };
+                }
+            }
+            else
+            {
+                throw new NotSupportedException("A statement with more than 2 queries is not supported.");
+            }
         }
     }
 

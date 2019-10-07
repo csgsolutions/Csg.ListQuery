@@ -12,6 +12,11 @@ namespace Csg.Data.ListQuery
 {
     public static class DbQueryBuilderExtensions
     {
+        public static IListQueryBuilder ListQuery(this IDbQueryBuilder queryBuilder, ListQueryDefinition queryDef)
+        {
+            return Csg.Data.ListQuery.ListQueryBuilder.Create(queryBuilder, queryDef);
+        }
+
         /// <summary>
         /// Creates a filter using the given generic filter operator
         /// </summary>
