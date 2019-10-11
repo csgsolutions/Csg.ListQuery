@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net461;net451;net472;netstandard2.0</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Csg.Data" Version="3.3.0-preview-00024" />
+    <PackageReference Include="Csg.Data.Dapper" Version="2.0.0-preview-00786" />
+    <PackageReference Include="Dapper" Version="1.60.6" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Csg.ListQuery\Csg.ListQuery.csproj" />
+  </ItemGroup>
+
+
+</Project>

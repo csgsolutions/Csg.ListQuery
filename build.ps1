@@ -16,8 +16,9 @@ Param(
 
 $Solution =  "$(Get-Item -Path *.sln | Select-Object -First 1)"
 $PackageProjects = @(
-	".\src\Csg.Data.ListQuery\Csg.Data.ListQuery.csproj",
-	".\src\Csg.Data.ListQuery.Abstractions\Csg.Data.ListQuery.Abstractions.csproj"
+	".\src\Csg.ListQuery\Csg.ListQuery.csproj",
+	".\src\Csg.ListQuery.Sql\Csg.ListQuery.Sql.csproj"
+	".\src\Csg.ListQuery.AspNetCore\Csg.ListQuery.AspNetCore.csproj"
 )
 $PublishProjects = @(
 	#".\src\Web\Web.csproj"
@@ -25,12 +26,12 @@ $PublishProjects = @(
 $TestProjects = Get-Item -Path tests\**\*Tests.csproj | %{ $_.FullName }
 
 Write-Host "==============================================================================" -ForegroundColor DarkYellow
-Write-Host "The Build Script for Csg.Data.ListQuery"
+Write-Host "The Build Script for Csg.ListQuery"
 Write-Host "==============================================================================" -ForegroundColor DarkYellow
 Write-Host "Build Tools:`t$BuildToolsVersion"
 Write-Host "Solution:`t$Solution"
 Write-Host "Build Number:`t$BuildNumber"
-Write-Host "Run Tests:`t$NoTest"
+Write-Host "Skip Tests:`t$NoTest"
 Write-Host "==============================================================================" -ForegroundColor DarkYellow
 
 if ($BuildNumber) {

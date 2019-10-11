@@ -14,7 +14,7 @@ steps:
   displayName: 'Test'
   inputs:
     command: test
-    projects: 'tests\**\*UnitTests.csproj'
+    projects: 'tests\**\*Tests.csproj'
     arguments: '--no-build --configuration Release'
     verbosityPack: Minimal
 - task: CopyFiles@2

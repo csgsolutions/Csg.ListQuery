@@ -1,0 +1,68 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29025.244
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{648BA441-31D3-4A16-8970-CE71BEB6FA5F}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		azure-pipelines.yml = azure-pipelines.yml
+		bootstrap.ps1 = bootstrap.ps1
+		build.ps1 = build.ps1
+		src\Directory.Build.props = src\Directory.Build.props
+		README.md = README.md
+		build\repo.props = build\repo.props
+		build\sources.props = build\sources.props
+		version.props = version.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{51A71DC0-F4E1-4BF8-AF63-C28752AD634C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csg.ListQuery", "src\Csg.ListQuery\Csg.ListQuery.csproj", "{5CB85504-0C47-443E-9F30-5BEB5F7A1DBB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csg.ListQuery.Sql", "src\Csg.ListQuery.Sql\Csg.ListQuery.Sql.csproj", "{930DE91A-36C3-4294-B38D-AA3193EEF0F9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csg.ListQuery.Tests", "tests\Csg.ListQuery.Tests\Csg.ListQuery.Tests.csproj", "{668B758C-93A3-4019-9BC1-B5C45B28DFB9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csg.ListQuery.AspNetCore", "src\Csg.ListQuery.AspNetCore\Csg.ListQuery.AspNetCore.csproj", "{53362792-7D5F-48C5-9A1D-7E9BDCB53111}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csg.ListQuery.AspNetCore.Tests", "tests\Csg.ListQuery.AspNetCore.Tests\Csg.ListQuery.AspNetCore.Tests.csproj", "{482D0B96-D62E-40E4-B7E2-32256DA563CC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5CB85504-0C47-443E-9F30-5BEB5F7A1DBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CB85504-0C47-443E-9F30-5BEB5F7A1DBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CB85504-0C47-443E-9F30-5BEB5F7A1DBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CB85504-0C47-443E-9F30-5BEB5F7A1DBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{930DE91A-36C3-4294-B38D-AA3193EEF0F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{930DE91A-36C3-4294-B38D-AA3193EEF0F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{930DE91A-36C3-4294-B38D-AA3193EEF0F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{930DE91A-36C3-4294-B38D-AA3193EEF0F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{668B758C-93A3-4019-9BC1-B5C45B28DFB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{668B758C-93A3-4019-9BC1-B5C45B28DFB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{668B758C-93A3-4019-9BC1-B5C45B28DFB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{668B758C-93A3-4019-9BC1-B5C45B28DFB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53362792-7D5F-48C5-9A1D-7E9BDCB53111}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53362792-7D5F-48C5-9A1D-7E9BDCB53111}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53362792-7D5F-48C5-9A1D-7E9BDCB53111}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53362792-7D5F-48C5-9A1D-7E9BDCB53111}.Release|Any CPU.Build.0 = Release|Any CPU
+		{482D0B96-D62E-40E4-B7E2-32256DA563CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{482D0B96-D62E-40E4-B7E2-32256DA563CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{482D0B96-D62E-40E4-B7E2-32256DA563CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{482D0B96-D62E-40E4-B7E2-32256DA563CC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{668B758C-93A3-4019-9BC1-B5C45B28DFB9} = {51A71DC0-F4E1-4BF8-AF63-C28752AD634C}
+		{482D0B96-D62E-40E4-B7E2-32256DA563CC} = {51A71DC0-F4E1-4BF8-AF63-C28752AD634C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0E21AC56-6551-4639-BCF6-591DE16E7378}
+	EndGlobalSection
+EndGlobal
