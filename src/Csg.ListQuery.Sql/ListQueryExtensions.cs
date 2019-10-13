@@ -18,7 +18,7 @@ namespace Csg.ListQuery.Sql
 
         public static IListQueryBuilder ValidateWith(this IListQueryBuilder listQuery, Type validationType)
         {
-            listQuery.Configuration.ShouldValidate = true;
+            listQuery.Configuration.UseValidation = true;
 
             var properties = ListQuery.Internal.ReflectionHelper.GetListPropertyInfo(validationType);
 
@@ -32,7 +32,7 @@ namespace Csg.ListQuery.Sql
 
         public static IListQueryBuilder ValidateWith(this IListQueryBuilder listQuery, IEnumerable<ListPropertyInfo> fields)
         {
-            listQuery.Configuration.ShouldValidate = true;
+            listQuery.Configuration.UseValidation = true;
 
             foreach (var field in fields)
             {
@@ -81,7 +81,13 @@ namespace Csg.ListQuery.Sql
 
         public static IListQueryBuilder NoValidation(this IListQueryBuilder listQuery)
         {
-            listQuery.Configuration.ShouldValidate = false;
+            listQuery.Configuration.UseValidation = false;
+            return listQuery;
+        }
+
+        public static IListQueryBuilder UseStreamingResult(this IListQueryBuilder listQuery)
+        {
+            listQuery.Configuration.UseStreamingResult = true;
             return listQuery;
         }
 
@@ -99,11 +105,11 @@ namespace Csg.ListQuery.Sql
                     {
                         handler(where, filter, validationField);
                     }
-                    else if (hasConfig || !listQuery.Configuration.ShouldValidate)
+                    else if (hasConfig || !listQuery.Configuration.UseValidation)
                     {
                         where.AddFilter(filter.Name, filter.Operator ?? ListFilterOperator.Equal, filter.Value, validationField?.DataType ?? System.Data.DbType.String, validationField?.DataTypeSize);
                     }
-                    else if (listQuery.Configuration.ShouldValidate)
+                    else if (listQuery.Configuration.UseValidation)
                     {
                         throw new Exception($"No handler is defined for the filter '{filter.Name}'.");
                     }
@@ -126,7 +132,7 @@ namespace Csg.ListQuery.Sql
                     {
                         queryBuilder.SelectColumns.Add(new Csg.Data.Sql.SqlColumn(queryBuilder.Root, config.Name));
                     }
-                    else if (listQuery.Configuration.ShouldValidate)
+                    else if (listQuery.Configuration.UseValidation)
                     {
                         throw new Exception($"The selection field '{column}' does not exist.");
                     }
@@ -152,7 +158,7 @@ namespace Csg.ListQuery.Sql
                             SortDirection = column.SortDescending ? Csg.Data.Sql.DbSortDirection.Descending : Csg.Data.Sql.DbSortDirection.Ascending
                         });
                     }
-                    else if (listQuery.Configuration.ShouldValidate)
+                    else if (listQuery.Configuration.UseValidation)
                     {
                         throw new Exception($"The sort field '{column.Name}' does not exist.");
                     }
@@ -168,13 +174,13 @@ namespace Csg.ListQuery.Sql
             }
         }
 
-        public static void ApplyLimit(IListQueryBuilder listQuery, IDbQueryBuilder queryBuilder, bool getTotal = false)
+        public static void ApplyLimit(IListQueryBuilder listQuery, IDbQueryBuilder queryBuilder)
         {
-            if (listQuery.Configuration.QueryDefinition.Offset > 0)
+            if (listQuery.Configuration.QueryDefinition.Limit > 0)
             {
                 queryBuilder.PagingOptions = new Csg.Data.Sql.SqlPagingOptions()
                 {
-                    Limit = listQuery.Configuration.QueryDefinition.Limit,
+                    Limit = listQuery.Configuration.UseLimitOracle && !listQuery.Configuration.UseStreamingResult ? listQuery.Configuration.QueryDefinition.Limit + 1 : listQuery.Configuration.QueryDefinition.Limit,
                     Offset = listQuery.Configuration.QueryDefinition.Offset
                 };
             }                
@@ -227,28 +233,40 @@ namespace Csg.ListQuery.Sql
         public async static System.Threading.Tasks.Task<ListQueryResult<T>> GetResultAsync<T>(this Csg.ListQuery.Sql.IListQueryBuilder builder, bool queryTotalWhenLimiting = true)
         {
             var stmt = builder.Render(queryTotalWhenLimiting);
-            var cmd = stmt.ToDapperCommand(builder.Configuration.QueryBuilder.Transaction, builder.Configuration.QueryBuilder.CommandTimeout);
+            var cmdFlags = builder.Configuration.UseStreamingResult ? Dapper.CommandFlags.Pipelined : Dapper.CommandFlags.Buffered;
+            var cmd = stmt.ToDapperCommand(builder.Configuration.QueryBuilder.Transaction, builder.Configuration.QueryBuilder.CommandTimeout, commandFlags: cmdFlags);
+            int? totalCount = null;
+            IEnumerable<T> data = null;
+            bool isBuffered = !builder.Configuration.UseStreamingResult;
+            bool limitOracle = builder.Configuration.QueryDefinition.Limit < builder.Configuration.QueryBuilder.PagingOptions?.Limit;
+            int? dataCount = null;
 
             if (stmt.Count == 1)
             {
-                return new ListQueryResult<T>(await Dapper.SqlMapper.QueryAsync<T>(builder.Configuration.QueryBuilder.Connection, cmd));
+                data = await Dapper.SqlMapper.QueryAsync<T>(builder.Configuration.QueryBuilder.Connection, cmd);
             }
             else if (stmt.Count == 2)
             {
                 using (var batchReader = await Dapper.SqlMapper.QueryMultipleAsync(builder.Configuration.QueryBuilder.Connection, cmd))
                 {
-
-                    return new ListQueryResult<T>()
-                    {
-                        TotalCount = await batchReader.ReadFirstAsync<int>(),
-                        Data = await batchReader.ReadAsync<T>()
-                    };
+                    totalCount = await batchReader.ReadFirstAsync<int>();
+                    await batchReader.ReadAsync<T>();
                 }
             }
             else
             {
                 throw new NotSupportedException("A statement with more than 2 queries is not supported.");
             }
+
+            if (limitOracle && isBuffered)
+            {
+                // if we used a limit oracle, then strip the last row off
+                data = data.Take(builder.Configuration.QueryDefinition.Limit);
+                dataCount = data.Count();
+                // if the data is streamed, we can't provide a total count, and we can't use the next page oracle
+            }
+
+            return new ListQueryResult<T>(data, dataCount, totalCount, isBuffered);
         }
     }
 

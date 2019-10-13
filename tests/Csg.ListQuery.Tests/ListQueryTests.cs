@@ -47,6 +47,7 @@ namespace Csg.ListQuery.Tests
 
             var stmt = ListQueryBuilder.Create(query, queryDef)
                 .NoValidation()
+                .UseStreamingResult()
                 .Apply()
                 .Render();
 
@@ -337,7 +338,7 @@ namespace Csg.ListQuery.Tests
         [TestMethod]
         public void Test_ListQuery_Paging()
         {
-            var expectedSql = "SELECT COUNT(1) FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]=@p0);\r\nSELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]=@p1) ORDER BY [FirstName] ASC OFFSET 50 ROWS FETCH NEXT 25 ROWS ONLY;";
+            var expectedSql = "SELECT COUNT(1) FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]=@p0);\r\nSELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]=@p1) ORDER BY [FirstName] ASC OFFSET 50 ROWS FETCH NEXT 26 ROWS ONLY;";
             IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
 
             var queryDef = new ListQueryDefinition();
@@ -360,6 +361,53 @@ namespace Csg.ListQuery.Tests
                 .Render();
 
             Assert.AreEqual(expectedSql, stmt.CommandText.Trim(), true);
+        }
+
+        [TestMethod]
+        public void Test_ListQuery_Buffered_ApplyAddsLimitOracle()
+        {
+            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
+
+            var queryDef = new ListQueryDefinition();
+
+            queryDef.Sort = new List<ListQuerySort>()
+            {
+               new ListQuerySort(){ Name = "FirstName" }
+            };
+
+            queryDef.Offset = 0;
+            queryDef.Limit = 50;
+
+            var qb = ListQueryBuilder.Create(query, queryDef)
+                .NoValidation()
+                .Apply();
+
+            Assert.AreEqual(0, qb.PagingOptions.Value.Offset);
+            Assert.AreEqual(51, qb.PagingOptions.Value.Limit);
+        }
+
+        [TestMethod]
+        public void Test_ListQuery_Streamed_Apply()
+        {
+            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
+
+            var queryDef = new ListQueryDefinition();
+
+            queryDef.Sort = new List<ListQuerySort>()
+            {
+               new ListQuerySort(){ Name = "FirstName" }
+            };
+
+            queryDef.Offset = 0;
+            queryDef.Limit = 50;
+
+            var qb = ListQueryBuilder.Create(query, queryDef)
+                .NoValidation()
+                .UseStreamingResult()
+                .Apply();
+
+            Assert.AreEqual(0, qb.PagingOptions.Value.Offset);
+            Assert.AreEqual(50, qb.PagingOptions.Value.Limit);
         }
     }
 }

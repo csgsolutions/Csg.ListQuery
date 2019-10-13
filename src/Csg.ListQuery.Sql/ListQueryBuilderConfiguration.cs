@@ -17,6 +17,14 @@ namespace Csg.ListQuery.Sql
 
         public virtual ListQueryDefinition QueryDefinition { get; set; }
 
-        public virtual bool ShouldValidate { get; set; } = true;
+        public virtual bool UseValidation { get; set; } = true;
+
+        public virtual bool UseStreamingResult { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets a value that indicates if an additional row beyond <see cref="ListQueryDefinition.Limit"/> will be requested from the data source in order to determine if additional rows can be fetched.
+        /// </summary>
+        /// <remarks>If <see cref="UseStreamingResult"/> is true, this value is ignored and defaults to false.</remarks>
+        public virtual bool UseLimitOracle { get; set; } = true;
     }
 }

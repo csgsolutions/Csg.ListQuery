@@ -15,6 +15,9 @@ namespace Csg.ListQuery.AspNetCore
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="request"></param>
+        /// <param name="domainProperties"></param>
+        /// <param name="filterProperties"></param>
+        /// <param name="useLimitCanary">When true, creates a query definition that requests 1 additional row beyond <see cref="IPagedListRequest.Limit"/> so that <see cref="ListResponseExtensions.ToListResponse{TInfrastructure, TDomain}(ListQueryResult{TInfrastructure}, IPagedListRequest, IDictionary{string, DomainPropertyInfo}, Func{TInfrastructure, TDomain}, Uri)"/> can add link and offset information for the next page.</param>
         /// <returns></returns>
         public static Csg.ListQuery.Abstractions.ListQueryDefinition ToListQuery(this IListRequest request, 
             IDictionary<string, DomainPropertyInfo> domainProperties,

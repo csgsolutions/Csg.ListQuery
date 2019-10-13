@@ -45,43 +45,43 @@ namespace Csg.ListQuery.AspNetCore
             System.Uri currentUri
         ) where TDomain : new()
         {
-            IEnumerable<TDomain> data = queryResult.Data.Select(selector).ToList();
-            int actualCount = data.Count();
-            int responseCount = Math.Min(actualCount, request.Limit);
-
-            if (actualCount > request.Limit)
-            {
-                data = data.Take(request.Limit);
-            }
+            IEnumerable<TDomain> data = queryResult.Data.Select(selector);
+            int? dataCount = queryResult.IsBuffered ? data.Count() : (int?)null;
 
             var response = new PagedListResponse<TDomain>()
             {
-                Data = data,
                 Links = new PagedListLinks()
                 {
                     Self = currentUri.AbsoluteUri
                 },
                 Meta = new PagedListMeta()
                 {
-                    CurrentCount = responseCount,
                     TotalCount = queryResult.TotalCount
                 }
             };
 
-            if (actualCount > request.Limit)
+            if (dataCount.HasValue)
+            {
+                response.Meta.CurrentCount = dataCount;
+            }
+
+            if (queryResult.IsBuffered)
             {
                 var nextOffset = (request.Offset + request.Limit);
                 response.Links.Next = CreateUri(request, currentUri, nextOffset).ToString();
                 response.Meta.Next = new PageInfo(nextOffset);
             }
 
+            // Wait until here to set data so we can deal with the useLimitCanary situation above
+            response.Data = data;
+            
             if (request.Offset > 0)
             {
                 var prevOffset = Math.Max(request.Offset - request.Limit, 0);
                 response.Links.Prev = CreateUri(request, currentUri, prevOffset).ToString();
                 response.Meta.Prev = new PageInfo(prevOffset);
             }
-            
+
             if (request.Fields != null)
             {
                 response.Fields = properties.Select(s => s.Value.JsonName).Intersect(request.Fields, StringComparer.OrdinalIgnoreCase);
@@ -89,12 +89,6 @@ namespace Csg.ListQuery.AspNetCore
             else
             {
                 response.Fields = properties.Select(s => s.Value.JsonName);
-            }
-
-            if (queryResult.TotalCount.HasValue)
-            {
-                response.Meta = new PagedListMeta();
-                response.Meta.TotalCount = queryResult.TotalCount;
             }
 
             return response;
