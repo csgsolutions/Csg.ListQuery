@@ -38,7 +38,7 @@ if ($BuildNumber) {
 	$BuildNumber = $BuildNumber.PadLeft(5, "0")
 }
 
-Update-CIBuildNumber $BuildNumber
+#Update-CIBuildNumber $BuildNumber
 
 try {
 	. "$PSScriptRoot/bootstrap.ps1"	
