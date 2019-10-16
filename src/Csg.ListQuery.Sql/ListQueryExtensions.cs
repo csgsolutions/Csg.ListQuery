@@ -236,7 +236,7 @@ namespace Csg.ListQuery.Sql
             int? totalCount = null;
             IEnumerable<T> data = null;
             bool isBuffered = !builder.Configuration.UseStreamingResult;
-            bool limitOracle = builder.Configuration.QueryDefinition.Limit < builder.Configuration.QueryBuilder.PagingOptions?.Limit;
+            bool limitOracle = builder.Configuration.UseLimitOracle && !builder.Configuration.UseStreamingResult;
             int? dataCount = null;
 
             if (stmt.Count == 1)
@@ -257,7 +257,7 @@ namespace Csg.ListQuery.Sql
             }
 
             //TODO: Can we still use .Take() here with a limit oracle when streaming?
-            if (limitOracle && isBuffered)
+            if (limitOracle)
             {
                 // if we used a limit oracle, then strip the last row off
                 data = data.Take(builder.Configuration.QueryDefinition.Limit);
