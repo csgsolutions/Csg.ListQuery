@@ -248,7 +248,7 @@ namespace Csg.ListQuery.Sql
                 using (var batchReader = await Dapper.SqlMapper.QueryMultipleAsync(builder.Configuration.QueryBuilder.Connection, cmd))
                 {
                     totalCount = await batchReader.ReadFirstAsync<int>();
-                    await batchReader.ReadAsync<T>();
+                    data = await batchReader.ReadAsync<T>();
                 }
             }
             else
@@ -256,6 +256,7 @@ namespace Csg.ListQuery.Sql
                 throw new NotSupportedException("A statement with more than 2 queries is not supported.");
             }
 
+            //TODO: Can we still use .Take() here with a limit oracle when streaming?
             if (limitOracle && isBuffered)
             {
                 // if we used a limit oracle, then strip the last row off
