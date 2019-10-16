@@ -205,11 +205,9 @@ namespace Csg.ListQuery.Sql
 
         public static IDbQueryBuilder GetCountQuery(IListQueryBuilder query)
         {
-            var countQuery = query.Apply();
+            var countQuery = query.Apply().Select(new SqlRawColumn("COUNT(1)"));
 
             countQuery.PagingOptions = null;
-            countQuery.SelectColumns.Clear();
-            countQuery.SelectColumns.Add(new Csg.Data.Sql.SqlRawColumn("COUNT(1)"));
             countQuery.OrderBy.Clear();
 
             return countQuery;           

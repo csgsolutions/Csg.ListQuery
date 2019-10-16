@@ -244,14 +244,14 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
         /// <returns></returns>
         protected static Csg.ListQuery.Abstractions.ListFilterOperator PrefixToOperator(ReadOnlySpan<char> oper)
         {
-            if (oper.Equals(op_eq, StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.Equal;
-            if (oper.Equals(op_gt, StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.GreaterThan;
-            if (oper.Equals(op_ge, StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.GreaterThanOrEqual;
-            if (oper.Equals(op_lt, StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.LessThan;
-            if (oper.Equals(op_le, StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.LessThanOrEqual;
-            if (oper.Equals(op_ne, StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.NotEqual;
-            if (oper.Equals(op_like, StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.Like;
-            if (oper.Equals(op_isnull, StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.IsNull;
+            if (oper.Equals(op_eq.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.Equal;
+            if (oper.Equals(op_gt.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.GreaterThan;
+            if (oper.Equals(op_ge.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.GreaterThanOrEqual;
+            if (oper.Equals(op_lt.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.LessThan;
+            if (oper.Equals(op_le.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.LessThanOrEqual;
+            if (oper.Equals(op_ne.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.NotEqual;
+            if (oper.Equals(op_like.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.Like;
+            if (oper.Equals(op_isnull.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.IsNull;
             //TODO: handle IN & NOT IN operators???
 
             throw new NotSupportedException($"The given operator prefix '{oper.ToString()}' is not supported.");
@@ -265,7 +265,7 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
             if (indexOfFirstColon > 0)
             {
                 return (
-                    new string(span.Slice(indexOfFirstColon+1)),
+                    span.Slice(indexOfFirstColon+1).ToString(),
                     PrefixToOperator(span.Slice(0,indexOfFirstColon))
                 );
             }
