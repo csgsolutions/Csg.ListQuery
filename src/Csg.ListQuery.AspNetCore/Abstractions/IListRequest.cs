@@ -9,12 +9,6 @@ namespace Csg.ListQuery.AspNetCore.Abstractions
     public interface IListRequest
     {
         /// <summary>
-        /// When implemented in a derived class, gets the validation type that will be used to validate fields, filters, and sort options.
-        /// </summary>
-        /// <returns></returns>
-        Type GetValidationType();
-
-        /// <summary>
         /// When implemented in a derived class, gets or sets a collection of field names to return.
         /// </summary>
         IEnumerable<string> Fields { get; set; }
@@ -28,5 +22,11 @@ namespace Csg.ListQuery.AspNetCore.Abstractions
         /// When implemented in a derived class, gets or sets a list of sort actions to apply.
         /// </summary>
         IEnumerable<Csg.ListQuery.Abstractions.ListQuerySort> Sort { get; set; }
+
+        ListRequestValidationResult Validate(
+            IDictionary<string, DomainPropertyInfo> selectableProperties,
+            IDictionary<string, DomainPropertyInfo> filerableProperties,
+            IDictionary<string, DomainPropertyInfo> sortableProperties            
+        );
     }
 }

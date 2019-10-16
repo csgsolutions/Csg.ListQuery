@@ -7,7 +7,7 @@ namespace Csg.ListQuery.AspNetCore
 {
     public static class PropertyHelper
     {
-        public static Dictionary<string, DomainPropertyInfo> GetDomainProperties(Type type)
+        public static Dictionary<string, DomainPropertyInfo> GetDomainProperties(Type type, Func<DomainPropertyInfo, bool> predicate = null)
         {
             var listConfigs = Csg.ListQuery.Internal.ReflectionHelper.GetListPropertyInfo(type, fromCache: true);
            
@@ -25,6 +25,7 @@ namespace Csg.ListQuery.AspNetCore
 
                     return propInfo;
                 })
+                .Where(x => predicate == null || predicate(x))
                 .ToDictionary(k => k.PropertyName, StringComparer.OrdinalIgnoreCase);
         }
     }

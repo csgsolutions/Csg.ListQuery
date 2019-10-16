@@ -1,4 +1,4 @@
-﻿namespace Csg.ListQuery.Abstractions
+﻿namespace Csg.ListQuery
 {
     public class SortableAttribute : System.Attribute
     {

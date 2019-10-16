@@ -84,9 +84,9 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
 
             var listRequest = (IListRequest)Activator.CreateInstance(modelType);
             var filterList = new List<Csg.ListQuery.Abstractions.ListQueryFilter>();
-            var validationProperties = listRequest.GetValidationType()
-                .GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
-                .ToDictionary(s => s.Name, StringComparer.OrdinalIgnoreCase);
+            //var validationProperties = listRequest.GetValidationType()
+            //    .GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+            //    .ToDictionary(s => s.Name, StringComparer.OrdinalIgnoreCase);
 
             listRequest.Filters = filterList;
 
@@ -96,13 +96,14 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
                 {
                     filterList.AddRange(ParseFilters(pair.Key, pair.Value).Select(f =>
                     {
-                        if (!validationProperties.TryGetValue(f.Name, out System.Reflection.PropertyInfo propInfo))
-                        {
-                            throw new FormatException($"The filter parameter '{f.Name}' is not recognized.");
-                        }
+                        //if (!validationProperties.TryGetValue(f.Name, out System.Reflection.PropertyInfo propInfo))
+                        //{
+                        //    throw new FormatException($"The filter parameter '{f.Name}' is not recognized.");
+                        //}
 
-                        f.Name = propInfo.Name;
+                        //f.Name = propInfo.Name;
 
+                        //TODO: Remove this selection
                         return f;
                     }));
                 }
@@ -110,26 +111,26 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
                 {
                     listRequest.Fields = pair.Value.SelectMany(s => s.Split(',')).Select(fieldName =>
                     {
-                        if (!validationProperties.TryGetValue(fieldName, out System.Reflection.PropertyInfo propInfo))
-                        {
-                            throw new FormatException($"The selection field '{fieldName}' is not recognized.");
-                        }
+                        //if (!validationProperties.TryGetValue(fieldName, out System.Reflection.PropertyInfo propInfo))
+                        //{
+                        //    throw new FormatException($"The selection field '{fieldName}' is not recognized.");
+                        //}
 
-                        return propInfo.Name;
+                        return fieldName; //propInfo.Name;
                     });
                 }
                 else if (pair.Key.Equals(c_order, StringComparison.OrdinalIgnoreCase))
                 {
                     listRequest.Sort = pair.Value.Select(sortField => 
                     {
-                        if (!validationProperties.TryGetValue(sortField.TrimStart('-'), out System.Reflection.PropertyInfo propInfo))
-                        {
-                            throw new FormatException($"The sort field '{sortField}' is not recognized.");
-                        }
+                        //if (!validationProperties.TryGetValue(sortField.TrimStart('-'), out System.Reflection.PropertyInfo propInfo))
+                        //{
+                        //    throw new FormatException($"The sort field '{sortField}' is not recognized.");
+                        //}
 
                         return new Csg.ListQuery.Abstractions.ListQuerySort()
                         {
-                            Name = propInfo.Name,
+                            Name = sortField.TrimStart('-'), //propInfo.Name,
                             SortDescending = sortField.StartsWith("-")
                         };
                     });

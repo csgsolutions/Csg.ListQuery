@@ -9,91 +9,61 @@ namespace Csg.ListQuery.AspNetCore
 {
     public static class ListRequestExtensions
     {
+        /// <summary>
+        /// Transforms a list request into a repository query
+        /// </summary>
+        /// <typeparam name="TValidationModel">A type that defines the selections, filters, and sortable fields allowed.</typeparam>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static Csg.ListQuery.AspNetCore.ListRequestValidationResult Validate<TValidationModel>(this IListRequest request)
+        {
+            var properties = PropertyHelper.GetDomainProperties(typeof(TValidationModel));
+            return request.Validate(properties, properties, properties);
+        }
 
         /// <summary>
-        /// Transforms a list request into a repository query, mapping column names from domain to infrastructure
+        /// Transforms a list request into a repository query
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TFieldValidationModel">A type that defines the selections and sortable fields allowed.</typeparam>
+        /// <typeparam name="TFilterValidationModel">A type that defines the filters allowed.</typeparam>
         /// <param name="request"></param>
-        /// <param name="domainProperties"></param>
-        /// <param name="filterProperties"></param>
-        /// <param name="useLimitCanary">When true, creates a query definition that requests 1 additional row beyond <see cref="IPagedListRequest.Limit"/> so that <see cref="ListResponseExtensions.ToListResponse{TInfrastructure, TDomain}(ListQueryResult{TInfrastructure}, IPagedListRequest, IDictionary{string, DomainPropertyInfo}, Func{TInfrastructure, TDomain}, Uri)"/> can add link and offset information for the next page.</param>
         /// <returns></returns>
-        public static Csg.ListQuery.Abstractions.ListQueryDefinition ToListQuery(this IListRequest request, 
-            IDictionary<string, DomainPropertyInfo> domainProperties,
-            IDictionary<string, DomainPropertyInfo> filterProperties
-        )
+        public static Csg.ListQuery.AspNetCore.ListRequestValidationResult Validate<TFieldValidationModel, TFilterValidationModel>(this IListRequest request)
         {
-            var queryDef = new Csg.ListQuery.Abstractions.ListQueryDefinition();
+            var fieldProperties = PropertyHelper.GetDomainProperties(typeof(TFieldValidationModel));
+            var filterPropreties = PropertyHelper.GetDomainProperties(typeof(TFilterValidationModel));
+            return request.Validate(fieldProperties, filterPropreties, fieldProperties);
+        }
 
-            if (request.Fields != null)
+        /// <summary>
+        /// Transforms a list request into a repository query
+        /// </summary>
+        /// <typeparam name="TSelectableProperties">A type that defines the selections and sortable fields allowed.</typeparam>
+        /// <typeparam name="TFilterableProperties">A type that defines the filters allowed.</typeparam>
+        /// <typeparam name="TSortableProperties">A type that defines the filters allowed.</typeparam>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public static Csg.ListQuery.AspNetCore.ListRequestValidationResult Validate<TSelectableProperties, TFilterableProperties, TSortableProperties>(this IListRequest request)
+        {
+            var selectProperties = PropertyHelper.GetDomainProperties(typeof(TSelectableProperties));
+            var filterProperties = PropertyHelper.GetDomainProperties(typeof(TFilterableProperties));
+            var orderProperties = PropertyHelper.GetDomainProperties(typeof(TSortableProperties));
+            return request.Validate(selectProperties, filterProperties, orderProperties);
+        }
+
+        /// <summary>
+        /// Adds a validation error message for the given field name.
+        /// </summary>
+        /// <param name="errors"></param>
+        /// <param name="fieldName"></param>
+        /// <param name="errorMessage"></param>
+        public static void Add(this ICollection<ListRequestValidationError> errors, string fieldName, string errorMessage)
+        {
+            errors.Add(new ListRequestValidationError()
             {
-                queryDef.Selections = request.Fields.Select(field =>
-                {
-                    if (domainProperties.TryGetValue(field, out DomainPropertyInfo domainProp))
-                    {
-                        return domainProp.PropertyName;
-                    }
-                    else
-                    {
-                        throw new MissingFieldException($"An invalid field '{field}' was requested.");
-                    }
-                });
-            }
-
-            if (request.Filters != null)
-            {            
-                queryDef.Filters = request.Filters.Select(filter =>
-                {
-                    string name = filter.Name;
-                
-                    if (filterProperties.TryGetValue(filter.Name, out DomainPropertyInfo domainProp) && domainProp.IsFilterable)
-                    {
-                        name = domainProp.PropertyName;
-                    }
-                    else
-                    {
-                        throw new MissingFieldException($"An invalid filter '{filter.Name}' was requested.");
-                    }
-
-                    return new ListQueryFilter()
-                    {
-                        Name = name,
-                        Operator = filter.Operator,
-                        Value = filter.Value
-                    };
-                });
-            }
-
-            if (request.Sort != null)
-            {
-                queryDef.Sort = request.Sort.Select(s =>
-                {
-                    if (domainProperties.TryGetValue(s.Name, out DomainPropertyInfo domainProp) && domainProp.IsSortable)
-                    {
-                        return new ListQuerySort()
-                        {
-                            Name = domainProp.PropertyName,
-                            SortDescending = s.SortDescending
-                        };
-                    }
-                    else
-                    {
-                        throw new MissingFieldException($"An invalid sort field '{s.Name}' was requested.");
-                    }
-                });
-            }
-
-            if (request is IPagedListRequest pagedRequest)
-            {
-                if (pagedRequest.Limit > 0)
-                {
-                    queryDef.Offset = pagedRequest.Offset;
-                    queryDef.Limit = pagedRequest.Limit;
-                }
-            }          
-
-            return queryDef;           
+                Field = fieldName,
+                Error = errorMessage
+            });
         }
     }
 }

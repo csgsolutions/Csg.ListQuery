@@ -91,6 +91,28 @@ namespace Csg.ListQuery.Sql
             return listQuery;
         }
 
+
+        public static IListQueryBuilder BeforeApply(this IListQueryBuilder builder, Action<ListQueryBuilderConfiguration> action)
+        {
+            builder.Configuration.BeforeApply += (sender, e) =>
+            {
+                action(e.Configuration);
+            };
+
+            return builder;
+        }
+
+        public static IListQueryBuilder AfterApply(this IListQueryBuilder builder, Action<ListQueryBuilderConfiguration, IDbQueryBuilder> action)
+        {
+            builder.Configuration.AfterApply += (sender, e) =>
+            {
+                action(e.Configuration, e.QueryBuilder);
+            };
+
+            return builder;
+        }
+
+
         public static void ApplyFilters(IListQueryBuilder listQuery, IDbQueryBuilder queryBuilder)
         {
             if (listQuery.Configuration.QueryDefinition.Filters != null)
@@ -193,13 +215,17 @@ namespace Csg.ListQuery.Sql
         /// <returns></returns>
         public static IDbQueryBuilder Apply(this IListQueryBuilder listQuery)
         {
+            listQuery.Configuration.OnBeforeApply();
+
             var query = listQuery.Configuration.QueryBuilder.Fork();
 
             ApplySelections(listQuery, query);
             ApplyFilters(listQuery, query);
             ApplySort(listQuery, query);
             ApplyLimit(listQuery, query);
-            
+
+            listQuery.Configuration.OnAfterApply(query);
+
             return query;
         }
 

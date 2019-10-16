@@ -12,22 +12,22 @@ namespace Csg.ListQuery.AspNetCore.Tests
         public void CreateRequest_FromString()
         {
             var queryString = "fields=PersonID,FirstName,LastName,BirthDate&where[firstName]=bob&order=LastName&order=-FirstName";
-            var request = ModelBinding.ListRequestQueryStringModelBinder.CreateRequest<ListRequest<Person>>(queryString);
+            var request = ModelBinding.ListRequestQueryStringModelBinder.CreateRequest<ListRequest>(queryString);
 
             Assert.AreEqual(4, request.Fields.Count());
-            Assert.AreEqual("PersonID", request.Fields.First());
-            Assert.AreEqual("FirstName", request.Fields.Skip(1).First());
-            Assert.AreEqual("LastName", request.Fields.Skip(2).First());
-            Assert.AreEqual("BirthDate", request.Fields.Last());
+            Assert.AreEqual("PersonID", request.Fields.First(), true);
+            Assert.AreEqual("FirstName", request.Fields.Skip(1).First(), true);
+            Assert.AreEqual("LastName", request.Fields.Skip(2).First(), true);
+            Assert.AreEqual("BirthDate", request.Fields.Last(), true);
 
             Assert.AreEqual(1, request.Filters.Count());
-            Assert.AreEqual("FirstName", request.Filters.First().Name);
+            Assert.AreEqual("FirstName", request.Filters.First().Name, true);
             Assert.AreEqual("bob", request.Filters.First().Value);
             Assert.AreEqual(Csg.ListQuery.Abstractions.ListFilterOperator.Equal, request.Filters.First().Operator.Value);
 
             Assert.AreEqual(2, request.Sort.Count());
-            Assert.AreEqual("LastName", request.Sort.First().Name);
-            Assert.AreEqual("FirstName", request.Sort.Last().Name);
+            Assert.AreEqual("LastName", request.Sort.First().Name, true);
+            Assert.AreEqual("FirstName", request.Sort.Last().Name, true);
             Assert.AreEqual(true, request.Sort.Last().SortDescending);
         }
 
@@ -38,7 +38,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
 
             Assert.ThrowsException<NotSupportedException>(() =>
             {
-                ModelBinding.ListRequestQueryStringModelBinder.CreateRequest<ListRequest<Person>>(queryString);
+                ModelBinding.ListRequestQueryStringModelBinder.CreateRequest<ListRequest>(queryString);
             });            
         }
 
@@ -46,22 +46,22 @@ namespace Csg.ListQuery.AspNetCore.Tests
         public void CreateRequest_FromStringWithPaging()
         {
             var queryString = "fields=PersonID,FirstName,LastName,BirthDate&where[firstName]=bob&order=LastName&order=-FirstName&offset=50&limit=10";
-            var request = ModelBinding.ListRequestQueryStringModelBinder.CreateRequest<PagedListRequest<Person>>(queryString);
+            var request = ModelBinding.ListRequestQueryStringModelBinder.CreateRequest<PagedListRequest>(queryString);
 
             Assert.AreEqual(4, request.Fields.Count());
-            Assert.AreEqual("PersonID", request.Fields.First());
-            Assert.AreEqual("FirstName", request.Fields.Skip(1).First());
-            Assert.AreEqual("LastName", request.Fields.Skip(2).First());
-            Assert.AreEqual("BirthDate", request.Fields.Last());
+            Assert.AreEqual("PersonID", request.Fields.First(), true);
+            Assert.AreEqual("FirstName", request.Fields.Skip(1).First(), true);
+            Assert.AreEqual("LastName", request.Fields.Skip(2).First(), true);
+            Assert.AreEqual("BirthDate", request.Fields.Last(), true);
 
             Assert.AreEqual(1, request.Filters.Count());
-            Assert.AreEqual("FirstName", request.Filters.First().Name);
+            Assert.AreEqual("FirstName", request.Filters.First().Name, true);
             Assert.AreEqual("bob", request.Filters.First().Value);
             Assert.AreEqual(Csg.ListQuery.Abstractions.ListFilterOperator.Equal, request.Filters.First().Operator.Value);
 
             Assert.AreEqual(2, request.Sort.Count());
-            Assert.AreEqual("LastName", request.Sort.First().Name);
-            Assert.AreEqual("FirstName", request.Sort.Last().Name);
+            Assert.AreEqual("LastName", request.Sort.First().Name, true);
+            Assert.AreEqual("FirstName", request.Sort.Last().Name, true);
             Assert.AreEqual(true, request.Sort.Last().SortDescending);
 
             Assert.AreEqual(10, request.Limit);

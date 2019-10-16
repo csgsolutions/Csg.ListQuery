@@ -409,5 +409,42 @@ namespace Csg.ListQuery.Tests
             Assert.AreEqual(0, qb.PagingOptions.Value.Offset);
             Assert.AreEqual(50, qb.PagingOptions.Value.Limit);
         }
+
+        [TestMethod]
+        public void Test_ListQuery_ApplyEventHandlers()
+        {
+            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
+            var queryDef = new ListQueryDefinition();
+            bool beforeInvoked = false;
+            bool afterInvoked = false;
+
+            queryDef.Sort = new List<ListQuerySort>()
+            {
+               new ListQuerySort(){ Name = "FirstName" }
+            };
+
+            var qb = ListQueryBuilder.Create(query, queryDef)
+                .NoValidation()
+                .BeforeApply((config) =>
+                {
+                    beforeInvoked = true;
+                    Assert.IsNotNull(config);
+                    Assert.AreEqual(0, config.QueryBuilder.OrderBy.Count);
+                    config.QueryBuilder.OrderBy.Add("LastName");
+                })
+                .AfterApply((config, appliedQuery) =>
+                {
+                    afterInvoked = true;
+                    Assert.IsNotNull(config);
+                    Assert.IsNotNull(appliedQuery);
+                    Assert.AreEqual(2, appliedQuery.OrderBy.Count);
+                    Assert.IsTrue(appliedQuery.OrderBy.Any(x => x.ColumnName == "LastName"));
+                })
+                .Apply();
+
+            Assert.IsTrue(beforeInvoked);
+            Assert.IsTrue(afterInvoked);
+            Assert.AreEqual(2, qb.OrderBy.Count);
+        }
     }
 }
