@@ -116,25 +116,3 @@ try {
 } finally {
 	Remove-Module 'BuildTools' -ErrorAction Ignore
 }
-
-function Update-CIBuildNumber($buildNo){
-	[xml]$xml = Get-Content .\version.props
-	
-	$versionPrefix = $xml.Project.PropertyGroup.VersionPrefix
-	$versionSuffix = $xml.Project.PropertyGroup.VersionSuffix[0]
-	
-	$buildDisplay = "$versionPrefix-release-$buildNo"
-	
-	if ($versionSuffix) {
-		$buildDisplay = "$versionPrefix-$versionSuffix-$buildNo"
-	}
-
-	# Azure DevOps
-	if ($env:AGENT_ID -and $env:SYSTEM_COLLECTIONID){
-		Write-Output "##vso[build.updatebuildnumber]$buildDisplay"
-	} 
-	# APPVEYOR
-	else if ($env:APPVEYOR_BUILD_NUMBER) {
-		#TODO: Do something here?
-	}
-}
