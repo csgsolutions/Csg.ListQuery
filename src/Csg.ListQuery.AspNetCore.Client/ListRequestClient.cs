@@ -39,30 +39,31 @@ namespace Csg.ListQuery.AspNetCore.Client
 
         public async Task<PagedListResponse<T>> GetAllAsync<T>(string path, ListRequestMessage request)
         {
-            int totalCount = 0;
-            var requestQuery = CreateQueryFromRequest(request);
-            var response = await GetAsync<T>(path, requestQuery);
-            var result = new PagedListResponse<T>();
+            throw new NotImplementedException();
+            //int totalCount = 0;
+            //var requestQuery = CreateQueryFromRequest(request);
+            //var response = await GetAsync<T>(path, requestQuery);
+            //var result = new PagedListResponse<T>();
 
-            result.Data = response.Data;
-            result.Fields = response.Fields;
+            //result.Data = response.Data;
+            //result.Fields = response.Fields;
 
-            while(response.Meta.Next?.Offset > 0)
-            {
-                // set the next offset
-                requestQuery["offset"] = response.Meta.Next?.Offset.ToString();
+            //while(response.Meta.Next?.Offset > 0)
+            //{
+            //    // set the next offset
+            //    requestQuery["offset"] = response.Meta.Next?.Offset.ToString();
                 
-                // get the next page
-                response = await GetAsync<T>(path, requestQuery);
+            //    // get the next page
+            //    response = await GetAsync<T>(path, requestQuery);
                 
-                // concat with existing page(s)
-                result.Data = result.Data.Concat(response.Data);
-                totalCount += response.Meta.Count;
-            }
+            //    // concat with existing page(s)
+            //    result.Data = result.Data.Concat(response.Data);
+            //    totalCount += response.Meta.Count;
+            //}
 
-            result.Meta.Add("total_count", totalCount.ToString());
+            //result.Meta.Add("total_count", totalCount.ToString());
 
-            return response;
+            //return response;
         }
                
         public async Task<ListResponse<T>> PostAsync<T>(string url, ListRequestMessage request)

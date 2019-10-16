@@ -63,16 +63,19 @@ namespace Csg.ListQuery.AspNetCore
         public int Offset => _offset;
     }
 
-    public class PagedListMeta : Dictionary<string, object>
+    public class PagedListMeta
     {
-        public PagedListMeta() : base(StringComparer.OrdinalIgnoreCase)
+        public PagedListMeta() //: base(StringComparer.OrdinalIgnoreCase)
         {
 
         }
 
-        public PageInfo? Next { get => (PageInfo?)this["next"]; set => this["next"] = value; }
-        public PageInfo? Prev { get => (PageInfo?)this["prev"]; set => this["prev"] = value; }
-        public int? CurrentCount { get => (int?)this["count"]; set => this["count"] = value; }
-        public int? TotalCount { get => (int?)this["total_count"]; set => this["total_count"] = value; }
+        public PageInfo? Next { get; set; }
+
+        public PageInfo? Prev { get; set; }
+
+        public int? CurrentCount { get; set; }
+
+        public int? TotalCount { get; set; }
     }
 }

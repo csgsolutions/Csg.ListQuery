@@ -32,6 +32,19 @@ namespace Csg.ListQuery.AspNetCore.Tests
         }
 
         [TestMethod]
+        public void CreateRequest_FromString_TrimsFields()
+        {
+            var queryString = "fields=PersonID, FirstName, LastName,BirthDate";
+            var request = ModelBinding.ListRequestQueryStringModelBinder.CreateRequest<ListRequest>(queryString);
+
+            Assert.AreEqual(4, request.Fields.Count());
+            Assert.AreEqual("PersonID", request.Fields.First(), true);
+            Assert.AreEqual("FirstName", request.Fields.Skip(1).First(), true);
+            Assert.AreEqual("LastName", request.Fields.Skip(2).First(), true);
+            Assert.AreEqual("BirthDate", request.Fields.Last(), true);
+        }
+
+        [TestMethod]
         public void CreateRequest_UnsupportedPaging_Throws()
         {
             var queryString = "offset=50&limit=10";

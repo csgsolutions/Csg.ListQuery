@@ -264,6 +264,7 @@ namespace Csg.ListQuery.Sql
             bool isBuffered = !builder.Configuration.UseStreamingResult;
             bool limitOracle = builder.Configuration.UseLimitOracle && !builder.Configuration.UseStreamingResult;
             int? dataCount = null;
+            bool hasMoreData = false;
 
             if (stmt.Count == 1)
             {
@@ -283,15 +284,17 @@ namespace Csg.ListQuery.Sql
             }
 
             //TODO: Can we still use .Take() here with a limit oracle when streaming?
+            // if the data is streamed, we can't provide a total count, and we can't use the next page oracle
             if (limitOracle)
             {
                 // if we used a limit oracle, then strip the last row off
+                int countBefore = data.Count();
                 data = data.Take(builder.Configuration.QueryDefinition.Limit);
                 dataCount = data.Count();
-                // if the data is streamed, we can't provide a total count, and we can't use the next page oracle
+                hasMoreData = countBefore > dataCount;
             }
 
-            return new ListQueryResult<T>(data, dataCount, totalCount, isBuffered);
+            return new ListQueryResult<T>(data, dataCount, totalCount, isBuffered, hasMoreData);
         }
     }
 

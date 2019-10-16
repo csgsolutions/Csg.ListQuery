@@ -8,12 +8,13 @@ namespace Csg.ListQuery.Abstractions
 {
     public class ListQueryResult<T>
     {
-        public ListQueryResult(IEnumerable<T> data, int? dataCount = null, int ? totalCount = null, bool isBuffered = true)
+        public ListQueryResult(IEnumerable<T> data, int? dataCount = null, int ? totalCount = null, bool isBuffered = true, bool hasMoreData = false)
         {
             this.Data = data;
             this.DataCount = dataCount;
             this.IsBuffered = isBuffered;
             this.TotalCount = totalCount;
+            this.HasMoreData = hasMoreData;
         }
 
         /// <summary>
@@ -35,5 +36,10 @@ namespace Csg.ListQuery.Abstractions
         /// Gets the length of the data in <see cref="Data"/> if the result is buffered.
         /// </summary>
         public int? DataCount { get; private set; }
+
+        /// <summary>
+        /// Gets a value that indicates if there is more data at the source that can be fetched by incrementing the requested offset.
+        /// </summary>
+        public bool HasMoreData { get; private set; }
     }
 }

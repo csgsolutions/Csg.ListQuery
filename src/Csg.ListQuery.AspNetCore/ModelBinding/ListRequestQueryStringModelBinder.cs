@@ -116,7 +116,7 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
                         //    throw new FormatException($"The selection field '{fieldName}' is not recognized.");
                         //}
 
-                        return fieldName; //propInfo.Name;
+                        return fieldName.Trim(); //propInfo.Name;
                     });
                 }
                 else if (pair.Key.Equals(c_order, StringComparison.OrdinalIgnoreCase))

@@ -65,7 +65,7 @@ namespace Csg.ListQuery.AspNetCore
                 response.Meta.CurrentCount = dataCount;
             }
 
-            if (queryResult.IsBuffered)
+            if (queryResult.HasMoreData)
             {
                 var nextOffset = (request.Offset + request.Limit);
                 response.Links.Next = CreateUri(request, currentUri, nextOffset).ToString();
