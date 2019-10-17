@@ -144,12 +144,12 @@ namespace Csg.ListQuery.AspNetCore
         /// <summary>
         /// Gets or sets the zero-based index of the first record in the result set that will be returned.
         /// </summary>
-        public int Offset { get; set; } = 0;
+        public int Offset { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of records that will be returned in the result set.
         /// </summary>
-        public int Limit { get; set; } = 100;
+        public int Limit { get; set; }
 
         /// <summary>
         /// Transforms a list request into a list query

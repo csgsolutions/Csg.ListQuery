@@ -290,7 +290,6 @@ namespace Csg.ListQuery.Tests
             Assert.AreEqual("Bob%", stmt.Parameters.First().Value.ToString());
         }
 
-
         [TestMethod]
         public void Test_ListQuery_InlineHandler()
         {
@@ -445,6 +444,35 @@ namespace Csg.ListQuery.Tests
             Assert.IsTrue(beforeInvoked);
             Assert.IsTrue(afterInvoked);
             Assert.AreEqual(2, qb.OrderBy.Count);
+        }
+
+        [TestMethod]
+        public void Test_ListQuery_DefaultSort()
+        {
+            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
+            var queryDef = new ListQueryDefinition();
+
+            var qb = ListQueryBuilder.Create(query, queryDef)
+                .NoValidation()
+                .DefaultSort("FirstName")
+                .Apply();
+
+            Assert.AreEqual(1, qb.OrderBy.Count);
+            Assert.AreEqual("FirstName", qb.OrderBy.First().ColumnName);
+        }
+
+        [TestMethod]
+        public void Test_ListQuery_DefaultLimit()
+        {
+            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
+            var queryDef = new ListQueryDefinition();
+
+            var qb = ListQueryBuilder.Create(query, queryDef)
+                .NoValidation()
+                .DefaultLimit(150)
+                .Apply();
+
+            Assert.AreEqual(150, qb.PagingOptions.Value.Limit);
         }
     }
 }

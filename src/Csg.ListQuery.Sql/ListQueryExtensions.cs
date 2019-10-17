@@ -91,6 +91,38 @@ namespace Csg.ListQuery.Sql
             return listQuery;
         }
 
+        public static IListQueryBuilder DefaultSort(this Csg.ListQuery.Sql.IListQueryBuilder builder, params string[] sortFields)
+        {
+            return DefaultSort(builder, sortFields);
+        }
+
+        public static IListQueryBuilder DefaultSort(this Csg.ListQuery.Sql.IListQueryBuilder builder, IEnumerable<string> sortFields)
+        {
+            builder.AfterApply((config, query) =>
+            {
+                if (query.OrderBy.Count == 0)
+                {
+                    query.OrderBy(sortFields.ToArray());
+                }
+            });
+            return builder;
+        }
+
+        public static IListQueryBuilder DefaultLimit(this Csg.ListQuery.Sql.IListQueryBuilder builder, int limit)
+        {
+            builder.AfterApply((config, query) =>
+            {
+                if (query.PagingOptions == null)
+                {
+                    query.PagingOptions = new SqlPagingOptions()
+                    {
+                        Limit = limit,
+                        Offset = 0
+                    };
+                }
+            });
+            return builder;
+        }
 
         public static IListQueryBuilder BeforeApply(this IListQueryBuilder builder, Action<ListQueryBuilderConfiguration> action)
         {
