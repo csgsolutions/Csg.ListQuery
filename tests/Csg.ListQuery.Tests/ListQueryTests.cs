@@ -5,6 +5,7 @@ using Csg.Data.Sql;
 using System.Linq;
 using Csg.Data;
 using Csg.ListQuery.Sql;
+using System.Data;
 
 namespace Csg.ListQuery.Tests
 {
@@ -473,6 +474,29 @@ namespace Csg.ListQuery.Tests
                 .Apply();
 
             Assert.AreEqual(150, qb.PagingOptions.Value.Limit);
+        }
+
+        [TestMethod] 
+        public void ReflectionHelper_GetListPropertyInfo_DbTypeMappingsCorrect()
+        {
+            var properties = Csg.ListQuery.Internal.ReflectionHelper.GetListPropertyInfo(typeof(Mock.TypeCheckModel));
+
+            Assert.AreEqual(DbType.Byte, properties[nameof(Mock.TypeCheckModel.Byte)].DataType);
+            Assert.AreEqual(DbType.Int16, properties[nameof(Mock.TypeCheckModel.Int16)].DataType);
+            Assert.AreEqual(DbType.Int32, properties[nameof(Mock.TypeCheckModel.Int32)].DataType);
+            Assert.AreEqual(DbType.Int32, properties[nameof(Mock.TypeCheckModel.NullableInt32)].DataType);
+            Assert.AreEqual(DbType.Int64, properties[nameof(Mock.TypeCheckModel.Int64)].DataType);
+            Assert.AreEqual(DbType.Boolean, properties[nameof(Mock.TypeCheckModel.Bool)].DataType);
+            Assert.AreEqual(DbType.Guid, properties[nameof(Mock.TypeCheckModel.Guid)].DataType);
+            Assert.AreEqual(DbType.DateTime2, properties[nameof(Mock.TypeCheckModel.DateTime)].DataType);
+            Assert.AreEqual(DbType.DateTimeOffset, properties[nameof(Mock.TypeCheckModel.DateTimeOffset)].DataType);
+            Assert.AreEqual(DbType.Time, properties[nameof(Mock.TypeCheckModel.TimeSpan)].DataType);
+            Assert.AreEqual(DbType.String, properties[nameof(Mock.TypeCheckModel.String)].DataType);
+            Assert.AreEqual(DbType.StringFixedLength, properties[nameof(Mock.TypeCheckModel.Char)].DataType);
+            Assert.AreEqual(DbType.Binary, properties[nameof(Mock.TypeCheckModel.ByteArray)].DataType);
+            Assert.AreEqual(DbType.Decimal, properties[nameof(Mock.TypeCheckModel.Decimal)].DataType);
+            Assert.AreEqual(DbType.Single, properties[nameof(Mock.TypeCheckModel.Float)].DataType);
+            Assert.AreEqual(DbType.Double, properties[nameof(Mock.TypeCheckModel.Double)].DataType);
         }
     }
 }

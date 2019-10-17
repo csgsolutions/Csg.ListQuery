@@ -92,12 +92,9 @@ namespace Csg.ListQuery.Internal
         /// <remarks>From https://github.com/csgsolutions/Csg.Data/blob/1a8b0c54047cc645a5b7b42119a64f4c70c31ba5/Csg.Data/DbConvert.cs#L145</remarks>
         /// <param name="type"></param>
         /// <returns></returns>
-        internal static System.Data.DbType TypeToDbType(Type type)
+        public static System.Data.DbType TypeToDbType(Type type)
         {
-            if (type == typeof(Nullable<>))
-            {
-                type = type.GetGenericArguments()[0];
-            }
+            type = Nullable.GetUnderlyingType(type) ?? type;
 
             if (type == typeof(byte)) return DbType.Byte;
             if (type == typeof(short)) return DbType.Int16;
