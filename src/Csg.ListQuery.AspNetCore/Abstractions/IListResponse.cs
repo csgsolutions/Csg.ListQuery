@@ -16,11 +16,6 @@ namespace Csg.ListQuery.AspNetCore.Abstractions
         Type GetDataType();
 
         /// <summary>
-        /// Gets the fields that are populated on the returned data.
-        /// </summary>
-        IEnumerable<string> Fields { get; }
-
-        /// <summary>
         /// Gets the records returned.
         /// </summary>
         IEnumerable Data { get; }

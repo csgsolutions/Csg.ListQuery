@@ -13,69 +13,18 @@ namespace Csg.ListQuery.AspNetCore
 
         public ListResponse(IListRequest request, IEnumerable<T> data)
         {
-            this.Fields = request.Fields;
             this.Data = data;
+            this.Meta = this.Meta ?? new ListResponseMeta();
+            this.Meta.Fields = request.Fields;
         }
-
-        public virtual IEnumerable<string> Fields { get; set; }
 
         public virtual IEnumerable<T> Data { get; set; }
 
-        IEnumerable<string> IListResponse.Fields => this.Fields;
-
+        public virtual ListResponseMeta Meta { get; set; }
+        
         IEnumerable IListResponse.Data => this.Data;
 
         Type IListResponse.GetDataType() => typeof(T);
-    }
-
-    public class PagedListResponse<T> : ListResponse<T>
-    {
-        public PagedListResponse() : base()
-        {
-        }
-
-        public PagedListResponse(IListRequest request, IEnumerable<T> data) : base(request, data)
-        {
-
-        }
-
-        public PagedListLinks Links { get; set; }
-
-        public PagedListMeta Meta { get; set; }
-    }
-
-    public class PagedListLinks
-    {
-        public string Next { get; set; }
-        public string Self { get; set; }
-        public string Prev { get; set; }
-    }
-
-    public struct PageInfo
-    {
-        private int _offset;
-
-        public PageInfo(int offset)
-        {
-            _offset = offset;
-        }
-
-        public int Offset => _offset;
-    }
-
-    public class PagedListMeta
-    {
-        public PagedListMeta() //: base(StringComparer.OrdinalIgnoreCase)
-        {
-
-        }
-
-        public PageInfo? Next { get; set; }
-
-        public PageInfo? Prev { get; set; }
-
-        public int? CurrentCount { get; set; }
-
-        public int? TotalCount { get; set; }
+        
     }
 }

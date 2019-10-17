@@ -24,16 +24,7 @@ namespace Csg.ListQuery.AspNetCore
             Func<TInfrastructure, TDomain> selector) where TDomain : new()
         {
             var response = new ListResponse<TDomain>(request, queryResult.Data.Select(selector));
-
-            if (request.Fields != null)
-            {
-                response.Fields = properties.Select(s => s.Value.JsonName).Intersect(request.Fields, StringComparer.OrdinalIgnoreCase);
-            }
-            else
-            {
-                response.Fields = properties.Select(s => s.Value.JsonName);
-            }
-
+                       
             return response;
         }
 
@@ -47,18 +38,27 @@ namespace Csg.ListQuery.AspNetCore
         {
             IEnumerable<TDomain> data = queryResult.Data.Select(selector);
             int? dataCount = queryResult.IsBuffered ? data.Count() : (int?)null;
-
+                        
             var response = new PagedListResponse<TDomain>()
             {
                 Links = new PagedListLinks()
                 {
                     Self = currentUri.AbsoluteUri
                 },
-                Meta = new PagedListMeta()
+                Meta = new PagedListResponseMeta()
                 {
-                    TotalCount = queryResult.TotalCount
+                    TotalCount = queryResult.TotalCount                     
                 }
             };
+
+            if (request.Fields != null)
+            {
+                response.Meta.Fields = properties.Select(s => s.Value.JsonName).Intersect(request.Fields, StringComparer.OrdinalIgnoreCase);
+            }
+            else
+            {
+                response.Meta.Fields = properties.Select(s => s.Value.JsonName);
+            }
 
             if (dataCount.HasValue)
             {
@@ -80,15 +80,6 @@ namespace Csg.ListQuery.AspNetCore
                 var prevOffset = Math.Max(request.Offset - request.Limit, 0);
                 response.Links.Prev = CreateUri(request, currentUri, prevOffset).ToString();
                 response.Meta.Prev = new PageInfo(prevOffset);
-            }
-
-            if (request.Fields != null)
-            {
-                response.Fields = properties.Select(s => s.Value.JsonName).Intersect(request.Fields, StringComparer.OrdinalIgnoreCase);
-            }
-            else
-            {
-                response.Fields = properties.Select(s => s.Value.JsonName);
             }
 
             return response;
