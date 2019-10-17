@@ -1,11 +1,11 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/ccooswpu1m658409?svg=true)](https://ci.appveyor.com/project/jusbuc2k/csg-data-listquery)
+
 # Introduction 
-This repository provides the basic folder structure for a .NET Core project.
+Provides a structured way to build components that return lists of data.
 
 ## Folders & Files
 
 ### build
-
-[![Build status](https://ci.appveyor.com/api/projects/status/hx4so74ja1y42lfw/branch/master?svg=true)](https://ci.appveyor.com/project/jusbuc2k/csg-data/branch/master)
 
 This folder contains repository-wide settings, targets, properties related to building the project. ```repo.props``` contains MSBuild properties that will apply to all projects in the repository. ```sources.props``` contains NuGet 
 repositories that will be used when restoring packages to projects in the repository.
