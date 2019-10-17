@@ -93,7 +93,7 @@ namespace Csg.ListQuery.Sql
 
         public static IListQueryBuilder DefaultSort(this Csg.ListQuery.Sql.IListQueryBuilder builder, params string[] sortFields)
         {
-            return DefaultSort(builder, sortFields);
+            return DefaultSort(builder, (IEnumerable<string>)sortFields);
         }
 
         public static IListQueryBuilder DefaultSort(this Csg.ListQuery.Sql.IListQueryBuilder builder, IEnumerable<string> sortFields)
@@ -102,7 +102,10 @@ namespace Csg.ListQuery.Sql
             {
                 if (query.OrderBy.Count == 0)
                 {
-                    query.OrderBy(sortFields.ToArray());
+                    foreach (var sortField in sortFields)
+                    {
+                        query.OrderBy.Add(sortField);
+                    }
                 }
             });
             return builder;
@@ -263,7 +266,7 @@ namespace Csg.ListQuery.Sql
 
         public static IDbQueryBuilder GetCountQuery(IListQueryBuilder query)
         {
-            var countQuery = query.Apply().Select(new SqlRawColumn("COUNT(1)"));
+            var countQuery = query.Apply().SelectOnly(new SqlRawColumn("COUNT(1)"));
 
             countQuery.PagingOptions = null;
             countQuery.OrderBy.Clear();

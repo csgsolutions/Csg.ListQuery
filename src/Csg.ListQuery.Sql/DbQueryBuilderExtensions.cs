@@ -21,13 +21,13 @@ namespace Csg.Data
         }
         
         /// <summary>
-        /// Sets the columns that will be selected on the given query builder.
+        /// Sets the columns that will be selected on the given query builder and replaces any existing selections.
         /// </summary>
         /// <param name="queryBuilder"></param>
         /// <param name="columns"></param>
         /// <remarks>This method replaces any existing selected columns on the query builder.</remarks>
         /// <returns></returns>
-        public static IDbQueryBuilder Select(this IDbQueryBuilder queryBuilder, params ISqlColumn[] columns)
+        public static IDbQueryBuilder SelectOnly(this IDbQueryBuilder queryBuilder, params ISqlColumn[] columns)
         {
             var query = queryBuilder.Fork();
 
@@ -52,6 +52,16 @@ namespace Csg.Data
             {
                 yield return SqlColumn.Parse(table, columnExpr);
             }
+        }
+
+        public static IDbQueryWhereClause Any(this Csg.Data.IDbQueryWhereClause where, Action<IDbQueryWhereClause> whereClause)
+        {
+            var orWhere = new Csg.Data.DbQueryWhereClause(where.Root, SqlLogic.Or);
+
+            whereClause(orWhere);
+            where.AddFilter(orWhere.Filters);
+
+            return where;
         }
     }
 }
