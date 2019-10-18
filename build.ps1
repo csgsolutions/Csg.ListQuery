@@ -13,7 +13,9 @@ Param(
 	[string]
 	$BuildNumber="",
 	[switch]
-	$NoPackage
+	$NoPackage,
+	[string]
+	$PullRequestNumber=""
 )
 
 $Solution =  "$(Get-Item -Path *.sln | Select-Object -First 1)"
@@ -29,8 +31,10 @@ $TestProjects = Get-Item -Path tests\**\*Tests.csproj | %{ $_.FullName }
 
 if ($BuildNumber) {
 	$BuildNumber = $BuildNumber.PadLeft(5, "0")
-
 }
+
+$SkipPackage = $NoPackage.IsPresent
+
 Write-Host "==============================================================================" -ForegroundColor DarkYellow
 Write-Host "The Build Script for Csg.ListQuery"
 Write-Host "==============================================================================" -ForegroundColor DarkYellow
@@ -38,7 +42,13 @@ Write-Host "Build Tools:`t$BuildToolsVersion"
 Write-Host "Solution:`t$Solution"
 Write-Host "Build Number:`t$BuildNumber"
 Write-Host "Skip Tests:`t$NoTest"
+Write-Host "Pull Req:`t$PullRequestNumber"
 Write-Host "==============================================================================" -ForegroundColor DarkYellow
+
+if ($PullRequestNumber) {
+    Write-Host "Building for a pull request (#$PullRequestNumber), skipping packaging." -ForegroundColor Yellow
+    $SkipPackage = $true
+}
 
 try {
 	. "$PSScriptRoot/bootstrap.ps1"	
@@ -81,7 +91,7 @@ try {
 		}
 	}
 
-	if ( !($NoPackage.IsPresent) -and $PackageProjects.Length -gt 0 ) {
+	if ( !($SkipPackage) -and $PackageProjects.Length -gt 0 ) {
 		Write-Host "Packaging..."  -ForegroundColor Magenta
 		foreach ($pack_proj in $PackageProjects){
 			Write-Host "Packing $pack_proj"
@@ -94,7 +104,7 @@ try {
 		}
 	}
 
-	if ( !($NoPackage.IsPresent) -and $PublishProjects.Length -gt 0 ) {
+	if ( !($SkipPackage) -and $PublishProjects.Length -gt 0 ) {
 		Write-Host "Publishing..." -ForegroundColor Magenta
 		foreach ($pub_proj in $PublishProjects){
 			Write-Host "Publishing $pack_proj"

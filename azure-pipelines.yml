@@ -9,7 +9,7 @@ steps:
   displayName: 'Build'
   inputs:
     scriptName: build.ps1
-    arguments: '-BuildNumber $(Build.BuildNumber) -NoTest'
+    arguments: '-BuildNumber $(Build.BuildNumber) -NoTest -PullRequestNumber $(System.PullRequest.PullRequestNumber)'
 - task: DotNetCoreCLI@2
   displayName: 'Test'
   inputs:
