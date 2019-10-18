@@ -23,8 +23,8 @@ $PackageProjects = @(
 	".\src\Csg.ListQuery\Csg.ListQuery.csproj",
 	".\src\Csg.ListQuery.Sql\Csg.ListQuery.Sql.csproj"
 	".\src\Csg.ListQuery.AspNetCore.Abstractions\Csg.ListQuery.AspNetCore.Abstractions.csproj"
+	".\src\Csg.ListQuery.AspNetCore.Client\Csg.ListQuery.AspNetCore.Client.csproj"
 	".\src\Csg.ListQuery.AspNetCore\Csg.ListQuery.AspNetCore.csproj",
-	".\src\Csg.ListQuery.AspNetCore\Csg.ListQuery.AspNetCore.Client.csproj"
 )
 $PublishProjects = @(
 	#".\src\Web\Web.csproj"
