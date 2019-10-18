@@ -12,7 +12,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
         public void CreateRequest_FromString()
         {
             var queryString = "fields=PersonID,FirstName,LastName,BirthDate&where[firstName]=bob&order=LastName&order=-FirstName";
-            var request = ModelBinding.ListRequestQueryStringModelBinder.CreateRequest<ListRequest>(queryString);
+            var request = new ModelBinding.ListRequestFactory().CreateRequest<ListRequest>(queryString);
 
             Assert.AreEqual(4, request.Fields.Count());
             Assert.AreEqual("PersonID", request.Fields.First(), true);
@@ -35,7 +35,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
         public void CreateRequest_FromString_TrimsFields()
         {
             var queryString = "fields=PersonID, FirstName, LastName,BirthDate";
-            var request = ModelBinding.ListRequestQueryStringModelBinder.CreateRequest<ListRequest>(queryString);
+            var request = new ModelBinding.ListRequestFactory().CreateRequest<ListRequest>(queryString);
 
             Assert.AreEqual(4, request.Fields.Count());
             Assert.AreEqual("PersonID", request.Fields.First(), true);
@@ -51,15 +51,26 @@ namespace Csg.ListQuery.AspNetCore.Tests
 
             Assert.ThrowsException<NotSupportedException>(() =>
             {
-                ModelBinding.ListRequestQueryStringModelBinder.CreateRequest<ListRequest>(queryString);
+                new ModelBinding.ListRequestFactory().CreateRequest<ListRequest>(queryString);
             });            
+        }
+
+        [TestMethod]
+        public void CreateRequest_UnsupportedParameter_Throws()
+        {
+            var queryString = "fields=FirstName&foo=bar";
+
+            Assert.ThrowsException<FormatException>(() =>
+            {
+                new ModelBinding.ListRequestFactory().CreateRequest<ListRequest>(queryString);
+            });
         }
 
         [TestMethod]
         public void CreateRequest_FromStringWithPaging()
         {
             var queryString = "fields=PersonID,FirstName,LastName,BirthDate&where[firstName]=bob&order=LastName&order=-FirstName&offset=50&limit=10";
-            var request = ModelBinding.ListRequestQueryStringModelBinder.CreateRequest<PagedListRequest>(queryString);
+            var request = new ModelBinding.ListRequestFactory().CreateRequest<PagedListRequest>(queryString);
 
             Assert.AreEqual(4, request.Fields.Count());
             Assert.AreEqual("PersonID", request.Fields.First(), true);
@@ -80,23 +91,5 @@ namespace Csg.ListQuery.AspNetCore.Tests
             Assert.AreEqual(10, request.Limit);
             Assert.AreEqual(50, request.Offset);
         }
-
-        //[TestMethod]
-        //public void CreateRequest_FromString_Perf()
-        //{
-        //    var queryString = "fields=PersonID,FirstName,LastName,BirthDate&where[firstName]=bob&order=LastName";
-        //    var request = ModelBinding.ListRequestModelBinder.CreateRequest<ListRequest<Person>>(queryString);
-
-        //    var sw = new System.Diagnostics.Stopwatch();
-
-        //    sw.Start();
-        //    for(int i = 1; i < 1000000; i++)
-        //    {
-        //        ModelBinding.ListRequestModelBinder.CreateRequest<ListRequest<Person>>(queryString);
-        //    }
-        //    sw.Stop();
-
-        //    System.Diagnostics.Debug.WriteLine($"Time: {sw.ElapsedMilliseconds}ms");
-        //}
     }
 }

@@ -12,7 +12,7 @@ namespace Csg.ListQuery.AspNetCore
         public static ListResponse<T> ToListResponse<T>(
             this ListQueryResult<T> queryResult,
             IListRequest request,
-            IDictionary<string, DomainPropertyInfo> properties) where T : new()
+            IDictionary<string, ListItemPropertyInfo> properties) where T : new()
         {
             return ToListResponse<T, T>(queryResult, request, properties, s => s);
         }
@@ -20,8 +20,8 @@ namespace Csg.ListQuery.AspNetCore
         public static ListResponse<TDomain> ToListResponse<TInfrastructure, TDomain>(
             this ListQueryResult<TInfrastructure> queryResult,
             IListRequest request,
-            IDictionary<string, DomainPropertyInfo> properties,
-            Func<TInfrastructure, TDomain> selector) where TDomain : new()
+            IDictionary<string, ListItemPropertyInfo> properties,
+            Func<TInfrastructure, TDomain> selector)
         {
             var response = new ListResponse<TDomain>(request, queryResult.Data.Select(selector));
                        
@@ -31,15 +31,67 @@ namespace Csg.ListQuery.AspNetCore
         public static PagedListResponse<TDomain> ToListResponse<TInfrastructure, TDomain>(
             this ListQueryResult<TInfrastructure> queryResult,
             IPagedListRequest request,
-            IDictionary<string, DomainPropertyInfo> properties,
-            Func<TInfrastructure, TDomain> selector,
-            System.Uri currentUri
-        ) where TDomain : new()
+            IDictionary<string, ListItemPropertyInfo> properties,
+            Func<TInfrastructure, TDomain> selector)
         {
             IEnumerable<TDomain> data = queryResult.Data.Select(selector);
             int? dataCount = queryResult.IsBuffered ? data.Count() : (int?)null;
-                        
+
             var response = new PagedListResponse<TDomain>()
+            {
+                Meta = new PagedListResponseMeta()
+                {
+                    TotalCount = queryResult.TotalCount
+                }
+            };
+
+            if (request.Fields != null)
+            {
+                response.Meta.Fields = properties.Select(s => s.Value.JsonName).Intersect(request.Fields, StringComparer.OrdinalIgnoreCase);
+            }
+            else
+            {
+                response.Meta.Fields = properties.Select(s => s.Value.JsonName);
+            }
+
+            if (dataCount.HasValue)
+            {
+                response.Meta.CurrentCount = dataCount;
+            }
+
+            if (queryResult.HasMoreData)
+            {
+                var nextOffset = (request.Offset + request.Limit);
+                response.Meta.Next = new PageInfo(nextOffset);
+            }
+
+            // Wait until here to set data so we can deal with the useLimitCanary situation above
+            response.Data = data;
+
+            if (request.Offset > 0)
+            {
+                var prevOffset = Math.Max(request.Offset - request.Limit, 0);
+                response.Meta.Prev = new PageInfo(prevOffset);
+            }
+
+            return response;
+        }
+
+        public static PagedListHateoasResponse<TDomain> ToListResponse<TInfrastructure, TDomain>(
+            this ListQueryResult<TInfrastructure> queryResult,
+            IPagedListRequest request,
+            IDictionary<string, ListItemPropertyInfo> properties,
+            Func<TInfrastructure, TDomain> selector,
+            System.Uri currentUri
+        )
+        {
+
+            properties = properties ?? throw new ArgumentNullException(nameof(properties));
+
+            IEnumerable<TDomain> data = queryResult.Data.Select(selector);
+            int? dataCount = queryResult.IsBuffered ? data.Count() : (int?)null;
+                        
+            var response = new PagedListHateoasResponse<TDomain>()
             {
                 Links = new PagedListLinks()
                 {

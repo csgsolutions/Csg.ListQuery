@@ -1,5 +1,6 @@
 ﻿using Csg.ListQuery.AspNetCore.Abstractions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using System;
 
 namespace Csg.ListQuery.AspNetCore.ModelBinding
@@ -13,10 +14,9 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
                 throw new ArgumentNullException(nameof(context));
             }
 
-            // does the model type implement IListRequest?
             if (typeof(IListRequest).IsAssignableFrom(context.Metadata.ModelType))
             {
-                return new ListRequestQueryStringModelBinder();
+                return new BinderTypeModelBinder(typeof(ListRequestQueryStringModelBinder));
             }
 
             return null;

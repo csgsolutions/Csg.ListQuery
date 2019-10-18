@@ -12,10 +12,10 @@ namespace Csg.ListQuery.AspNetCore
             this.ListQuery = query;
         }
 
-        public ICollection<ListRequestValidationError> Errors { get; set; }
+        public virtual ICollection<ListRequestValidationError> Errors { get; set; }
 
-        public bool IsValid { get => this.Errors.Count <= 0; }
+        public virtual bool IsValid { get => this.Errors.Count <= 0; }
 
-        public Csg.ListQuery.Abstractions.ListQueryDefinition ListQuery { get; }
+        public virtual Csg.ListQuery.Abstractions.ListQueryDefinition ListQuery { get; }
     }
 }

@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using Csg.ListQuery.AspNetCore.Abstractions;
 
-namespace Csg.ListQuery.AspNetCore
+namespace Csg.ListQuery.AspNetCore.Abstractions
 {
-    public class ListResponse<T> : IListResponse
+    public class ListResponse<T> : IListResponse<T>
     {
         public ListResponse()
         {
@@ -21,10 +21,5 @@ namespace Csg.ListQuery.AspNetCore
         public virtual IEnumerable<T> Data { get; set; }
 
         public virtual ListResponseMeta Meta { get; set; }
-        
-        IEnumerable IListResponse.Data => this.Data;
-
-        Type IListResponse.GetDataType() => typeof(T);
-        
     }
 }

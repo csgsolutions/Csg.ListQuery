@@ -9,22 +9,22 @@ namespace Csg.ListQuery.AspNetCore
     /// <summary>
     /// Represents a query for a list of objects that optionally specifies a set of fields to return, filters, and sort order.
     /// </summary>
-    public class ListRequest : IListRequest
+    public class ListRequest : IListRequestModel
     {
         /// <summary>
         /// Gets or sets a collection of field names to return.
         /// </summary>
-        public IEnumerable<string> Fields { get; set; }
+        public virtual IEnumerable<string> Fields { get; set; }
 
         /// <summary>
         /// Gets or sets a collection of filters to apply.
         /// </summary>
-        public IEnumerable<Csg.ListQuery.Abstractions.ListQueryFilter> Filters { get; set; }
+        public virtual IEnumerable<Csg.ListQuery.Abstractions.ListQueryFilter> Filters { get; set; }
 
         /// <summary>
         /// Gets or sets a list of sort actions to apply.
         /// </summary>
-        public IEnumerable<Csg.ListQuery.Abstractions.ListQuerySort> Sort { get; set; }
+        public virtual IEnumerable<Csg.ListQuery.Abstractions.ListQuerySort> Sort { get; set; }
 
         /// <summary>
         /// Transforms a list request into a list query
@@ -35,9 +35,9 @@ namespace Csg.ListQuery.AspNetCore
         /// <exception cref="MissingFieldException">When a field is not valid</exception>
         /// <returns></returns>
         public virtual ListRequestValidationResult Validate(
-            IDictionary<string, DomainPropertyInfo> selectableProperties,
-            IDictionary<string, DomainPropertyInfo> filerableProperties,
-            IDictionary<string, DomainPropertyInfo> sortableProperties
+            IDictionary<string, ListItemPropertyInfo> selectableProperties,
+            IDictionary<string, ListItemPropertyInfo> filerableProperties,
+            IDictionary<string, ListItemPropertyInfo> sortableProperties
         )
         {
             var queryDef = new Csg.ListQuery.Abstractions.ListQueryDefinition();
@@ -48,7 +48,7 @@ namespace Csg.ListQuery.AspNetCore
                 queryDef.Selections = this.Fields.Select(s => new
                 {
                     Raw = s,
-                    Exists = selectableProperties.TryGetValue(s, out DomainPropertyInfo domainProp),
+                    Exists = selectableProperties.TryGetValue(s, out ListItemPropertyInfo domainProp),
                     Domain = domainProp
                 }).Where(field =>
                 {
@@ -71,7 +71,7 @@ namespace Csg.ListQuery.AspNetCore
                 queryDef.Filters = this.Filters.Select(s => new
                 {
                     Raw = s,
-                    Exists = filerableProperties.TryGetValue(s.Name, out DomainPropertyInfo domainProp),
+                    Exists = filerableProperties.TryGetValue(s.Name, out ListItemPropertyInfo domainProp),
                     Domain = domainProp
                 }).Where(filter =>
                 {
@@ -101,7 +101,7 @@ namespace Csg.ListQuery.AspNetCore
                 queryDef.Sort = this.Sort.Select(s => new
                 {
                     Raw = s,
-                    Exists = sortableProperties.TryGetValue(s.Name, out DomainPropertyInfo domainProp),
+                    Exists = sortableProperties.TryGetValue(s.Name, out ListItemPropertyInfo domainProp),
                     Domain = domainProp
                 }).Where(s =>
                 {
@@ -144,12 +144,12 @@ namespace Csg.ListQuery.AspNetCore
         /// <summary>
         /// Gets or sets the zero-based index of the first record in the result set that will be returned.
         /// </summary>
-        public int Offset { get; set; }
+        public virtual int Offset { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of records that will be returned in the result set.
         /// </summary>
-        public int Limit { get; set; }
+        public virtual int Limit { get; set; }
 
         /// <summary>
         /// Transforms a list request into a list query
@@ -158,7 +158,7 @@ namespace Csg.ListQuery.AspNetCore
         /// <param name="filerableProperties"></param>
         /// <param name="sortableProperties"></param>
         /// <returns></returns>
-        public override ListRequestValidationResult Validate(IDictionary<string, DomainPropertyInfo> selectableProperties, IDictionary<string, DomainPropertyInfo> filerableProperties, IDictionary<string, DomainPropertyInfo> sortableProperties)
+        public override ListRequestValidationResult Validate(IDictionary<string, ListItemPropertyInfo> selectableProperties, IDictionary<string, ListItemPropertyInfo> filerableProperties, IDictionary<string, ListItemPropertyInfo> sortableProperties)
         {
             var result = base.Validate(selectableProperties, filerableProperties, sortableProperties);
 

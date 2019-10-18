@@ -1,4 +1,4 @@
-﻿namespace Csg.ListQuery.AspNetCore
+﻿namespace Csg.ListQuery.AspNetCore.Abstractions
 {
     public struct PageInfo
     {
