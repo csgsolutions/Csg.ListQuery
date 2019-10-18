@@ -37,7 +37,7 @@ steps:
    if ($versionSuffix) {
    Write-Output "##vso[build.updatebuildnumber]$versionPrefix-$versionSuffix-$BuildNumber"
    } else {
-   Write-Output "##vso[build.updatebuildnumber]$versionPrefix-final-$BuildNumber"
+   Write-Output "##vso[build.updatebuildnumber]$versionPrefix-$BuildNumber"
    }
   displayName: 'Set Build Number'
   condition: succeededOrFailed()
