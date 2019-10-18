@@ -5,16 +5,25 @@ using System.Text;
 
 namespace Csg.ListQuery.AspNetCore
 {
+    /// <summary>
+    /// Helper methods for property reflection
+    /// </summary>
     public static class PropertyHelper
     {
-        public static Dictionary<string, DomainPropertyInfo> GetDomainProperties(Type type, Func<DomainPropertyInfo, bool> predicate = null)
+        /// <summary>
+        /// Gets a list of the properties for a give type and optionally matching the given predicate.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public static Dictionary<string, ListItemPropertyInfo> GetProperties(Type type, Func<ListItemPropertyInfo, bool> predicate = null)
         {
             var listConfigs = Csg.ListQuery.Internal.ReflectionHelper.GetListPropertyInfo(type, fromCache: true);
            
             return listConfigs.Values
                 .Select(prop =>
                 {
-                    var propInfo = new DomainPropertyInfo();
+                    var propInfo = new ListItemPropertyInfo();
                     var jsonPropertyAttribute = prop.PropertyInfo.GetCustomAttributes(typeof(Newtonsoft.Json.JsonPropertyAttribute), false).FirstOrDefault();
 
                     propInfo.Property = prop.PropertyInfo;

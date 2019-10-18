@@ -22,11 +22,5 @@ namespace Csg.ListQuery.AspNetCore.Abstractions
         /// When implemented in a derived class, gets or sets a list of sort actions to apply.
         /// </summary>
         IEnumerable<Csg.ListQuery.Abstractions.ListQuerySort> Sort { get; set; }
-
-        ListRequestValidationResult Validate(
-            IDictionary<string, DomainPropertyInfo> selectableProperties,
-            IDictionary<string, DomainPropertyInfo> filerableProperties,
-            IDictionary<string, DomainPropertyInfo> sortableProperties            
-        );
     }
 }

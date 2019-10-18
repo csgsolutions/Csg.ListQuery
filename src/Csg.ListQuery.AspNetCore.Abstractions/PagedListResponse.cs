@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using Csg.ListQuery.AspNetCore.Abstractions;
 
-namespace Csg.ListQuery.AspNetCore
+namespace Csg.ListQuery.AspNetCore.Abstractions
 {
-    public class PagedListResponse<T> : ListResponse<T>
+    public class PagedListResponse<T> : ListResponse<T>, IPagedListResponse<T>
     {
         public PagedListResponse() : base()
         {
@@ -15,8 +14,6 @@ namespace Csg.ListQuery.AspNetCore
             this.Meta.Fields = request.Fields;
         }
 
-        public PagedListLinks Links { get; set; }
-
-        public PagedListResponseMeta Meta { get; set; }
+        public virtual PagedListResponseMeta Meta { get; set; }
     }
 }

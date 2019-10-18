@@ -10,10 +10,10 @@ Param(
 	$BuildToolsVersion = "1.0-latest",
 	[switch]
 	$NoTest,
-	[string]
-	$BuildNumber="",
 	[switch]
 	$NoPackage,
+	[string]
+	$BuildNumber="",
 	[string]
 	$PullRequestNumber=""
 )
@@ -22,7 +22,9 @@ $Solution =  "$(Get-Item -Path *.sln | Select-Object -First 1)"
 $PackageProjects = @(
 	".\src\Csg.ListQuery\Csg.ListQuery.csproj",
 	".\src\Csg.ListQuery.Sql\Csg.ListQuery.Sql.csproj"
-	".\src\Csg.ListQuery.AspNetCore\Csg.ListQuery.AspNetCore.csproj"
+	".\src\Csg.ListQuery.AspNetCore\Csg.ListQuery.AspNetCore.Abstractions.csproj"
+	".\src\Csg.ListQuery.AspNetCore\Csg.ListQuery.AspNetCore.csproj",
+	".\src\Csg.ListQuery.AspNetCore\Csg.ListQuery.AspNetCore.Client.csproj"
 )
 $PublishProjects = @(
 	#".\src\Web\Web.csproj"

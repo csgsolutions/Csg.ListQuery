@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Csg.ListQuery.AspNetCore.Abstractions\Csg.ListQuery.AspNetCore.Abstractions.csproj" />
+    <ProjectReference Include="..\Csg.ListQuery\Csg.ListQuery.csproj" />
   </ItemGroup>
 
 </Project>

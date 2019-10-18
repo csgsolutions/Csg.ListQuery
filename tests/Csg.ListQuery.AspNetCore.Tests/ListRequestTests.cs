@@ -12,9 +12,9 @@ namespace Csg.ListQuery.AspNetCore.Tests
         [TestMethod]
         public void Test_PropertyHelper_GetDomainProperties()
         {
-            var selectProps = PropertyHelper.GetDomainProperties(typeof(Person));
-            var filterProps = PropertyHelper.GetDomainProperties(typeof(PersonFilters));
-            var sortProps = PropertyHelper.GetDomainProperties(typeof(PersonSorts));
+            var selectProps = PropertyHelper.GetProperties(typeof(Person));
+            var filterProps = PropertyHelper.GetProperties(typeof(PersonFilters));
+            var sortProps = PropertyHelper.GetProperties(typeof(PersonSorts));
 
             Assert.AreEqual(4, selectProps.Count);
             Assert.AreEqual(4, selectProps.Count(x => x.Value.IsSortable));
@@ -31,9 +31,9 @@ namespace Csg.ListQuery.AspNetCore.Tests
         [TestMethod]
         public void Test_Validate_AllArgs()
         {
-            var selectProps = PropertyHelper.GetDomainProperties(typeof(Person));
-            var filterProps = PropertyHelper.GetDomainProperties(typeof(PersonFilters), x => x.IsFilterable);
-            var sortProps = PropertyHelper.GetDomainProperties(typeof(PersonSorts), x => x.IsSortable);
+            var selectProps = PropertyHelper.GetProperties(typeof(Person));
+            var filterProps = PropertyHelper.GetProperties(typeof(PersonFilters), x => x.IsFilterable);
+            var sortProps = PropertyHelper.GetProperties(typeof(PersonSorts), x => x.IsSortable);
            
             var request = new ListRequest();
             request.Fields = new string[] { "PersonID", "LastName", "FirstName", "BirthDate" };
