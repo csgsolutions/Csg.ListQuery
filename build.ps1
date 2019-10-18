@@ -17,6 +17,7 @@ Param(
 	[string]
 	$PullRequestNumber=""
 )
+. "$PSScriptRoot/bootstrap.ps1"	
 
 $Solution =  "$(Get-Item -Path *.sln | Select-Object -First 1)"
 $PackageProjects = @(
@@ -30,12 +31,15 @@ $PublishProjects = @(
 	#".\src\Web\Web.csproj"
 )
 $TestProjects = Get-Item -Path tests\**\*Tests.csproj | %{ $_.FullName }
+$BuildNumber = Get-BuildNumber $BuildNumber
+$SkipPackage = $NoPackage.IsPresent
 
-if ($BuildNumber) {
-	$BuildNumber = $BuildNumber.PadLeft(5, "0")
+if ($PullRequestNumber) {
+    Write-Host "Building for a pull request (#$PullRequestNumber), skipping packaging." -ForegroundColor Yellow
+    $SkipPackage = $true
 }
 
-$SkipPackage = $NoPackage.IsPresent
+Set-BuildInformation .\version.props $BuildNumber
 
 Write-Host "==============================================================================" -ForegroundColor DarkYellow
 Write-Host "The Build Script for Csg.ListQuery"
@@ -47,13 +51,9 @@ Write-Host "Skip Tests:`t$NoTest"
 Write-Host "Pull Req:`t$PullRequestNumber"
 Write-Host "==============================================================================" -ForegroundColor DarkYellow
 
-if ($PullRequestNumber) {
-    Write-Host "Building for a pull request (#$PullRequestNumber), skipping packaging." -ForegroundColor Yellow
-    $SkipPackage = $true
-}
 
 try {
-	. "$PSScriptRoot/bootstrap.ps1"	
+
 	Get-BuildTools -Version $BuildToolsVersion | Out-Null
 
 	# Uncomment if you need to use msbuild commands in this file
