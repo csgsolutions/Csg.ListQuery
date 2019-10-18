@@ -57,12 +57,12 @@ namespace Csg.ListQuery.AspNetCore
             if (dataCount.HasValue)
             {
                 response.Meta.CurrentCount = dataCount;
-            }
 
-            if (queryResult.HasMoreData)
-            {
-                var nextOffset = (request.Offset + request.Limit);
-                response.Meta.Next = new PageInfo(nextOffset);
+                if (queryResult.HasMoreData)
+                {
+                    var nextOffset = (request.Offset + dataCount.Value);
+                    response.Meta.Next = new PageInfo(nextOffset);
+                }
             }
 
             // Wait until here to set data so we can deal with the useLimitCanary situation above
