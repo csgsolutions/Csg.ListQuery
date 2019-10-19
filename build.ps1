@@ -19,6 +19,7 @@ Param(
 	[string]
 	$TestLogger = "trx;logfilename=TEST-$(get-date -format yyyyMMddHHmmss).trx"
 )
+. "$PSScriptRoot/bootstrap.ps1"	
 
 $Solution =  "$(Get-Item -Path *.sln | Select-Object -First 1)"
 $PackageProjects = @(
@@ -33,11 +34,10 @@ $PublishProjects = @(
 )
 $TestProjects = Get-Item -Path tests\**\*Tests.csproj | %{ $_.FullName }
 
-if ($BuildNumber) {
-	$BuildNumber = $BuildNumber.PadLeft(5, "0")
-}
-
+$BuildNumber = Get-BuildNumber $BuildNumber
 $SkipPackage = $NoPackage.IsPresent
+
+Set-BuildInformation .\version.props $BuildNumber
 
 Write-Host "==============================================================================" -ForegroundColor DarkYellow
 Write-Host "The Build Script for Csg.ListQuery"
