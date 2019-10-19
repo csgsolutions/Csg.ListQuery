@@ -15,7 +15,9 @@ Param(
 	[string]
 	$BuildNumber="",
 	[string]
-	$PullRequestNumber=""
+	$PullRequestNumber="",
+	[string]
+	$TestLogger = "trx;logfilename=TEST-$(get-date -format yyyyMMddHHmmss).trx"
 )
 
 $Solution =  "$(Get-Item -Path *.sln | Select-Object -First 1)"
@@ -85,7 +87,7 @@ try {
 			Write-Host "Testing $test_proj"			
 			
 			#Note: The --logger parameter is specifically for mstest to make it output test results
-			dotnet test $test_proj --no-build --configuration $Configuration --logger "trx;logfilename=TEST-$(get-date -format yyyyMMddHHmmss).xml"
+			dotnet test $test_proj --no-build --configuration $Configuration --logger "$TestLogger"
 			
 			if ($LASTEXITCODE -ne 0) {
 				throw "Test failed with code $LASTEXITCODE"
