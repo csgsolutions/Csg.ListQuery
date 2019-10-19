@@ -149,6 +149,8 @@ namespace Csg.ListQuery.Sql
             {
                 var where = new DbQueryWhereClause(queryBuilder.Root, Csg.Data.Sql.SqlLogic.And);
 
+                //tODO: IsFilterable is not being enforced. Shoult it be?
+
                 foreach (var filter in listQuery.Configuration.QueryDefinition.Filters)
                 {
                     var hasConfig = listQuery.Configuration.Validations.TryGetValue(filter.Name, out ListPropertyInfo validationField);
