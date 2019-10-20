@@ -20,7 +20,7 @@ namespace Csg.ListQuery.AspNetCore.Client
         /// <param name="delayBetweenRequests">The delay (in milliseconds) to wait between requests.</param>
         /// <param name="maxRequests">The maximum number of requests to send to the source API.</param>
         /// <returns></returns>
-        public static async Task<AggregateListResponse<TData>> GetAllPagesAsync<TData>(this IPagedListSupport client, IPagedListHateaosResponse<TData> response, int delayBetweenRequests = 25, int? maxRequests = null)
+        public static async Task<AggregateListResponse<TData>> GetAllPagesAsync<TData>(this IPagedListSupport client, IListResponse<TData> response, int delayBetweenRequests = 25, int? maxRequests = null)
         {
             var result = response.Data;
             int pageCount = 1;
@@ -50,7 +50,7 @@ namespace Csg.ListQuery.AspNetCore.Client
         /// <param name="delayBetweenRequests">The delay (in milliseconds) to wait between requests.</param>
         /// <param name="maxPagesToFetch">The maximum number of pages to fetch from the API.</param>
         /// <returns></returns>
-        public static async Task<AggregateListResponse<TData>> PostAllPagesAsync<TData>(this IPagedListSupport client, IPagedListRequest request, int delayBetweenRequests = 25, int? maxPagesToFetch = null)
+        public static async Task<AggregateListResponse<TData>> PostAllPagesAsync<TData>(this IPagedListSupport client, IListRequest request, int delayBetweenRequests = 25, int? maxPagesToFetch = null)
         {
             IEnumerable<TData> result = new List<TData>();
             int pageCount = 0;

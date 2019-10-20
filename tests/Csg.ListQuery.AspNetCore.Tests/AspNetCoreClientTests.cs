@@ -21,13 +21,13 @@ namespace Csg.ListQuery.AspNetCore.Tests
 
             string uri = "https://localhost/api/People/filter?offset=10&limit=10";
 
-            var response = new Abstractions.PagedListHateoasResponse<Person>();
+            var response = new Abstractions.ListResponse<Person>();
             response.Data = client.People.Take(10);
-            response.Links = new Abstractions.PagedListLinks()
+            response.Links = new Abstractions.ListResponseLinks()
             {
                 Next = uri
             };
-            response.Meta = new Abstractions.PagedListResponseMeta()
+            response.Meta = new Abstractions.ListResponseMeta()
             {
                 CurrentCount = 10
                 //Next = new Abstractions.PageInfo(10)
@@ -50,7 +50,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
                 client.People.Add(new Person());
             }
 
-            var response = new PagedListRequest()
+            var response = new ListRequest()
             {
                 Offset = 0,
                 Limit = 10

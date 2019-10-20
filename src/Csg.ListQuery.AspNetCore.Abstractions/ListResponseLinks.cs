@@ -1,6 +1,6 @@
 ﻿namespace Csg.ListQuery.AspNetCore.Abstractions
 {
-    public class PagedListLinks
+    public class ListResponseLinks
     {
         public virtual string Next { get; set; }
         public virtual string Self { get; set; }

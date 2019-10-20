@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Csg.ListQuery.AspNetCore.Abstractions;
 using Csg.ListQuery.Abstractions;
 using System.Linq;
+using System.Text;
 
 namespace Csg.ListQuery.AspNetCore
 {
@@ -25,6 +26,16 @@ namespace Csg.ListQuery.AspNetCore
         /// Gets or sets a list of sort actions to apply.
         /// </summary>
         public virtual IEnumerable<Csg.ListQuery.Abstractions.ListQuerySort> Sort { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the zero-based index of the first record in the result set that will be returned.
+        /// </summary>
+        public virtual int Offset { get; set; }
+
+        /// <summary>
+        /// Gets or sets the maximum number of records that will be returned in the result set.
+        /// </summary>
+        public virtual int Limit { get; set; }
 
         /// <summary>
         /// Transforms a list request into a list query
@@ -125,7 +136,72 @@ namespace Csg.ListQuery.AspNetCore
                 .ToList();
             }
 
+            if (this.Limit > 0)
+            {
+                queryDef.Offset = this.Offset;
+                queryDef.Limit = this.Limit;
+            }
+
             return new ListRequestValidationResult(errors, queryDef);
+        }
+        
+        public string ToQueryString()
+        {
+            var query = new StringBuilder("?");
+
+            if (this.Fields != null)
+            {
+                query.Append(UrlElements.c_fields).Append("=").Append(string.Join(",", this.Fields.Select(System.Uri.EscapeDataString))).Append("&");
+            }
+
+            if (this.Sort != null)
+            {
+                query.Append(UrlElements.c_order).Append("=").Append(string.Join(",", this.Sort.Select(s => string.Concat(s.SortDescending ? "-" : "", System.Uri.EscapeDataString(s.Name))))).Append("&");
+            }
+
+            if (this.Offset > 0)
+            {
+                query.Append($"offset={this.Offset}").Append("&");
+            }
+
+            if (this.Limit > 0)
+            {
+                query.Append($"limit={this.Limit}").Append("&");
+            }
+
+            if (this.Filters != null)
+            {
+                foreach (var filter in this.Filters)
+                {
+
+                    // special case needs to make two filters and Value is an enumerable with two values
+                    if (filter.Operator == ListQuery.Abstractions.ListFilterOperator.Between)
+                    {
+                        var filterValues = Csg.ListQuery.Internal.ValueHelpers.GetFilterValues(filter.Value, System.Data.DbType.String, true)
+                            .Select(s => s.ToString());
+
+                        query.Append($"where[{System.Uri.EscapeDataString(filter.Name)}]=ge:")
+                            .Append(System.Uri.EscapeDataString(filterValues.First()))
+                            .Append("&")
+                            .Append($"where[{System.Uri.EscapeDataString(filter.Name)}]=le:")
+                            .Append(System.Uri.EscapeDataString(filterValues.Skip(1).First()))
+                            .Append("&");
+                    }
+                    else
+                    {
+                        query.Append($"where[{System.Uri.EscapeDataString(filter.Name)}]=")
+                            .Append(ListQueryFilter.OperatorToString(filter.Operator))
+                            .Append(":")
+                            .Append(System.Uri.EscapeDataString(filter.Value.ToString()))
+                            .Append("&");
+                    }
+                }
+            }
+
+            // remove the last ampersand
+            query.Length--;
+
+            return query.ToString();
         }
 
         #region IListRequest
@@ -137,38 +213,5 @@ namespace Csg.ListQuery.AspNetCore
         IEnumerable<ListQuerySort> IListRequest.Sort { get => this.Sort; set => this.Sort = value; }
 
         #endregion
-    }
-
-    public class PagedListRequest : ListRequest, IPagedListRequest 
-    {
-        /// <summary>
-        /// Gets or sets the zero-based index of the first record in the result set that will be returned.
-        /// </summary>
-        public virtual int Offset { get; set; }
-
-        /// <summary>
-        /// Gets or sets the maximum number of records that will be returned in the result set.
-        /// </summary>
-        public virtual int Limit { get; set; }
-
-        /// <summary>
-        /// Transforms a list request into a list query
-        /// </summary>
-        /// <param name="selectableProperties"></param>
-        /// <param name="filerableProperties"></param>
-        /// <param name="sortableProperties"></param>
-        /// <returns></returns>
-        public override ListRequestValidationResult Validate(IDictionary<string, ListItemPropertyInfo> selectableProperties, IDictionary<string, ListItemPropertyInfo> filerableProperties, IDictionary<string, ListItemPropertyInfo> sortableProperties)
-        {
-            var result = base.Validate(selectableProperties, filerableProperties, sortableProperties);
-
-            if (this.Limit > 0)
-            {
-                result.ListQuery.Offset = this.Offset;
-                result.ListQuery.Limit = this.Limit;
-            }
-
-            return result;
-        }
     }
 }

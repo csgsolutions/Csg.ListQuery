@@ -23,23 +23,14 @@ namespace Csg.ListQuery.AspNetCore
             IDictionary<string, ListItemPropertyInfo> properties,
             Func<TInfrastructure, TDomain> selector)
         {
-            var response = new ListResponse<TDomain>(request, queryResult.Data.Select(selector));
-                       
-            return response;
-        }
+            properties = properties ?? throw new ArgumentNullException(nameof(properties));
 
-        public static PagedListResponse<TDomain> ToListResponse<TInfrastructure, TDomain>(
-            this ListQueryResult<TInfrastructure> queryResult,
-            IPagedListRequest request,
-            IDictionary<string, ListItemPropertyInfo> properties,
-            Func<TInfrastructure, TDomain> selector)
-        {
             IEnumerable<TDomain> data = queryResult.Data.Select(selector);
             int? dataCount = queryResult.IsBuffered ? data.Count() : (int?)null;
 
-            var response = new PagedListResponse<TDomain>()
+            var response = new ListResponse<TDomain>()
             {
-                Meta = new PagedListResponseMeta()
+                Meta = new ListResponseMeta()
                 {
                     TotalCount = queryResult.TotalCount
                 }
@@ -57,87 +48,57 @@ namespace Csg.ListQuery.AspNetCore
             if (dataCount.HasValue)
             {
                 response.Meta.CurrentCount = dataCount;
-            }
 
-            if (queryResult.HasMoreData)
-            {
-                var nextOffset = (request.Offset + request.Limit);
-                response.Meta.Next = new PageInfo(nextOffset);
+                if (queryResult.HasMoreData)
+                {
+                    var nextOffset = (request.Offset + dataCount.Value);
+                    response.Meta.Next = new PageInfo(nextOffset);
+                }
             }
-
-            // Wait until here to set data so we can deal with the useLimitCanary situation above
-            response.Data = data;
 
             if (request.Offset > 0)
             {
+                //TODO: Limit will be zero if the default limit was applied inside ListQuery.
                 var prevOffset = Math.Max(request.Offset - request.Limit, 0);
                 response.Meta.Prev = new PageInfo(prevOffset);
             }
 
+            response.Data = data;
+
             return response;
         }
 
-        public static PagedListHateoasResponse<TDomain> ToListResponse<TInfrastructure, TDomain>(
+        public static ListResponse<TDomain> ToListResponse<TInfrastructure, TDomain>(
             this ListQueryResult<TInfrastructure> queryResult,
-            IPagedListRequest request,
+            IListRequest request,
             IDictionary<string, ListItemPropertyInfo> properties,
             Func<TInfrastructure, TDomain> selector,
             System.Uri currentUri
         )
         {
+            var response = ToListResponse<TInfrastructure, TDomain>(queryResult, request, properties, selector);
 
-            properties = properties ?? throw new ArgumentNullException(nameof(properties));
-
-            IEnumerable<TDomain> data = queryResult.Data.Select(selector);
-            int? dataCount = queryResult.IsBuffered ? data.Count() : (int?)null;
-                        
-            var response = new PagedListHateoasResponse<TDomain>()
+            response.Links = new ListResponseLinks()
             {
-                Links = new PagedListLinks()
-                {
-                    Self = currentUri.AbsoluteUri
-                },
-                Meta = new PagedListResponseMeta()
-                {
-                    TotalCount = queryResult.TotalCount                     
-                }
+                Self = currentUri.AbsoluteUri
             };
 
-            if (request.Fields != null)
-            {
-                response.Meta.Fields = properties.Select(s => s.Value.JsonName).Intersect(request.Fields, StringComparer.OrdinalIgnoreCase);
-            }
-            else
-            {
-                response.Meta.Fields = properties.Select(s => s.Value.JsonName);
-            }
+           
 
-            if (dataCount.HasValue)
+            if (response.Meta?.Next?.Offset >= 0)
             {
-                response.Meta.CurrentCount = dataCount;
+                response.Links.Next = CreateUri(request, currentUri, response.Meta.Next.Value.Offset).ToString();
             }
-
-            if (queryResult.HasMoreData)
-            {
-                var nextOffset = (request.Offset + request.Limit);
-                response.Links.Next = CreateUri(request, currentUri, nextOffset).ToString();
-                response.Meta.Next = new PageInfo(nextOffset);
-            }
-
-            // Wait until here to set data so we can deal with the useLimitCanary situation above
-            response.Data = data;
             
-            if (request.Offset > 0)
+            if (response.Meta?.Prev?.Offset >= 0)
             {
-                var prevOffset = Math.Max(request.Offset - request.Limit, 0);
-                response.Links.Prev = CreateUri(request, currentUri, prevOffset).ToString();
-                response.Meta.Prev = new PageInfo(prevOffset);
+                response.Links.Prev = CreateUri(request, currentUri, response.Meta.Prev.Value.Offset).ToString();
             }
 
             return response;
         }
 
-        private static Uri CreateUri(IPagedListRequest request, Uri currentUri, int offset)
+        private static Uri CreateUri(IListRequest request, Uri currentUri, int offset)
         {
             var keyPairs = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(currentUri.Query)
                                     .Where(x => x.Key.ToLower() != "offset")

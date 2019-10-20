@@ -21,5 +21,7 @@ namespace Csg.ListQuery.AspNetCore.Abstractions
         public virtual IEnumerable<T> Data { get; set; }
 
         public virtual ListResponseMeta Meta { get; set; }
+
+        public virtual ListResponseLinks Links { get; set; }
     }
 }

@@ -131,25 +131,11 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
                 }
                 else if (pair.Key.Equals(c_start, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (listRequest is IPagedListRequest pagedRequest)
-                    {
-                        pagedRequest.Offset = int.Parse(pair.Value.First());
-                    }
-                    else
-                    {
-                        throw new NotSupportedException("Paging is not supported.");
-                    }
+                    listRequest.Offset = int.Parse(pair.Value.First());
                 }
                 else if (pair.Key.Equals(c_limit, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (listRequest is IPagedListRequest pagedRequest)
-                    {
-                        pagedRequest.Limit = int.Parse(pair.Value.First());
-                    }
-                    else
-                    {
-                        throw new NotSupportedException("Paging is not supported.");
-                    }
+                    listRequest.Limit = int.Parse(pair.Value.First());
                 }
                 else
                 {

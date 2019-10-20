@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Csg.ListQuery.Sql.Internal
+namespace Csg.ListQuery.Internal
 {
     public static class ValueHelpers
     {

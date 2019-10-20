@@ -8,7 +8,7 @@ namespace Csg.ListQuery.AspNetCore.Client
     /// </summary>
     public interface IPagedListSupport
     {
-        System.Threading.Tasks.Task<IPagedListHateaosResponse<TData>> GetAsync<TData>(string url);
-        System.Threading.Tasks.Task<IPagedListResponse<TData>> PostAsync<TData>(IPagedListRequest request);
+        System.Threading.Tasks.Task<IListResponse<TData>> GetAsync<TData>(string url);
+        System.Threading.Tasks.Task<IListResponse<TData>> PostAsync<TData>(IListRequest request);
     }
 }

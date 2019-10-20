@@ -13,5 +13,15 @@ namespace Csg.ListQuery.AspNetCore.Abstractions
         /// Gets the records returned.
         /// </summary>
         IEnumerable<T> Data { get; }
+
+        /// <summary>
+        /// Gets the links for this response
+        /// </summary>
+        ListResponseLinks Links { get; }
+
+        /// <summary>
+        /// Gets the metadata set for this response.
+        /// </summary>
+        ListResponseMeta Meta { get; }
     }
 }

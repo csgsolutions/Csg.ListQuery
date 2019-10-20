@@ -70,7 +70,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
         public void CreateRequest_FromStringWithPaging()
         {
             var queryString = "fields=PersonID,FirstName,LastName,BirthDate&where[firstName]=bob&order=LastName&order=-FirstName&offset=50&limit=10";
-            var request = new ModelBinding.ListRequestFactory().CreateRequest<PagedListRequest>(queryString);
+            var request = new ModelBinding.ListRequestFactory().CreateRequest<ListRequest>(queryString);
 
             Assert.AreEqual(4, request.Fields.Count());
             Assert.AreEqual("PersonID", request.Fields.First(), true);

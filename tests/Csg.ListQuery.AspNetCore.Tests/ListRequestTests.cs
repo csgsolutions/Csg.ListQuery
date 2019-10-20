@@ -144,5 +144,33 @@ namespace Csg.ListQuery.AspNetCore.Tests
             Assert.AreEqual(2, result.ListQuery.Filters.Count());
             Assert.AreEqual(2, result.ListQuery.Sort.Count());
         }
+
+        [TestMethod]
+        public void Test_ToQueryString()
+        {
+            string expected = "?fields=PersonID,LastName,FirstName,BirthDate&sort=PersonID,LastName,FirstName,BirthDate&offset=50&limit=25&where[PersonID]=eq:123&where[LastName]=lt:test&where[FirstName]=like:test&where[BirthDate]=gt:1900-01-01";
+            var request = new ListRequest();
+            request.Offset = 50;
+            request.Limit = 25;
+            request.Fields = new string[] { "PersonID", "LastName", "FirstName", "BirthDate" };
+            request.Filters = new List<ListQuery.Abstractions.ListQueryFilter>
+            {
+                new ListQuery.Abstractions.ListQueryFilter(){ Name  = "PersonID", Operator = ListQuery.Abstractions.ListFilterOperator.Equal, Value = "123" },
+                new ListQuery.Abstractions.ListQueryFilter(){ Name  = "LastName", Operator = ListQuery.Abstractions.ListFilterOperator.LessThan, Value = "test" },
+                new ListQuery.Abstractions.ListQueryFilter(){ Name  = "FirstName", Operator = ListQuery.Abstractions.ListFilterOperator.Like, Value = "test" },
+                new ListQuery.Abstractions.ListQueryFilter(){ Name  = "BirthDate", Operator = ListQuery.Abstractions.ListFilterOperator.GreaterThan, Value = "1900-01-01" },
+            };
+            request.Sort = new List<ListQuery.Abstractions.ListQuerySort>
+            {
+                new ListQuery.Abstractions.ListQuerySort(){ Name  = "PersonID" },
+                new ListQuery.Abstractions.ListQuerySort(){ Name  = "LastName" },
+                new ListQuery.Abstractions.ListQuerySort(){ Name  = "FirstName" },
+                new ListQuery.Abstractions.ListQuerySort(){ Name  = "BirthDate" },
+            };
+
+            var result = request.ToQueryString();
+
+            Assert.AreEqual(expected, result);
+        }
     }
 }
