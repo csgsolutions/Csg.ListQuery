@@ -85,9 +85,8 @@ try {
 		Write-Host "Performing tests..." -ForegroundColor Magenta
 		foreach ($test_proj in $TestProjects) {
 			Write-Host "Testing $test_proj"			
-			
-			#Note: The --logger parameter is specifically for mstest to make it output test results
-			dotnet test $test_proj --no-build --configuration $Configuration --logger "$TestLogger"
+
+			dotnet test $test_proj --no-build --configuration $Configuration --logger $TestLogger
 			
 			if ($LASTEXITCODE -ne 0) {
 				throw "Test failed with code $LASTEXITCODE"

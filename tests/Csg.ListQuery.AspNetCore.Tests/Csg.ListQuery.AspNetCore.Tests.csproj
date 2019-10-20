@@ -17,4 +17,8 @@
     <ProjectReference Include="..\..\src\Csg.ListQuery.AspNetCore\Csg.ListQuery.AspNetCore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="TestResults\" />
+  </ItemGroup>
+
 </Project>
