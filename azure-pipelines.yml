@@ -17,17 +17,10 @@ steps:
     projects: 'tests\**\*Tests.csproj'
     arguments: '--no-build --configuration Release'
     verbosityPack: Minimal
-- task: CopyFiles@2
-  displayName: 'Copy nupkgs'
-  inputs:
-    Contents: '**\bin\**\*.nupkg'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)\nupkgs'
-    CleanTargetFolder: true
-    flattenFolders: true
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: nupkgs'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)\nupkgs'
+    PathtoPublish: 'bin\Release'
     ArtifactName: nupkgs
 - powershell: |
    $BuildNumber=$env:BUILD_BUILDNUMBER
