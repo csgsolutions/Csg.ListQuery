@@ -95,7 +95,7 @@ try {
 		foreach ($pack_proj in $PackageProjects){
 			Write-Host "Packing $pack_proj"
 			
-			dotnet pack $pack_proj --no-build --configuration $Configuration /p:BuildNumber=$BuildNumber --output "./bin/$Configuration/"
+			dotnet pack $pack_proj --no-build --configuration $Configuration /p:BuildNumber=$BuildNumber
 			
 			if ($LASTEXITCODE -ne 0) {
 				throw "Pack failed with code $result"
