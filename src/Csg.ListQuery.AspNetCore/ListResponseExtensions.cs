@@ -57,7 +57,8 @@ namespace Csg.ListQuery.AspNetCore
 
             if (request.Offset > 0)
             {
-                //TODO: Limit will be zero if the default limit was applied inside ListQuery.
+                //TODO: prevOFfset is wrong when using DefaultLimit on the ListQuery
+                // maybe need to implement returning 
                 var prevOffset = Math.Max(request.Offset - request.Limit, 0);
                 response.Meta.Prev = new PageInfo(prevOffset);
             }
