@@ -1,5 +1,8 @@
-﻿namespace Csg.ListQuery
+﻿using System;
+
+namespace Csg.ListQuery
 {
+    [System.AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
     public class SortableAttribute : System.Attribute
     {
         public SortableAttribute(bool sortable = true, bool descending = false, bool isDefault = false)

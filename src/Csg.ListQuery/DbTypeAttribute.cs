@@ -1,5 +1,8 @@
-﻿namespace Csg.ListQuery
+﻿using System;
+
+namespace Csg.ListQuery
 {
+    [System.AttributeUsage(AttributeTargets.Property)]
     public class DbTypeAttribute : System.Attribute
     {
         private readonly System.Data.DbType _type;

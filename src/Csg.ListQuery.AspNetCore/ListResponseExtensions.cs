@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Csg.ListQuery.AspNetCore;
-using Csg.ListQuery.AspNetCore.Abstractions;
-using Csg.ListQuery.Abstractions;
+using Csg.ListQuery.Server;
 
 namespace Csg.ListQuery.AspNetCore
 {
@@ -77,13 +76,11 @@ namespace Csg.ListQuery.AspNetCore
         )
         {
             var response = ToListResponse<TInfrastructure, TDomain>(queryResult, request, properties, selector);
-
+           
             response.Links = new ListResponseLinks()
             {
                 Self = currentUri.AbsoluteUri
             };
-
-           
 
             if (response.Meta?.Next?.Offset >= 0)
             {

@@ -1,7 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Csg.ListQuery.Abstractions;
+using Csg.ListQuery;
 using System.Collections.Generic;
-using Csg.ListQuery.AspNetCore.Client;
+using Csg.ListQuery.Client;
 using System.Linq;
 using System.Data;
 
@@ -13,17 +13,18 @@ namespace Csg.ListQuery.AspNetCore.Tests
         [TestMethod]
         public void Test_BuildRequest()
         {
-            var builder = new Csg.ListQuery.AspNetCore.Client.ListRequestBuilder();
-
+            var builder = new Mock.MockRequestBuilder();
             var request = builder.Select("FirstName", "LastName")
                 .Where("FirstName", "Bob")
                 .Where("Age", ListFilterOperator.GreaterThan, 1)
-                .Order("LastName", "FirstName")
-                .Offset(0)
-                .Limit(25)
-                .ToQueryString();
+                .Order("LastName", "-FirstName")
+                .Offset(25)
+                .Limit(50)
+                .ToQueryString();                
 
+            string expected = "?fields=FirstName,LastName&order=LastName,-FirstName&offset=25&limit=50&where[FirstName]=eq:Bob&where[Age]=gt:1";
+
+            Assert.AreEqual(expected, request);
         }
-
     }
 }

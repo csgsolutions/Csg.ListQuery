@@ -1,5 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Csg.ListQuery.Abstractions;
+using Csg.ListQuery;
 using System.Collections.Generic;
 using Csg.Data.Sql;
 using System.Linq;

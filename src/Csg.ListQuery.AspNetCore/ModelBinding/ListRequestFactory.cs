@@ -1,4 +1,4 @@
-﻿using Csg.ListQuery.AspNetCore.Abstractions;
+﻿using Csg.ListQuery.Server;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Primitives;
 using System;
@@ -77,7 +77,7 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
             }
 
             var listRequest = (IListRequest)Activator.CreateInstance(modelType);
-            var filterList = new List<Csg.ListQuery.Abstractions.ListQueryFilter>();
+            var filterList = new List<Csg.ListQuery.ListQueryFilter>();
             //var validationProperties = listRequest.GetValidationType()
             //    .GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
             //    .ToDictionary(s => s.Name, StringComparer.OrdinalIgnoreCase);
@@ -111,7 +111,7 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
                         //}
 
                         return fieldName.Trim(); //propInfo.Name;
-                    });
+                    }).ToList();
                 }
                 else if (pair.Key.Equals(c_order, StringComparison.OrdinalIgnoreCase))
                 {
@@ -122,12 +122,12 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
                         //    throw new FormatException($"The sort field '{sortField}' is not recognized.");
                         //}
 
-                        return new Csg.ListQuery.Abstractions.ListQuerySort()
+                        return new Csg.ListQuery.ListQuerySort()
                         {
                             Name = sortField.TrimStart('-'), //propInfo.Name,
                             SortDescending = sortField.StartsWith("-")
                         };
-                    });
+                    }).ToList();
                 }
                 else if (pair.Key.Equals(c_start, StringComparison.OrdinalIgnoreCase))
                 {
@@ -152,17 +152,17 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
         /// <param name="filters"></param>
         /// <param name="key"></param>
         /// <param name="values"></param>
-        public virtual IEnumerable<Csg.ListQuery.Abstractions.ListQueryFilter> ParseFilters(string key, StringValues values)
+        public virtual IEnumerable<Csg.ListQuery.ListQueryFilter> ParseFilters(string key, StringValues values)
         {
             var nameMatches = s_filterNameRegex.Match(key);
             var name = nameMatches.Groups[1].Value;
 
             foreach (var value in values)
             {
-                var dto = new Csg.ListQuery.Abstractions.ListQueryFilter()
+                var dto = new Csg.ListQuery.ListQueryFilter()
                 {
                     Name = name,
-                    Operator = Csg.ListQuery.Abstractions.ListFilterOperator.Equal
+                    Operator = Csg.ListQuery.ListFilterOperator.Equal
                 };
 
                 var valueAndOperator = SplitValue(value);
@@ -176,26 +176,26 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
         }
 
         /// <summary>
-        /// Converts the given operator prefix into the appropriate <see cref="Csg.ListQuery.Abstractions.GenericOperator"/> operator.
+        /// Converts the given operator prefix into the appropriate <see cref="Csg.ListQuery.ListFilterOperator"/> operator.
         /// </summary>
         /// <param name="oper"></param>
         /// <returns></returns>
-        protected virtual Csg.ListQuery.Abstractions.ListFilterOperator PrefixToOperator(ReadOnlySpan<char> oper)
+        protected virtual Csg.ListQuery.ListFilterOperator PrefixToOperator(ReadOnlySpan<char> oper)
         {
-            if (oper.Equals(op_eq.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.Equal;
-            if (oper.Equals(op_gt.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.GreaterThan;
-            if (oper.Equals(op_ge.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.GreaterThanOrEqual;
-            if (oper.Equals(op_lt.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.LessThan;
-            if (oper.Equals(op_le.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.LessThanOrEqual;
-            if (oper.Equals(op_ne.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.NotEqual;
-            if (oper.Equals(op_like.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.Like;
-            if (oper.Equals(op_isnull.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.Abstractions.ListFilterOperator.IsNull;
+            if (oper.Equals(op_eq.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.ListFilterOperator.Equal;
+            if (oper.Equals(op_gt.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.ListFilterOperator.GreaterThan;
+            if (oper.Equals(op_ge.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.ListFilterOperator.GreaterThanOrEqual;
+            if (oper.Equals(op_lt.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.ListFilterOperator.LessThan;
+            if (oper.Equals(op_le.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.ListFilterOperator.LessThanOrEqual;
+            if (oper.Equals(op_ne.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.ListFilterOperator.NotEqual;
+            if (oper.Equals(op_like.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.ListFilterOperator.Like;
+            if (oper.Equals(op_isnull.AsSpan(), StringComparison.OrdinalIgnoreCase)) return Csg.ListQuery.ListFilterOperator.IsNull;
             //TODO: handle IN & NOT IN operators???
 
             throw new NotSupportedException($"The given operator prefix '{oper.ToString()}' is not supported.");
         }
 
-        protected virtual (string Value, Csg.ListQuery.Abstractions.ListFilterOperator @Operator) SplitValue(string s)
+        protected virtual (string Value, Csg.ListQuery.ListFilterOperator @Operator) SplitValue(string s)
         {
             var span = s.AsSpan();
             var indexOfFirstColon = span.IndexOf(c_colon);
@@ -211,7 +211,7 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
             {
                 return (
                     s,
-                    Csg.ListQuery.Abstractions.ListFilterOperator.Equal
+                    Csg.ListQuery.ListFilterOperator.Equal
                 );
             }
         }

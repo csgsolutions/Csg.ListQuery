@@ -1,5 +1,4 @@
 ﻿using Csg.Data.Sql;
-using Csg.ListQuery.Abstractions;
 using Csg.ListQuery.Internal;
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,4 @@
-﻿using Csg.ListQuery.Abstractions;
+﻿using Csg.ListQuery;
 using Csg.ListQuery.Internal;
 using Csg.Data.Sql;
 using System;

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Csg.ListQuery.AspNetCore.Abstractions;
+using Csg.ListQuery.Server;
 using Csg.ListQuery.AspNetCore.ModelBinding;
 
 namespace Csg.ListQuery.AspNetCore.Tests
 {
-    public class MockClient : Csg.ListQuery.AspNetCore.Client.IPagedListSupport
+    public class MockClient : Csg.ListQuery.Client.IPagedListSupport
     {
         public MockClient()
         {
@@ -35,7 +35,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
             var properties = PropertyHelper.GetProperties(typeof(TData));
 
             var resultData = dataSource.Skip(request.Offset).Take(request.Limit);
-            var queryResult = new Csg.ListQuery.Abstractions.ListQueryResult<TData>(
+            var queryResult = new Csg.ListQuery.ListQueryResult<TData>(
                 resultData,
                 resultData.Count(),
                 dataSource.Count(),
@@ -66,7 +66,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
 
             var resultData = dataSource.Skip(request.Offset).Take(request.Limit);
 
-            var queryResult = new Csg.ListQuery.Abstractions.ListQueryResult<TData>(
+            var queryResult = new Csg.ListQuery.ListQueryResult<TData>(
                 resultData,
                 resultData.Count(),
                 dataSource.Count(),

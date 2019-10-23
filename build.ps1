@@ -25,8 +25,8 @@ $Solution =  "$(Get-Item -Path *.sln | Select-Object -First 1)"
 $PackageProjects = @(
 	".\src\Csg.ListQuery\Csg.ListQuery.csproj",
 	".\src\Csg.ListQuery.Sql\Csg.ListQuery.Sql.csproj",
-	".\src\Csg.ListQuery.AspNetCore.Abstractions\Csg.ListQuery.AspNetCore.Abstractions.csproj",
-	".\src\Csg.ListQuery.AspNetCore.Client\Csg.ListQuery.AspNetCore.Client.csproj",
+	".\src\Csg.ListQuery.Server.Abstractions\Csg.ListQuery.Server.Abstractions.csproj",
+	".\src\Csg.ListQuery.Client.Abstractions\Csg.ListQuery.Client.Abstractions.csproj",
 	".\src\Csg.ListQuery.AspNetCore\Csg.ListQuery.AspNetCore.csproj"
 )
 $PublishProjects = @(
@@ -54,8 +54,7 @@ if ($PullRequestNumber) {
     $SkipPackage = $true
 }
 
-try {
-	. "$PSScriptRoot/bootstrap.ps1"	
+try {	
 	Get-BuildTools -Version $BuildToolsVersion | Out-Null
 
 	# Uncomment if you need to use msbuild commands in this file
@@ -99,7 +98,7 @@ try {
 		foreach ($pack_proj in $PackageProjects){
 			Write-Host "Packing $pack_proj"
 			
-			dotnet pack $pack_proj --no-build --configuration $Configuration /p:BuildNumber=$BuildNumber
+			dotnet pack $pack_proj --no-build --configuration $Configuration /p:BuildNumber=$BuildNumber --output "./bin/$Configuration/"
 			
 			if ($LASTEXITCODE -ne 0) {
 				throw "Pack failed with code $result"

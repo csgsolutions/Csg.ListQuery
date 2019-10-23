@@ -1,4 +1,4 @@
-﻿using Csg.ListQuery.Abstractions;
+﻿using Csg.ListQuery;
 
 namespace Csg.ListQuery.Tests.Mock
 {

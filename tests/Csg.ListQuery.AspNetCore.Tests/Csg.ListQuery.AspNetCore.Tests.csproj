@@ -13,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Csg.ListQuery.AspNetCore.Client\Csg.ListQuery.AspNetCore.Client.csproj" />
     <ProjectReference Include="..\..\src\Csg.ListQuery.AspNetCore\Csg.ListQuery.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\Csg.ListQuery.Client.Abstractions\Csg.ListQuery.Client.Abstractions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
