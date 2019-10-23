@@ -32,6 +32,7 @@ namespace Csg.ListQuery.AspNetCore
                     propInfo.JsonName = ((Newtonsoft.Json.JsonPropertyAttribute)jsonPropertyAttribute)?.PropertyName ?? prop.Name;
                     propInfo.IsFilterable = prop.IsFilterable == true;
                     propInfo.IsSortable = prop.IsSortable == true;
+                    propInfo.Description = prop.Description;
 
                     return propInfo;
                 })
