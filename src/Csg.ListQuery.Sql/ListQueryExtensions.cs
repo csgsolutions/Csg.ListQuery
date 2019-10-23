@@ -115,15 +115,11 @@ namespace Csg.ListQuery.Sql
 
         public static IListQueryBuilder DefaultLimit(this Csg.ListQuery.Sql.IListQueryBuilder builder, int limit)
         {
-            builder.AfterApply((config, query) =>
+            builder.BeforeApply((config) =>
             {
-                if (query.PagingOptions == null)
+                if (config.QueryDefinition.Limit <= 0)
                 {
-                    query.PagingOptions = new SqlPagingOptions()
-                    {
-                        Limit = limit,
-                        Offset = 0
-                    };
+                    config.QueryDefinition.Limit = limit;
                 }
             });
             return builder;
@@ -149,12 +145,13 @@ namespace Csg.ListQuery.Sql
             return builder;
         }
 
-
         public static void ApplyFilters(IListQueryBuilder listQuery, IDbQueryBuilder queryBuilder)
         {
             if (listQuery.Configuration.QueryDefinition.Filters != null)
             {
                 var where = new DbQueryWhereClause(queryBuilder.Root, Csg.Data.Sql.SqlLogic.And);
+
+                //tODO: IsFilterable is not being enforced. Shoult it be?
 
                 foreach (var filter in listQuery.Configuration.QueryDefinition.Filters)
                 {
@@ -276,24 +273,26 @@ namespace Csg.ListQuery.Sql
             return countQuery;           
         }
 
-        public static SqlStatementBatch Render(this Csg.ListQuery.Sql.IListQueryBuilder builder, bool queryTotalWhenLimiting = true)
+        public static SqlStatementBatch Render(this Csg.ListQuery.Sql.IListQueryBuilder builder, bool getTotalWhenLimiting = true)
         {
-            if (builder.Configuration.QueryDefinition.Limit > 0 && queryTotalWhenLimiting)
+            var appiedQuery = builder.Apply();
+
+            if (getTotalWhenLimiting && appiedQuery.PagingOptions?.Limit > 0 && appiedQuery.PagingOptions?.Offset == 0)
             {
                 var countQuery = GetCountQuery(builder);
-                return new DbQueryBuilder[] { (DbQueryBuilder)countQuery, (DbQueryBuilder)builder.Apply() }
+                return new DbQueryBuilder[] { (DbQueryBuilder)countQuery, (DbQueryBuilder)appiedQuery }
                     .RenderBatch();
             }
             else
             {
-                var stmt = builder.Apply().Render();
+                var stmt = appiedQuery.Render();
                 return new SqlStatementBatch(1, stmt.CommandText, stmt.Parameters);
             }
         }
 
-        public async static System.Threading.Tasks.Task<ListQueryResult<T>> GetResultAsync<T>(this Csg.ListQuery.Sql.IListQueryBuilder builder, bool queryTotalWhenLimiting = true)
+        public async static System.Threading.Tasks.Task<ListQueryResult<T>> GetResultAsync<T>(this Csg.ListQuery.Sql.IListQueryBuilder builder, bool getTotalWhenLimiting = true)
         {
-            var stmt = builder.Render(queryTotalWhenLimiting);
+            var stmt = builder.Render(getTotalWhenLimiting);
             var cmdFlags = builder.Configuration.UseStreamingResult ? Dapper.CommandFlags.Pipelined : Dapper.CommandFlags.Buffered;
             var cmd = stmt.ToDapperCommand(builder.Configuration.QueryBuilder.Transaction, builder.Configuration.QueryBuilder.CommandTimeout, commandFlags: cmdFlags);
             int? totalCount = null;

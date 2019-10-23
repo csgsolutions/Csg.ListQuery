@@ -22,15 +22,3 @@ steps:
   inputs:
     PathtoPublish: 'bin\Release'
     ArtifactName: nupkgs
-- powershell: |
-   $BuildNumber=$env:BUILD_BUILDNUMBER
-   [xml]$xml = Get-Content .\version.props
-   $versionPrefix = $xml.Project.PropertyGroup.VersionPrefix
-   $versionSuffix = $xml.Project.PropertyGroup.VersionSuffix[0]
-   if ($versionSuffix) {
-   Write-Output "##vso[build.updatebuildnumber]$versionPrefix-$versionSuffix-$BuildNumber"
-   } else {
-   Write-Output "##vso[build.updatebuildnumber]$versionPrefix-$BuildNumber"
-   }
-  displayName: 'Set Build Number'
-  condition: succeededOrFailed()

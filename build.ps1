@@ -33,9 +33,13 @@ $PublishProjects = @(
 	#".\src\Web\Web.csproj"
 )
 $TestProjects = Get-Item -Path tests\**\*Tests.csproj | %{ $_.FullName }
-
 $BuildNumber = Get-BuildNumber $BuildNumber
 $SkipPackage = $NoPackage.IsPresent
+
+if ($PullRequestNumber) {
+    Write-Host "Building for a pull request (#$PullRequestNumber), skipping packaging." -ForegroundColor Yellow
+    $SkipPackage = $true
+}
 
 Set-BuildInformation .\version.props $BuildNumber
 
@@ -49,12 +53,7 @@ Write-Host "Skip Tests:`t$NoTest"
 Write-Host "Pull Req:`t$PullRequestNumber"
 Write-Host "==============================================================================" -ForegroundColor DarkYellow
 
-if ($PullRequestNumber) {
-    Write-Host "Building for a pull request (#$PullRequestNumber), skipping packaging." -ForegroundColor Yellow
-    $SkipPackage = $true
-}
-
-try {	
+try {
 	Get-BuildTools -Version $BuildToolsVersion | Out-Null
 
 	# Uncomment if you need to use msbuild commands in this file
@@ -84,9 +83,7 @@ try {
 		Write-Host "Performing tests..." -ForegroundColor Magenta
 		foreach ($test_proj in $TestProjects) {
 			Write-Host "Testing $test_proj"			
-
-			dotnet test $test_proj --no-build --configuration $Configuration --logger $TestLogger
-			
+			dotnet test $test_proj --no-build --configuration $Configuration --logger $TestLogger		
 			if ($LASTEXITCODE -ne 0) {
 				throw "Test failed with code $LASTEXITCODE"
 			}
