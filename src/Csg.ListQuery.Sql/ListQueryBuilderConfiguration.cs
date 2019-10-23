@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Csg.ListQuery.Abstractions;
+using Csg.ListQuery;
 using Csg.Data;
 using System;
 using Csg.ListQuery.Sql.Internal;

@@ -1,4 +1,4 @@
-﻿using Csg.ListQuery.Abstractions;
+﻿using Csg.ListQuery;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -34,6 +34,9 @@ namespace Csg.ListQuery.Internal
                 var ci = new ReflectedListPropertyInfo();
 
                 ci.Name = property.Name;
+                ci.Description = property.TryGetAttribute<System.ComponentModel.DataAnnotations.DisplayAttribute>(out System.ComponentModel.DataAnnotations.DisplayAttribute displayAttr)
+                    ? displayAttr.GetDescription()
+                    : (string)null;
 
                 // first see if the property has the DbType attribute, otherwise infer DbType from the property type
                 if (property.TryGetAttribute(out DbTypeAttribute dbTypeAttr))
@@ -56,8 +59,18 @@ namespace Csg.ListQuery.Internal
                     ci.DataTypeSize = maxLengthAttr.Length;
                 }
 
-                ci.IsFilterable = property.TryGetAttribute(out filterableAttr) ? filterableAttr.IsFilterable : defaultFilterable;
+                if (property.TryGetAttribute(out filterableAttr)) 
+                {
+                    ci.IsFilterable = filterableAttr.IsFilterable;
+                    ci.Description = filterableAttr.Description ?? ci.Description;
+                }
+                else
+                {
+                    ci.IsFilterable = defaultFilterable;
+                }
+                
                 ci.IsSortable = property.TryGetAttribute(out sortableAttr) ? sortableAttr.IsSortable : defaultSortable;
+
                 ci.PropertyInfo = property;
 
                 schema.Add(property.Name, ci);

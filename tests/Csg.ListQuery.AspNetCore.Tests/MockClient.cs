@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Csg.ListQuery.AspNetCore.Abstractions;
+using Csg.ListQuery.Server;
 using Csg.ListQuery.AspNetCore.ModelBinding;
 
 namespace Csg.ListQuery.AspNetCore.Tests
 {
-    public class MockClient : Csg.ListQuery.AspNetCore.Client.IPagedListSupport
+    public class MockClient : Csg.ListQuery.Client.IPagedListSupport
     {
         public MockClient()
         {
@@ -16,11 +16,11 @@ namespace Csg.ListQuery.AspNetCore.Tests
 
         public IList<Person> People { get; set; } = new List<Person>();
                 
-        public Task<IPagedListHateaosResponse<TData>> GetAsync<TData>(string url)
+        public Task<IListResponse<TData>> GetAsync<TData>(string url)
         {
             var factory = new ListRequestFactory();
             var uri = new System.Uri(url);
-            var request = factory.CreateRequest<PagedListRequest>(uri.Query);
+            var request = factory.CreateRequest<ListRequest>(uri.Query);
             
             IEnumerable<TData> dataSource = null;
             if (typeof(TData) == typeof(Person))
@@ -35,7 +35,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
             var properties = PropertyHelper.GetProperties(typeof(TData));
 
             var resultData = dataSource.Skip(request.Offset).Take(request.Limit);
-            var queryResult = new Csg.ListQuery.Abstractions.ListQueryResult<TData>(
+            var queryResult = new Csg.ListQuery.ListQueryResult<TData>(
                 resultData,
                 resultData.Count(),
                 dataSource.Count(),
@@ -45,12 +45,12 @@ namespace Csg.ListQuery.AspNetCore.Tests
 
             var currentUri = new System.Uri(url);
 
-            return Task.FromResult<IPagedListHateaosResponse<TData>>(
+            return Task.FromResult<IListResponse<TData>>(
                 Csg.ListQuery.AspNetCore.ListResponseExtensions.ToListResponse<TData, TData>(queryResult, request, properties, x=>x, currentUri)
             );
         }
 
-        public Task<IPagedListResponse<TData>> PostAsync<TData>(IPagedListRequest request)
+        public Task<IListResponse<TData>> PostAsync<TData>(IListRequest request)
         {
             IEnumerable<TData> dataSource = null;
             if (typeof(TData) == typeof(Person))
@@ -66,7 +66,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
 
             var resultData = dataSource.Skip(request.Offset).Take(request.Limit);
 
-            var queryResult = new Csg.ListQuery.Abstractions.ListQueryResult<TData>(
+            var queryResult = new Csg.ListQuery.ListQueryResult<TData>(
                 resultData,
                 resultData.Count(),
                 dataSource.Count(),
@@ -74,7 +74,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
                 dataSource.Count() > request.Offset + request.Limit
             );
 
-            return Task.FromResult<IPagedListResponse<TData>>(
+            return Task.FromResult<IListResponse<TData>>(
                 Csg.ListQuery.AspNetCore.ListResponseExtensions.ToListResponse<TData, TData>(queryResult, request, properties, x => x)
             );
         }

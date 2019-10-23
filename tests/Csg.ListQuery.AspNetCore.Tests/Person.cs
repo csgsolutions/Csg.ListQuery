@@ -17,7 +17,6 @@ namespace Csg.ListQuery.AspNetCore.Tests
         public DateTimeOffset BirthDate { get; set; }
     }
 
-
     public class PersonFilters
     {
         [Filterable]
@@ -27,7 +26,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
 
         public string LastName { get; set; }
 
-        [Filterable]
+        [Filterable(Description = "Filters on birth date")]
         public DateTimeOffset BirthDate { get; set; }
     }
 

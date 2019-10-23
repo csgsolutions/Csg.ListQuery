@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Csg.ListQuery.Abstractions;
+using Csg.ListQuery;
 using Csg.Data;
 using Csg.Data.Sql;
 using Csg.ListQuery.Sql.Internal;
@@ -61,7 +61,7 @@ namespace Csg.ListQuery.Sql
             foreach (var method in methods)
             {
                 var handler = (ListQueryFilterHandler)ListQueryFilterHandler.CreateDelegate(typeof(ListQueryFilterHandler), method);
-                //TODO: Cache these
+                //TODO: Cache these maybe???
                 //ListQueryFilterHandler handler = (where, filter, config) =>
                 //{
                 //    method.Invoke(null, new object[] { where, filter, config });
@@ -110,6 +110,8 @@ namespace Csg.ListQuery.Sql
             });
             return builder;
         }
+
+        //TODO: Need Max Limit option
 
         public static IListQueryBuilder DefaultLimit(this Csg.ListQuery.Sql.IListQueryBuilder builder, int limit)
         {

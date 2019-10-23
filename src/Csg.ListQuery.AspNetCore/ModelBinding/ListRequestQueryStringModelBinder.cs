@@ -1,4 +1,4 @@
-﻿using Csg.ListQuery.AspNetCore.Abstractions;
+﻿using Csg.ListQuery.Server;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Primitives;
 using System;

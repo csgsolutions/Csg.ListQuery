@@ -76,6 +76,9 @@ function Get-BuildTools(
 }
 
 function Get-BuildNumber($BuildNumber) {
+	if (!($BuildNumber)){
+		return ""
+	}
 	# deal with passing in full version as build number
 	if ($BuildNumber.Contains("-")) {
 		$BuildNumber=$BuildNumber.Substring($BuildNumber.Length-5)
