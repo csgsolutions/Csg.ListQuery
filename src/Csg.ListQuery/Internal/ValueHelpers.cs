@@ -10,7 +10,7 @@ namespace Csg.ListQuery.Internal
     public static class ValueHelpers
     {
         /// <summary>
-        /// Gets a value that indicates if <see cref="ListFilter.Value"/> is a type derived from <see cref="System.Collections.IEnumerable"/>, and therefore contains multiple values.
+        /// Gets a value that indicates if <see cref="ListQueryFilter.Value"/> is a type derived from <see cref="System.Collections.IEnumerable"/>, and therefore contains multiple values.
         /// </summary>
         /// <returns></returns>
         internal static bool IsEnumerable(object value)
@@ -19,9 +19,11 @@ namespace Csg.ListQuery.Internal
         }
 
         /// <summary>
-        /// Returns the <see cref="Value"/> converted to the given data type and optional value converter.
+        /// Returns the given value converted to the given data type and optional value converter.
         /// </summary>
+        /// <param name="value"></param>
         /// <param name="dbType"></param>
+        /// <param name="shouldPerformDataTypeConversion"></param>
         /// <param name="valueConverter"></param>
         /// <returns></returns>
         internal static object GetFilterValue(object value, DbType dbType, bool shouldPerformDataTypeConversion = true, Func<object, object> valueConverter = null)
@@ -32,7 +34,7 @@ namespace Csg.ListQuery.Internal
         }
 
         /// <summary>
-        /// Returns <see cref="Value"/> cast as an IEnumerable of the given type and executes the given value converter over each value.
+        /// Returns the given value cast as an IEnumerable of the given type and executes the given value converter over each value.
         /// </summary>
         /// <returns></returns>
         public static IEnumerable<object> GetFilterValues(object value, DbType dbType, bool shouldPerformDataTypeConversion = true, Func<object, object> valueConverter = null)

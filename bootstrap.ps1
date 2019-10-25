@@ -74,26 +74,3 @@ function Get-BuildTools(
 
 	return $absolutePath 
 }
-
-function Get-BuildNumber($BuildNumber) {
-	if (!($BuildNumber)){
-		return ""
-	}
-	# deal with passing in full version as build number
-	if ($BuildNumber.Contains("-")) {
-		$BuildNumber=$BuildNumber.Substring($BuildNumber.Length-5)
-	}
-
-	return $BuildNumber.PadLeft(5, "0")
-}
-
-function Set-BuildInformation($VersionFile,$BuildNo){
-	[xml]$xml = Get-Content $VersionFile
-	$versionPrefix = $xml.Project.PropertyGroup.VersionPrefix;
-	$versionSuffix = $xml.Project.PropertyGroup.VersionSuffix[0];
-	if ($versionSuffix) {
-		Write-Output "##vso[build.updatebuildnumber]$versionPrefix-$versionSuffix-$BuildNo"
-	} else {
-		Write-Output "##vso[build.updatebuildnumber]$versionPrefix-$BuildNo"
-	}
-}

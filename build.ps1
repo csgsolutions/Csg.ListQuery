@@ -13,8 +13,6 @@ Param(
 	[switch]
 	$NoPackage,
 	[string]
-	$BuildNumber="",
-	[string]
 	$PullRequestNumber="",
 	[string]
 	$TestLogger = "trx;logfilename=TEST-$(get-date -format yyyyMMddHHmmss).trx"
@@ -33,7 +31,6 @@ $PublishProjects = @(
 	#".\src\Web\Web.csproj"
 )
 $TestProjects = Get-Item -Path tests\**\*Tests.csproj | %{ $_.FullName }
-$BuildNumber = Get-BuildNumber $BuildNumber
 $SkipPackage = $NoPackage.IsPresent
 
 if ($PullRequestNumber) {
@@ -41,14 +38,11 @@ if ($PullRequestNumber) {
     $SkipPackage = $true
 }
 
-Set-BuildInformation .\version.props $BuildNumber
-
 Write-Host "==============================================================================" -ForegroundColor DarkYellow
 Write-Host "The Build Script for Csg.ListQuery"
 Write-Host "==============================================================================" -ForegroundColor DarkYellow
 Write-Host "Build Tools:`t$BuildToolsVersion"
 Write-Host "Solution:`t$Solution"
-Write-Host "Build Number:`t$BuildNumber"
 Write-Host "Skip Tests:`t$NoTest"
 Write-Host "Pull Req:`t$PullRequestNumber"
 Write-Host "==============================================================================" -ForegroundColor DarkYellow
@@ -61,7 +55,7 @@ try {
 	
 	Write-Host "Restoring Packages..." -ForegroundColor Magenta
 	
-	dotnet restore $SOLUTION
+	dotnet restore $SOLUTION -v m
 	# Comment above and uncomment below if you need to use msbuild directly (if you have sdk and legacy projects)
 	# & $msbuild /t:Restore $SOLUTION
 
@@ -71,9 +65,7 @@ try {
 
 	Write-Host "Performing build..." -ForegroundColor Magenta	
 	
-	dotnet build $SOLUTION --configuration $Configuration /p:BuildNumber=$BuildNumber
-	# Comment above and uncomment below if you need to use msbuild directly (if you have sdk and legacy projects)
-	#& $msbuild /p:BuildNumber=$BuildNumber /p:Configuration=$Configuration /v:m $SOLUTION
+	dotnet build $SOLUTION --configuration $Configuration -v m
 
 	if ($LASTEXITCODE -ne 0) {
 		throw "Build failed with exit code $LASTEXITCODE."
@@ -95,7 +87,7 @@ try {
 		foreach ($pack_proj in $PackageProjects){
 			Write-Host "Packing $pack_proj"
 			
-			dotnet pack $pack_proj --no-build --configuration $Configuration /p:BuildNumber=$BuildNumber
+			dotnet pack $pack_proj --no-build --configuration $Configuration
 			
 			if ($LASTEXITCODE -ne 0) {
 				throw "Pack failed with code $result"

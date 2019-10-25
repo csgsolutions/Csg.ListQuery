@@ -4,11 +4,19 @@
     <EnableCsgInternalRestoreSources>false</EnableCsgInternalRestoreSources>
   </PropertyGroup>
   <PropertyGroup>
-    <PackageIconUrl>https://csgstorpub.blob.core.windows.net/images/csg-square-64.png</PackageIconUrl>
-    <PackageProjectUrl></PackageProjectUrl>
-    <PackageLicenseUrl></PackageLicenseUrl>
     <Owner>CSG</Owner>
-    <Authors>CSG</Authors>
-    <Copyright>2019 Cornerstone Solutions Group</Copyright>
+    <Copyright>Copyright 2019 Cornerstone Solutions Group, Inc.</Copyright>
+    <Authors>Justin R. Buchanan</Authors>
+    <Company>CSG</Company>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/csgsolutions/Csg.Data.ListQuery</PackageProjectUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>false</IncludeSymbols>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>embedded</DebugType>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/csgsolutions/Csg.Data.ListQuery</RepositoryUrl>
+    <Deterministic>false</Deterministic>
   </PropertyGroup>
 </Project>
