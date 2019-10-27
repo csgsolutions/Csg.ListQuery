@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Csg.ListQuery.AspNetCore
 {
-    public class DefaultListQueryValidator : IListQueryValidator
+    public class DefaultListQueryValidator : IListRequestValidator
     {
 
         protected virtual Csg.ListQuery.ListQueryDefinition CreateQueryDefinition()
@@ -36,7 +36,7 @@ namespace Csg.ListQuery.AspNetCore
 
             if (request.Fields != null)
             {
-                queryDef.Selections = request.Fields.Select(s => new
+                queryDef.Fields = request.Fields.Select(s => new
                 {
                     Raw = s,
                     Exists = selectableProperties.TryGetValue(s, out ListItemPropertyInfo domainProp),
@@ -77,7 +77,7 @@ namespace Csg.ListQuery.AspNetCore
                     }
                 }).Select(filter =>
                 {
-                    return new ListQueryFilter()
+                    return new ListFilter()
                     {
                         Name = filter.Domain.PropertyName,
                         Operator = filter.Raw.Operator,
@@ -89,7 +89,7 @@ namespace Csg.ListQuery.AspNetCore
 
             if (request.Sort != null)
             {
-                queryDef.Sort = request.Sort.Select(s => new
+                queryDef.Order = request.Sort.Select(s => new
                 {
                     Raw = s,
                     Exists = sortableProperties.TryGetValue(s.Name, out ListItemPropertyInfo domainProp),
@@ -107,7 +107,7 @@ namespace Csg.ListQuery.AspNetCore
                     }
                 }).Select(s =>
                 {
-                    return new ListQuerySort()
+                    return new SortField()
                     {
                         Name = s.Domain.PropertyName,
                         SortDescending = s.Raw.SortDescending

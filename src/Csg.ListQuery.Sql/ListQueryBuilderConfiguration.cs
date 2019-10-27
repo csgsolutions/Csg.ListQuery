@@ -17,7 +17,7 @@ namespace Csg.ListQuery.Sql
 
         public virtual IDictionary<string, ListQueryFilterHandler> Handlers { get; set; }
 
-        public virtual IDictionary<string, ListPropertyInfo> Validations { get; set; }
+        public virtual IDictionary<string, ListFieldMetadata> Validations { get; set; }
 
         public virtual ListQueryDefinition QueryDefinition { get; set; }
 

@@ -2,10 +2,13 @@
 
 namespace Csg.ListQuery
 {
-    public class ListQueryFilter
+    /// <summary>
+    /// Represents a filter to be applied to a query.
+    /// </summary>
+    public class ListFilter
     {
         /// <summary>
-        /// Gets or sets the column name.
+        /// Gets or sets the field name.
         /// </summary>
         public virtual string Name { get; set; }
 
@@ -18,7 +21,5 @@ namespace Csg.ListQuery
         /// Gets or sets the value(s) to be applied as part of the filter. This can be a single scalar value, or an IEnumerable.
         /// </summary>
         public virtual object Value { get; set; }
-
-
     }
 }

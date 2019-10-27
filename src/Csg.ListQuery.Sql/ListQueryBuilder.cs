@@ -10,12 +10,12 @@ using Csg.Data;
 namespace Csg.ListQuery.Sql
 {
     /// <summary>
-    /// Represents a method that handles application of a <see cref="ListQueryFilter"/> to a given <see cref="IDbQueryWhereClause"/>.
+    /// Represents a method that handles application of a <see cref="ListFilter"/> to a given <see cref="IDbQueryWhereClause"/>.
     /// </summary>
     /// <param name="where"></param>
     /// <param name="value"></param>
     /// <param name="config"></param>
-    public delegate void ListQueryFilterHandler(Csg.Data.IDbQueryWhereClause where, ListQueryFilter value, ListPropertyInfo config);
+    public delegate void ListQueryFilterHandler(Csg.Data.IDbQueryWhereClause where, ListFilter value, ListFieldMetadata config);
 
     public class ListQueryBuilder : IListQueryBuilder
     {
@@ -27,7 +27,7 @@ namespace Csg.ListQuery.Sql
                 {
                     QueryBuilder = queryBuilder,
                     QueryDefinition = queryDefinition,
-                    Validations = new Dictionary<string, ListPropertyInfo>(StringComparer.OrdinalIgnoreCase),
+                    Validations = new Dictionary<string, ListFieldMetadata>(StringComparer.OrdinalIgnoreCase),
                     Handlers = new Dictionary<string, ListQueryFilterHandler>(StringComparer.OrdinalIgnoreCase)
                 }
             };

@@ -8,14 +8,17 @@ using System.Threading.Tasks;
 
 namespace Csg.ListQuery.Internal
 {
+    /// <summary>
+    /// Reflection helpers
+    /// </summary>
     public static class ReflectionHelper
     {
-        private static System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, ReflectedListPropertyInfo>> s_typeCache 
-            = new System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, ReflectedListPropertyInfo>>();
+        private static System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, ReflectedFieldMetadata>> s_typeCache 
+            = new System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, ReflectedFieldMetadata>>();
 
-        private static IDictionary<string, ReflectedListPropertyInfo> GetListPropertyInfoInternal(Type type)
+        private static IDictionary<string, ReflectedFieldMetadata> GetListPropertyInfoInternal(Type type)
         {
-            var schema = new Dictionary<string, ReflectedListPropertyInfo>(StringComparer.OrdinalIgnoreCase);
+            var schema = new Dictionary<string, ReflectedFieldMetadata>(StringComparer.OrdinalIgnoreCase);
             bool defaultFilterable = false;
             bool defaultSortable = false;
 
@@ -31,7 +34,7 @@ namespace Csg.ListQuery.Internal
 
             foreach (var property in type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
             {
-                var ci = new ReflectedListPropertyInfo();
+                var ci = new ReflectedFieldMetadata();
 
                 ci.Name = property.Name;
                 ci.Description = property.TryGetAttribute<System.ComponentModel.DataAnnotations.DisplayAttribute>(out System.ComponentModel.DataAnnotations.DisplayAttribute displayAttr)
@@ -79,7 +82,13 @@ namespace Csg.ListQuery.Internal
             return schema;
         }
 
-        public static IDictionary<string, ReflectedListPropertyInfo> GetListPropertyInfo(Type type, bool fromCache = true)
+        /// <summary>
+        /// Gets a dictionary of field metadata created from the properties of the given type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="fromCache"></param>
+        /// <returns></returns>
+        public static IDictionary<string, ReflectedFieldMetadata> GetFieldsFromType(Type type, bool fromCache = true)
         {
             if (!fromCache)
             {
@@ -89,11 +98,18 @@ namespace Csg.ListQuery.Internal
             return s_typeCache.GetOrAdd(type, GetListPropertyInfoInternal);
         }
 
+        /// <summary>
+        /// Removes all cached metadata for the given type.
+        /// </summary>
+        /// <param name="type"></param>
         public static void RemoveCachedType(Type type)
         {
             s_typeCache.TryRemove(type, out _);
         }
 
+        /// <summary>
+        /// Clears all cached metadata.
+        /// </summary>
         public static void ClearCachedTypes()
         {
             s_typeCache.Clear();

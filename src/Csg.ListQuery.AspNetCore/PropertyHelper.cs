@@ -19,7 +19,7 @@ namespace Csg.ListQuery.AspNetCore
         /// <returns></returns>
         public static Dictionary<string, ListItemPropertyInfo> GetProperties(Type type, Func<ListItemPropertyInfo, bool> predicate = null)
         {
-            var listConfigs = Csg.ListQuery.Internal.ReflectionHelper.GetListPropertyInfo(type, fromCache: true);
+            var listConfigs = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(type, fromCache: true);
            
             return listConfigs.Values
                 .Select(prop =>

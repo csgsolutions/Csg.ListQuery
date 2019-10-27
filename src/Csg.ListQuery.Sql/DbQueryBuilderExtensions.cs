@@ -64,7 +64,7 @@ namespace Csg.Data
             return where;
         }
 
-        public static IDbQueryWhereClause AddFilter(this Csg.Data.IDbQueryWhereClause where, ListQueryFilter filter, System.Data.DbType valueType, int? valueTypeSize = null, SqlWildcardDecoration stringMatchType = SqlWildcardDecoration.BeginsWith, bool performDataTypeConversion = true, Func<object, object> valueConverter = null)
+        public static IDbQueryWhereClause AddFilter(this Csg.Data.IDbQueryWhereClause where, ListFilter filter, System.Data.DbType valueType, int? valueTypeSize = null, SqlWildcardDecoration stringMatchType = SqlWildcardDecoration.BeginsWith, bool performDataTypeConversion = true, Func<object, object> valueConverter = null)
         {
             Csg.ListQuery.Sql.Internal.Extensions.AddFilter(where, filter.Name, filter.Operator ?? ListFilterOperator.Equal, filter.Value, valueType: valueType, valueTypeSize: valueTypeSize, stringMatchType: stringMatchType, performDataTypeConversion: performDataTypeConversion, valueConverter: valueConverter);
             return where;

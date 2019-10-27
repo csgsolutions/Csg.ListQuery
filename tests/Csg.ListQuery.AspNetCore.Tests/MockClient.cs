@@ -46,7 +46,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
             var currentUri = new System.Uri(url);
 
             return Task.FromResult<IListResponse<TData>>(
-                Csg.ListQuery.AspNetCore.ListResponseExtensions.ToListResponse<TData, TData>(queryResult, request, properties, x=>x, currentUri)
+                Csg.ListQuery.AspNetCore.ListQueryResultExtensions.ToListResponse<TData, TData>(queryResult, request, properties, x=>x, currentUri)
             );
         }
 
@@ -75,7 +75,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
             );
 
             return Task.FromResult<IListResponse<TData>>(
-                Csg.ListQuery.AspNetCore.ListResponseExtensions.ToListResponse<TData, TData>(queryResult, request, properties, x => x)
+                Csg.ListQuery.AspNetCore.ListQueryResultExtensions.ToListResponse<TData, TData>(queryResult, request, properties, x => x)
             );
         }
     }

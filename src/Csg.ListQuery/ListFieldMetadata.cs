@@ -1,6 +1,9 @@
 ﻿namespace Csg.ListQuery
 {
-    public class ListPropertyInfo
+    /// <summary>
+    /// Provides metadata about a field.
+    /// </summary>
+    public class ListFieldMetadata
     {
         /// <summary>
         /// Gets or sets the column name as defined in the provider (database).
@@ -33,7 +36,10 @@
         public string Description { get; set; }
     }
 
-    public class ReflectedListPropertyInfo : ListPropertyInfo
+    /// <summary>
+    /// Represents property metadata obtained by reflection.
+    /// </summary>
+    public class ReflectedFieldMetadata : ListFieldMetadata
     {
         /// <summary>
         /// Gets or sets the property info inforation for the underlying field.

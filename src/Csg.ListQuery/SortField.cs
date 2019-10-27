@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace Csg.ListQuery
 {
-    public class ListQuerySort
+    /// <summary>
+    /// Represents a sort field and direction on a query.
+    /// </summary>
+    public class SortField
     {
         /// <summary>
         /// Gets or sets the column name.

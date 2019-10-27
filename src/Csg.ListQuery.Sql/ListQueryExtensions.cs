@@ -20,7 +20,7 @@ namespace Csg.ListQuery.Sql
         {
             listQuery.Configuration.UseValidation = true;
 
-            var properties = ListQuery.Internal.ReflectionHelper.GetListPropertyInfo(validationType);
+            var properties = ListQuery.Internal.ReflectionHelper.GetFieldsFromType(validationType);
 
             foreach (var property in properties)
             {
@@ -30,7 +30,7 @@ namespace Csg.ListQuery.Sql
             return listQuery;
         }
 
-        public static IListQueryBuilder ValidateWith(this IListQueryBuilder listQuery, IEnumerable<ListPropertyInfo> fields)
+        public static IListQueryBuilder ValidateWith(this IListQueryBuilder listQuery, IEnumerable<ListFieldMetadata> fields)
         {
             listQuery.Configuration.UseValidation = true;
 
@@ -155,7 +155,7 @@ namespace Csg.ListQuery.Sql
 
                 foreach (var filter in listQuery.Configuration.QueryDefinition.Filters)
                 {
-                    var hasConfig = listQuery.Configuration.Validations.TryGetValue(filter.Name, out ListPropertyInfo validationField);
+                    var hasConfig = listQuery.Configuration.Validations.TryGetValue(filter.Name, out ListFieldMetadata validationField);
 
                     if (listQuery.Configuration.Handlers.TryGetValue(filter.Name, out ListQueryFilterHandler handler))
                     {
@@ -180,11 +180,11 @@ namespace Csg.ListQuery.Sql
 
         public static void ApplySelections(IListQueryBuilder listQuery, IDbQueryBuilder queryBuilder)
         {
-            if (listQuery.Configuration.QueryDefinition.Selections != null)
+            if (listQuery.Configuration.QueryDefinition.Fields != null)
             {
-                foreach (var column in listQuery.Configuration.QueryDefinition.Selections)
+                foreach (var column in listQuery.Configuration.QueryDefinition.Fields)
                 {
-                    if (listQuery.Configuration.Validations.TryGetValue(column, out ListPropertyInfo config))
+                    if (listQuery.Configuration.Validations.TryGetValue(column, out ListFieldMetadata config))
                     {
                         queryBuilder.SelectColumns.Add(new Csg.Data.Sql.SqlColumn(queryBuilder.Root, config.Name));
                     }
@@ -202,11 +202,11 @@ namespace Csg.ListQuery.Sql
 
         public static void ApplySort(IListQueryBuilder listQuery, IDbQueryBuilder queryBuilder)
         {
-            if (listQuery.Configuration.QueryDefinition.Sort != null)
+            if (listQuery.Configuration.QueryDefinition.Order != null)
             {
-                foreach (var column in listQuery.Configuration.QueryDefinition.Sort)
+                foreach (var column in listQuery.Configuration.QueryDefinition.Order)
                 {
-                    if (listQuery.Configuration.Validations.TryGetValue(column.Name, out ListPropertyInfo config) && config.IsSortable == true)
+                    if (listQuery.Configuration.Validations.TryGetValue(column.Name, out ListFieldMetadata config) && config.IsSortable == true)
                     {
                         queryBuilder.OrderBy.Add(new Csg.Data.Sql.SqlOrderColumn()
                         {

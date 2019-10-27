@@ -16,12 +16,12 @@ namespace Csg.ListQuery.Server
         /// <summary>
         /// When implemented in a derived class, gets or sets a collection of filters to apply.
         /// </summary>
-        ICollection<Csg.ListQuery.ListQueryFilter> Filters { get; set; }
+        ICollection<Csg.ListQuery.ListFilter> Filters { get; set; }
 
         /// <summary>
         /// When implemented in a derived class, gets or sets a list of sort actions to apply.
         /// </summary>
-        IList<Csg.ListQuery.ListQuerySort> Sort { get; set; }
+        IList<Csg.ListQuery.SortField> Sort { get; set; }
 
         /// <summary>
         /// When implemented in a derived class, gets or sets the zero-based index of the first record in the result set that will be returned.

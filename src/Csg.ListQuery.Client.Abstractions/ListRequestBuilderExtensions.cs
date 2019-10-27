@@ -34,7 +34,7 @@ namespace Csg.ListQuery.Client
 
         public static ListRequestBuilder Where<TValue>(this ListRequestBuilder builder, string fieldName, TValue value)
         {
-            builder.Request.Filters.Add(new ListQuery.ListQueryFilter()
+            builder.Request.Filters.Add(new ListQuery.ListFilter()
             {
                 Name = fieldName,
                 Operator = ListFilterOperator.Equal,
@@ -45,7 +45,7 @@ namespace Csg.ListQuery.Client
 
         public static ListRequestBuilder Where<TValue>(this ListRequestBuilder builder, string fieldName, ListFilterOperator @operator, TValue value)
         {
-            builder.Request.Filters.Add(new ListQuery.ListQueryFilter()
+            builder.Request.Filters.Add(new ListQuery.ListFilter()
             {
                 Name = fieldName,
                 Operator = @operator,
@@ -56,7 +56,7 @@ namespace Csg.ListQuery.Client
 
         public static ListRequestBuilder Order(this ListRequestBuilder builder, IEnumerable<string> fields)
         {
-            builder.Request.Sort = fields.Select(s => new ListQuerySort()
+            builder.Request.Order = fields.Select(s => new SortField()
             {
                 Name = s.TrimStart('-'),
                 SortDescending = s.StartsWith("-")

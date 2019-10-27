@@ -6,8 +6,20 @@ using System.Threading.Tasks;
 
 namespace Csg.ListQuery
 {
+    /// <summary>
+    /// Represents the result of a list query against a data source.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class ListQueryResult<T>
     {
+        /// <summary>
+        /// Initializes a new instance with the given option.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="dataCount"></param>
+        /// <param name="totalCount"></param>
+        /// <param name="isBuffered"></param>
+        /// <param name="hasMoreData"></param>
         public ListQueryResult(IEnumerable<T> data, int? dataCount = null, int ? totalCount = null, bool isBuffered = true, bool hasMoreData = false)
         {
             this.Data = data;

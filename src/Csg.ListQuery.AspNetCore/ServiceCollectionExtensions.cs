@@ -9,9 +9,14 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
+        /// <summary>
+        /// Adds default ListQuery services to the given service collection.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
         public static IServiceCollection AddListQuery(this IServiceCollection services)
         {
-            services.TryAddSingleton<IListQueryValidator, DefaultListQueryValidator>();
+            services.TryAddSingleton<IListRequestValidator, DefaultListQueryValidator>();
             services.TryAddSingleton<ListRequestFactory>();
 
             return services;
