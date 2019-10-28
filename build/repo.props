@@ -1,7 +1,6 @@
 <Project>
   <PropertyGroup>
     <EnableCsgDevRestoreSources>true</EnableCsgDevRestoreSources>
-    <EnableCsgInternalRestoreSources>false</EnableCsgInternalRestoreSources>
   </PropertyGroup>
   <PropertyGroup>
     <Owner>CSG</Owner>

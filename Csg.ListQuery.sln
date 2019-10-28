@@ -10,9 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{648BA441
 		bootstrap.ps1 = bootstrap.ps1
 		build.ps1 = build.ps1
 		src\Directory.Build.props = src\Directory.Build.props
+		nuget.config = nuget.config
 		README.md = README.md
 		build\repo.props = build\repo.props
-		build\sources.props = build\sources.props
 		version.props = version.props
 	EndProjectSection
 EndProject
@@ -36,7 +36,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Csg.ListQuery.Client.Abstra
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{3F937508-DAC5-488C-BA9F-B5FFC6DAA94B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetCoreWebAPI", "examples\AspNetCoreWebAPI\AspNetCoreWebAPI.csproj", "{F976F933-86BC-4F2E-BABD-40749FA909A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetCoreWebAPI", "examples\AspNetCoreWebAPI\AspNetCoreWebAPI.csproj", "{F976F933-86BC-4F2E-BABD-40749FA909A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
