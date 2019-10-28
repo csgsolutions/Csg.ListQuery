@@ -19,6 +19,12 @@ namespace Csg.ListQuery.Sql
 
     public class ListQueryBuilder : IListQueryBuilder
     {
+        /// <summary>
+        /// Creates a <see cref="ListQueryBuilder"/> from the given query builder and query definition.
+        /// </summary>
+        /// <param name="queryBuilder"></param>
+        /// <param name="queryDefinition"></param>
+        /// <returns></returns>
         public static IListQueryBuilder Create(IDbQueryBuilder queryBuilder, ListQueryDefinition queryDefinition)
         {
             return new ListQueryBuilder()
@@ -33,6 +39,9 @@ namespace Csg.ListQuery.Sql
             };
         }
 
+        /// <summary>
+        /// Gets or sets the list builder configuration.
+        /// </summary>
         protected virtual ListQueryBuilderConfiguration Configuration { get; set; }
 
         ListQueryBuilderConfiguration IListQueryBuilder.Configuration { get => this.Configuration; }

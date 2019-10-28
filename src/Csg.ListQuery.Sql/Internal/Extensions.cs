@@ -11,6 +11,11 @@ namespace Csg.ListQuery.Sql.Internal
 {
     public static class Extensions
     {
+        /// <summary>
+        /// Converts the filter operator into the <see cref="Csg.Data.Sql.SqlOperator"/> equivalent
+        /// </summary>
+        /// <param name="operator"></param>
+        /// <returns></returns>
         public static Csg.Data.Sql.SqlOperator ToSqlOperator(this ListFilterOperator @operator)
         {
             Csg.Data.Sql.SqlOperator nativeOperator;

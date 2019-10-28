@@ -16,9 +16,11 @@ namespace AspNetCoreWebAPI.Controllers
     public class WeatherForecastController : ControllerBase
     {
         private readonly ILogger<WeatherForecastController> _logger;
-        private readonly Internal.IRepository _repo;
+        private readonly Internal.IRepository _repo = null;
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             _logger = logger;
         }

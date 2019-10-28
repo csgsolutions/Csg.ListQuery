@@ -3,7 +3,6 @@ using Csg.ListQuery.AspNetCore;
 using System.Linq;
 using System;
 using Csg.ListQuery.Server;
-using Csg.ListQuery.Server;
 
 namespace Csg.ListQuery.AspNetCore.Tests
 {

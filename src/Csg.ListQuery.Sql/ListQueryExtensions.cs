@@ -111,18 +111,28 @@ namespace Csg.ListQuery.Sql
             return builder;
         }
 
-        //TODO: Need Max Limit option
+        public static IListQueryBuilder MaxLimit(this Csg.ListQuery.Sql.IListQueryBuilder builder, int maxLimit, bool silent = true)
+        {
+            return builder.BeforeApply((config) =>
+            {
+                if (config.QueryDefinition.Limit > maxLimit && !silent)
+                {
+                    throw new InvalidOperationException($"The value specified for limit {config.QueryDefinition.Limit} is greater than the maximum allowed value of {maxLimit}.");
+                }
+
+                config.QueryDefinition.Limit = Math.Min(maxLimit, config.QueryDefinition.Limit);
+            });
+        }
 
         public static IListQueryBuilder DefaultLimit(this Csg.ListQuery.Sql.IListQueryBuilder builder, int limit)
         {
-            builder.BeforeApply((config) =>
+            return builder.BeforeApply((config) =>
             {
                 if (config.QueryDefinition.Limit <= 0)
                 {
                     config.QueryDefinition.Limit = limit;
                 }
             });
-            return builder;
         }
 
         public static IListQueryBuilder BeforeApply(this IListQueryBuilder builder, Action<ListQueryBuilderConfiguration> action)
@@ -298,9 +308,10 @@ namespace Csg.ListQuery.Sql
             int? totalCount = null;
             IEnumerable<T> data = null;
             bool isBuffered = !builder.Configuration.UseStreamingResult;
-            bool limitOracle = builder.Configuration.UseLimitOracle && !builder.Configuration.UseStreamingResult;
+            bool limitOracle = builder.Configuration.QueryDefinition.Limit > 0 && builder.Configuration.UseLimitOracle && !builder.Configuration.UseStreamingResult;
             int? dataCount = null;
-            bool hasMoreData = false;
+            int? nextOffset = null;
+            int? prevOffset = null;
 
             if (stmt.Count == 1)
             {
@@ -324,13 +335,27 @@ namespace Csg.ListQuery.Sql
             if (limitOracle)
             {
                 // if we used a limit oracle, then strip the last row off
-                int countBefore = data.Count();
+                int actualCount = data.Count();
                 data = data.Take(builder.Configuration.QueryDefinition.Limit);
                 dataCount = data.Count();
-                hasMoreData = countBefore > dataCount;
+
+                // if more records were fetched than limit, then there is at least one more page of data to fetch.
+                if (actualCount > dataCount)
+                {
+                    nextOffset = builder.Configuration.QueryDefinition.Offset + builder.Configuration.QueryDefinition.Limit;
+                }
+            }
+            else if (builder.Configuration.QueryDefinition.Limit > 0)
+            {
+                nextOffset = builder.Configuration.QueryDefinition.Offset + builder.Configuration.QueryDefinition.Limit;
             }
 
-            return new ListQueryResult<T>(data, dataCount, totalCount, isBuffered, hasMoreData);
+            if (builder.Configuration.QueryDefinition.Offset > 0)
+            {
+                prevOffset = Math.Max(builder.Configuration.QueryDefinition.Offset - builder.Configuration.QueryDefinition.Limit, 0);
+            }
+
+            return new ListQueryResult<T>(data, dataCount, totalCount, isBuffered, builder.Configuration.QueryDefinition.Limit, nextOffset, prevOffset);
         }
     }
 

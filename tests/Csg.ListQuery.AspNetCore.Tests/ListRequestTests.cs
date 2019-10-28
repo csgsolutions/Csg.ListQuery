@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using Csg.ListQuery.Server;
-using Csg.ListQuery.Server;
 
 namespace Csg.ListQuery.AspNetCore.Tests
 {

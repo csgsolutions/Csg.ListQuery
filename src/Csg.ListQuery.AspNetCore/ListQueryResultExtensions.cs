@@ -68,22 +68,10 @@ namespace Csg.ListQuery.AspNetCore
             if (dataCount.HasValue)
             {
                 response.Meta.CurrentCount = dataCount;
-
-                if (queryResult.HasMoreData)
-                {
-                    var nextOffset = (request.Offset + dataCount.Value);
-                    response.Meta.Next = new PageInfo(nextOffset);
-                }
             }
-
-            if (request.Offset > 0)
-            {
-                //TODO: prevOFfset is wrong when using DefaultLimit on the ListQuery
-                // maybe need to implement returning 
-                var prevOffset = Math.Max(request.Offset - request.Limit, 0);
-                response.Meta.Prev = new PageInfo(prevOffset);
-            }
-
+            
+            response.Meta.Next = queryResult.NextOffset.HasValue ? new PageInfo(queryResult.NextOffset.Value) : (PageInfo?)null;
+            response.Meta.Prev = queryResult.PreviousOffset.HasValue ? new PageInfo(queryResult.PreviousOffset.Value) : (PageInfo?)null;
             response.Data = data;
 
             return response;

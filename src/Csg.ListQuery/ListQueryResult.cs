@@ -19,14 +19,25 @@ namespace Csg.ListQuery
         /// <param name="dataCount"></param>
         /// <param name="totalCount"></param>
         /// <param name="isBuffered"></param>
-        /// <param name="hasMoreData"></param>
-        public ListQueryResult(IEnumerable<T> data, int? dataCount = null, int ? totalCount = null, bool isBuffered = true, bool hasMoreData = false)
+        /// <param name="limit"></param>
+        /// <param name="nextOffset"></param>
+        /// <param name="prevOffset"></param>
+        public ListQueryResult(IEnumerable<T> data,
+                               int? dataCount = null,
+                               int? totalCount = null,
+                               bool isBuffered = true,
+                               int? limit = null,
+                               int? nextOffset = null,
+                               int? prevOffset = null
+            )
         {
             this.Data = data;
             this.DataCount = dataCount;
             this.IsBuffered = isBuffered;
             this.TotalCount = totalCount;
-            this.HasMoreData = hasMoreData;
+            this.Limit = limit;
+            this.NextOffset = nextOffset;
+            this.PreviousOffset = prevOffset;
         }
 
         /// <summary>
@@ -50,8 +61,18 @@ namespace Csg.ListQuery
         public int? DataCount { get; private set; }
 
         /// <summary>
-        /// Gets a value that indicates if there is more data at the source that can be fetched by incrementing the requested offset.
+        /// Gets the limit value (if any) that was applied during query execution.
         /// </summary>
-        public bool HasMoreData { get; private set; }
+        public int? Limit { get; private set; }
+
+        /// <summary>
+        /// Gets a value that indicates what the offset value should be to request the next page.
+        /// </summary>
+        public int? NextOffset { get; private set; }
+
+        /// <summary>
+        /// Gets a value that indicates what the offset value should be to request the previous page.
+        /// </summary>
+        public int? PreviousOffset { get; private set; }
     }
 }
