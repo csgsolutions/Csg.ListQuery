@@ -19,8 +19,9 @@ namespace Csg.ListQuery.Client
         /// <param name="response">The response object from the request for the first page</param>
         /// <param name="delayBetweenRequests">The delay (in milliseconds) to wait between requests.</param>
         /// <param name="maxRequests">The maximum number of requests to send to the source API.</param>
+        /// <param name="onRequestComplete"></param>
         /// <returns></returns>
-        public static async Task<AggregateListResponse<TData>> GetAllPagesAsync<TData>(this IPagedListSupport client, IListResponse<TData> response, int delayBetweenRequests = 25, int? maxRequests = null)
+        public static async Task<AggregateListResponse<TData>> GetAllPagesAsync<TData>(this IPagedListSupport client, IListResponse<TData> response, int delayBetweenRequests = 25, int? maxRequests = null, Action<IListResponse<TData>> onRequestComplete = null)
         {
             var result = response.Data;
             int pageCount = 1;
@@ -31,11 +32,12 @@ namespace Csg.ListQuery.Client
             {
                 await Task.Delay(delayBetweenRequests);
                 var responseObject = await client.GetAsync<TData>(nextUrl);
-
                 result = result.Concat(responseObject.Data);
                 nextUrl = responseObject.Links?.Next;
                 pageCount++;
                 totalCount += responseObject.Meta?.CurrentCount ?? 0;
+
+                onRequestComplete?.Invoke(responseObject);
             }
 
             return new AggregateListResponse<TData>(result, totalCount, pageCount);
@@ -49,8 +51,9 @@ namespace Csg.ListQuery.Client
         /// <param name="request">The list request definition</param>
         /// <param name="delayBetweenRequests">The delay (in milliseconds) to wait between requests.</param>
         /// <param name="maxPagesToFetch">The maximum number of pages to fetch from the API.</param>
+        /// <param name="onRequestComplete"></param>
         /// <returns></returns>
-        public static async Task<AggregateListResponse<TData>> PostAllPagesAsync<TData>(this IPagedListSupport client, IListRequest request, int delayBetweenRequests = 25, int? maxPagesToFetch = null)
+        public static async Task<AggregateListResponse<TData>> PostAllPagesAsync<TData>(this IPagedListSupport client, IListRequest request, int delayBetweenRequests = 25, int? maxPagesToFetch = null, Action<IListResponse<TData>> onRequestComplete = null)
         {
             IEnumerable<TData> result = new List<TData>();
             int pageCount = 0;
@@ -62,11 +65,12 @@ namespace Csg.ListQuery.Client
                 await Task.Delay(delayBetweenRequests);
                 request.Offset = nextOffset.Value;
                 var responseObject = await client.PostAsync<TData>(request);
-
                 result = result.Concat(responseObject.Data);
                 nextOffset = responseObject.Meta?.Next?.Offset;
                 pageCount++;
                 totalCount += responseObject.Meta?.CurrentCount ?? 0;
+
+                onRequestComplete?.Invoke(responseObject);
             }
 
             return new AggregateListResponse<TData>(result, totalCount, pageCount);

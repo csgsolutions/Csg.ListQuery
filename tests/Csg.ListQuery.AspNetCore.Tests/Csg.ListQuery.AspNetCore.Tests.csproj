@@ -17,8 +17,4 @@
     <ProjectReference Include="..\..\src\Csg.ListQuery.Client.Abstractions\Csg.ListQuery.Client.Abstractions.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="TestResults\" />
-  </ItemGroup>
-
 </Project>
