@@ -8,6 +8,7 @@
     <Authors>Justin R. Buchanan</Authors>
     <Company>CSG</Company>
     <PackageIcon>icon.png</PackageIcon>
+    <PackageIconUrl>https://csgstorpub.blob.core.windows.net/images/csg-square-64.png</PackageIconUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/csgsolutions/Csg.Data.ListQuery</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
