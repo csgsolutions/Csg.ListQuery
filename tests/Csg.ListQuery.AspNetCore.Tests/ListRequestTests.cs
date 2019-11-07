@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using Csg.ListQuery.Server;
+using Csg.ListQuery.AspNetCore.Tests.Mock;
 
 namespace Csg.ListQuery.AspNetCore.Tests
 {
@@ -28,11 +29,11 @@ namespace Csg.ListQuery.AspNetCore.Tests
             Assert.AreEqual(2, sortProps.Count(x => x.Value.IsSortable));
         }
 
-
         [TestMethod]
         public void Test_DefaultValidator_Validate_AllArgs()
         {
-            var validator = new DefaultListQueryValidator();
+            var options = new MockOptionsMonitor<ListRequestOptions>(new ListRequestOptions());
+            var validator = new DefaultListQueryValidator(options);
             var selectProps = PropertyHelper.GetProperties(typeof(Person));
             var filterProps = PropertyHelper.GetProperties(typeof(PersonFilters), x => x.IsFilterable);
             var sortProps = PropertyHelper.GetProperties(typeof(PersonSorts), x => x.IsSortable);
@@ -58,12 +59,14 @@ namespace Csg.ListQuery.AspNetCore.Tests
 
             Assert.IsFalse(result.IsValid);
             Assert.AreEqual(result.Errors.Count, 4);
+
         }
 
         [TestMethod]
         public void Test_DefaultValidator_Validate_OneGenericArg()
         {
-            var validator = new DefaultListQueryValidator();
+            var options = new MockOptionsMonitor<ListRequestOptions>(new ListRequestOptions());
+            var validator = new DefaultListQueryValidator(options);
             var request = new ListRequest();
             request.Fields = new string[] { "PersonID","LastName","FirstName","BirthDate" };
             request.Filters = new List<ListFilter>
@@ -92,7 +95,8 @@ namespace Csg.ListQuery.AspNetCore.Tests
         [TestMethod]
         public void Test_DefaultValidator_Validate_TwoGenericArgs()
         {
-            var validator = new DefaultListQueryValidator();
+            var options = new MockOptionsMonitor<ListRequestOptions>(new ListRequestOptions());
+            var validator = new DefaultListQueryValidator(options);
             var request = new ListRequest();
             request.Fields = new string[] { "PersonID", "LastName", "FirstName", "BirthDate" };
             request.Filters = new List<ListFilter>
@@ -119,11 +123,11 @@ namespace Csg.ListQuery.AspNetCore.Tests
             Assert.AreEqual(4, result.ListQuery.Order.Count());
         }
 
-
         [TestMethod]
         public void Test_DefaultValidator_Validate_ThreeGenericArgs()
         {
-            var validator = new DefaultListQueryValidator();
+            var options = new MockOptionsMonitor<ListRequestOptions>(new ListRequestOptions());
+            var validator = new DefaultListQueryValidator(options);
             var request = new ListRequest();
             request.Fields = new string[] { "PersonID", "LastName", "FirstName", "BirthDate" };
             request.Filters = new List<ListFilter>
@@ -148,6 +152,32 @@ namespace Csg.ListQuery.AspNetCore.Tests
             Assert.AreEqual(4, result.ListQuery.Fields.Count());
             Assert.AreEqual(2, result.ListQuery.Filters.Count());
             Assert.AreEqual(2, result.ListQuery.Order.Count());
+        }
+
+        [TestMethod]
+        public void Test_DefaultValidator_Validate_DefaultLimit()
+        {
+            var options = new MockOptionsMonitor<ListRequestOptions>(new ListRequestOptions() { DefaultLimit = 10 });
+            var validator = new DefaultListQueryValidator(options);
+            var request = new ListRequest();
+            var result = validator.Validate<Person, PersonFilters, PersonSorts>(request);
+
+            Assert.IsTrue(result.IsValid);
+            Assert.AreEqual(10, result.ListQuery.Limit);
+        }
+
+        [TestMethod]
+        public void Test_DefaultValidator_Validate_MaxLimit()
+        {
+            var options = new MockOptionsMonitor<ListRequestOptions>(new ListRequestOptions() { MaxLimit = 10 });
+            var validator = new DefaultListQueryValidator(options);
+            var request = new ListRequest();
+            request.Limit = 50;
+            
+            var result = validator.Validate<Person, PersonFilters, PersonSorts>(request);
+
+            Assert.IsFalse(result.IsValid);
+            Assert.AreEqual(1, result.Errors.Count);
         }
 
         [TestMethod]

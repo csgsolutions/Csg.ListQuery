@@ -14,8 +14,13 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static IServiceCollection AddListQuery(this IServiceCollection services)
+        public static IServiceCollection AddListQuery(this IServiceCollection services, Action<ListRequestOptions> setupAction = null)
         {
+            if (setupAction != null)
+            {
+                services.Configure(setupAction);
+            }
+
             services.TryAddSingleton<IListRequestValidator, DefaultListQueryValidator>();
             services.TryAddSingleton<ListRequestFactory>();
 

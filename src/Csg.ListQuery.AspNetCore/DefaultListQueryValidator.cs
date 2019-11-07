@@ -1,6 +1,7 @@
 ﻿using Csg.ListQuery;
 using Csg.ListQuery.Server;
 using Csg.ListQuery.Server.Internal;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,30 @@ using System.Text;
 
 namespace Csg.ListQuery.AspNetCore
 {
-    public class DefaultListQueryValidator : IListRequestValidator
+    /// <summary>
+    /// Default validator implementation
+    /// </summary>
+    public class DefaultListQueryValidator : IListRequestValidator, System.IDisposable
     {
+        private ListRequestOptions _options;
+        private IDisposable _onChangeSubscription;
 
+        /// <summary>
+        /// Initializes a new instance
+        /// </summary>
+        public DefaultListQueryValidator(IOptionsMonitor<ListRequestOptions> options)
+        {
+            _options = options.CurrentValue;
+            _onChangeSubscription = options.OnChange((val) =>
+            {
+                _options = val;
+            });
+        }
+
+        /// <summary>
+        /// Creates a new query definition that will be populated with the filters, fields and sorts.
+        /// </summary>
+        /// <returns></returns>
         protected virtual Csg.ListQuery.ListQueryDefinition CreateQueryDefinition()
         {
             return new Csg.ListQuery.ListQueryDefinition();
@@ -116,13 +138,37 @@ namespace Csg.ListQuery.AspNetCore
                 .ToList();
             }
 
+            if (request.Offset < 0)
+            {
+                errors.Add("offset", $"Offset must be greater than or equal to 0.");
+            }
+
             if (request.Limit > 0)
             {
-                queryDef.Offset = request.Offset;
-                queryDef.Limit = request.Limit;
+                queryDef.Offset = request.Offset.GetValueOrDefault();
+                queryDef.Limit = request.Limit.Value;
+            }
+            else if (request.Limit < 0)
+            {
+                errors.Add("limit", $"Limit must be greater than or equal to zero.");
+            }
+
+            if (_options.DefaultLimit.HasValue && queryDef.Limit <= 0)
+            {
+                queryDef.Limit = _options.DefaultLimit.Value;
+            }
+
+            if (_options.MaxLimit.HasValue && queryDef.Limit > _options.MaxLimit.Value)
+            {
+                errors.Add("limit", $"Limit must be greater than or equal to 0 and less than or equal to {_options.MaxLimit}");
             }
 
             return new ListRequestValidationResult(errors, queryDef);
+        }
+
+        public void Dispose()
+        {
+            _onChangeSubscription?.Dispose();
         }
     }
 }

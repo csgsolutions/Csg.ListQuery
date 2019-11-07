@@ -67,12 +67,12 @@ namespace Csg.ListQuery.Server
         /// <summary>
         /// Gets or sets the zero-based index of the first record in the result set that will be returned.
         /// </summary>
-        public virtual int Offset { get; set; }
+        public virtual int? Offset { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of records that will be returned in the result set.
         /// </summary>
-        public virtual int Limit { get; set; }
+        public virtual int? Limit { get; set; }
         
         /// <summary>
         /// Gets a querystring representation of the request

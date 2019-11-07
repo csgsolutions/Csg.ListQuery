@@ -22,8 +22,6 @@ namespace Csg.ListQuery.Server
                 Field = fieldName,
                 Error = errorMessage
             });
-        }
-
-       
+        }       
     }
 }

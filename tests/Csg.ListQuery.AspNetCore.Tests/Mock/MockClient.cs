@@ -34,7 +34,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
 
             var properties = PropertyHelper.GetProperties(typeof(TData));
 
-            var resultData = dataSource.Skip(request.Offset).Take(request.Limit);
+            var resultData = dataSource.Skip(request.Offset.Value).Take(request.Limit.Value);
             var queryResult = new Csg.ListQuery.ListQueryResult<TData>(
                 resultData,
                 resultData.Count(),
@@ -42,7 +42,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
                 true,
                 request.Limit,
                 (request.Offset + resultData.Count()) < dataSource.Count() ? request.Offset + request.Limit : (int?)null,
-                request.Offset > 0 ? Math.Max(request.Offset - request.Limit, 0) : (int?)null
+                request.Offset > 0 ? Math.Max(request.Offset.Value - request.Limit.Value, 0) : (int?)null
             );
 
             var currentUri = new System.Uri(url);
@@ -66,7 +66,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
 
             var properties = PropertyHelper.GetProperties(typeof(TData));
 
-            var resultData = dataSource.Skip(request.Offset).Take(request.Limit);
+            var resultData = dataSource.Skip(request.Offset.Value).Take(request.Limit.Value);
 
             var queryResult = new Csg.ListQuery.ListQueryResult<TData>(
                 resultData,
@@ -75,7 +75,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
                 true,
                 request.Limit,
                 (request.Offset + resultData.Count()) < dataSource.Count() ? request.Offset + request.Limit : (int?)null,
-                request.Offset > 0 ? Math.Max(request.Offset - request.Limit, 0) :(int?)null
+                request.Offset > 0 ? Math.Max(request.Offset.Value - request.Limit.Value, 0) :(int?)null
             );
 
             return Task.FromResult<IListResponse<TData>>(
