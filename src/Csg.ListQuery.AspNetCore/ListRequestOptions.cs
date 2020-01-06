@@ -6,9 +6,9 @@ namespace Csg.ListQuery.AspNetCore
 {
     public class ListRequestOptions
     {
-        public int? MaxLimit { get; set; }
+        public int? MaxLimit { get; set; } = 100;
 
-        public int? DefaultLimit { get; set; }
+        public int? DefaultLimit { get; set; } = 25;
 
     }
 }
