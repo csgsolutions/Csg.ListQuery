@@ -33,11 +33,11 @@ namespace Csg.ListQuery.Server
         /// <summary>
         /// Gets or sets a collection of filters to apply.
         /// </summary>
-        public virtual ICollection<Csg.ListQuery.ListQueryFilter> Filters
+        public virtual ICollection<Csg.ListQuery.ListFilter> Filters
         {
             get
             {
-                _filters = _filters ?? new List<ListQueryFilter>();
+                _filters = _filters ?? new List<ListFilter>();
                 return _filters;
             }
             set
@@ -45,34 +45,34 @@ namespace Csg.ListQuery.Server
                 _filters = value;
             }
         }
-        private ICollection<ListQueryFilter> _filters;
+        private ICollection<ListFilter> _filters;
 
         /// <summary>
         /// Gets or sets a list of sort actions to apply.
         /// </summary>
-        public virtual IList<Csg.ListQuery.ListQuerySort> Sort
+        public virtual IList<Csg.ListQuery.SortField> Order
         {
             get
             {
-                _sort = _sort ?? new List<ListQuerySort>();
-                return _sort;
+                _order = _order ?? new List<SortField>();
+                return _order;
             }
             set
             {
-                _sort = value;
+                _order = value;
             }
         }
-        private IList<ListQuerySort> _sort;
+        private IList<SortField> _order;
 
         /// <summary>
         /// Gets or sets the zero-based index of the first record in the result set that will be returned.
         /// </summary>
-        public virtual int Offset { get; set; }
+        public virtual int? Offset { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of records that will be returned in the result set.
         /// </summary>
-        public virtual int Limit { get; set; }
+        public virtual int? Limit { get; set; }
         
         /// <summary>
         /// Gets a querystring representation of the request
@@ -87,9 +87,9 @@ namespace Csg.ListQuery.Server
                 query.Append(UrlElements.c_fields).Append("=").Append(string.Join(",", this.Fields.Select(System.Uri.EscapeDataString))).Append("&");
             }
 
-            if (this.Sort != null)
+            if (this.Order != null)
             {
-                query.Append(UrlElements.c_order).Append("=").Append(string.Join(",", this.Sort.Select(s => string.Concat(s.SortDescending ? "-" : "", System.Uri.EscapeDataString(s.Name))))).Append("&");
+                query.Append(UrlElements.c_order).Append("=").Append(string.Join(",", this.Order.Select(s => string.Concat(s.SortDescending ? "-" : "", System.Uri.EscapeDataString(s.Name))))).Append("&");
             }
 
             if (this.Offset > 0)
@@ -141,9 +141,9 @@ namespace Csg.ListQuery.Server
 
         IList<string> IListRequest.Fields { get => this.Fields; set => this.Fields = value; }
 
-        ICollection<ListQueryFilter> IListRequest.Filters { get => this.Filters; set => this.Filters = value; }
+        ICollection<ListFilter> IListRequest.Filters { get => this.Filters; set => this.Filters = value; }
 
-        IList<ListQuerySort> IListRequest.Sort { get => this.Sort; set => this.Sort = value; }
+        IList<SortField> IListRequest.Sort { get => this.Order; set => this.Order = value; }
 
         #endregion
     }

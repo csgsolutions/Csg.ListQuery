@@ -23,8 +23,8 @@ namespace Csg.ListQuery.Tests
             IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("Person", new Mock.MockConnection());
             var request = new ListQueryDefinition();
 
-            request.Filters = new List<ListQueryFilter>(new ListQueryFilter[] {
-                new ListQueryFilter() { Name = "FirstName", Operator = ListFilterOperator.Equal, Value = "Bob" }
+            request.Filters = new List<ListFilter>(new ListFilter[] {
+                new ListFilter() { Name = "FirstName", Operator = ListFilterOperator.Equal, Value = "Bob" }
             });
 
             Assert.ThrowsException<System.Exception>(() =>
@@ -41,9 +41,9 @@ namespace Csg.ListQuery.Tests
             IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
             var queryDef = new ListQueryDefinition();
 
-            queryDef.Selections = new string[] { "FirstName", "LastName" };
-            queryDef.Filters = new List<ListQueryFilter>(new ListQueryFilter[] {
-                new ListQueryFilter() { Name = "FirstName", Operator = ListFilterOperator.Equal, Value = "Bob" }
+            queryDef.Fields = new string[] { "FirstName", "LastName" };
+            queryDef.Filters = new List<ListFilter>(new ListFilter[] {
+                new ListFilter() { Name = "FirstName", Operator = ListFilterOperator.Equal, Value = "Bob" }
             });
 
             var stmt = ListQueryBuilder.Create(query, queryDef)
@@ -63,9 +63,9 @@ namespace Csg.ListQuery.Tests
             IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
             var queryDef = new ListQueryDefinition();
 
-            queryDef.Selections = new string[] { "FirstName", "LastName" };
-            queryDef.Filters = new List<ListQueryFilter>(new ListQueryFilter[] {
-                new ListQueryFilter() { Name = "FirstName", Operator = ListFilterOperator.Equal, Value = "Bob" }
+            queryDef.Fields = new string[] { "FirstName", "LastName" };
+            queryDef.Filters = new List<ListFilter>(new ListFilter[] {
+                new ListFilter() { Name = "FirstName", Operator = ListFilterOperator.Equal, Value = "Bob" }
             });
 
             var conn = new Mock.MockConnection();
@@ -87,8 +87,8 @@ namespace Csg.ListQuery.Tests
             var expectedSql = "SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]=@p0);";
             var queryDef = new ListQueryDefinition()
             {
-                Filters = new List<ListQueryFilter>() {
-                    new ListQueryFilter() { Name = "FirstName", Operator = ListFilterOperator.Equal, Value = "Bob" }
+                Filters = new List<ListFilter>() {
+                    new ListFilter() { Name = "FirstName", Operator = ListFilterOperator.Equal, Value = "Bob" }
                 }
             };
 
@@ -108,8 +108,8 @@ namespace Csg.ListQuery.Tests
             var expectedSql = "SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]<>@p0);";
             var queryDef = new ListQueryDefinition()
             {
-                Filters = new List<ListQueryFilter>() {
-                    new ListQueryFilter() { Name = "FirstName", Operator = ListFilterOperator.NotEqual, Value = "Bob" }
+                Filters = new List<ListFilter>() {
+                    new ListFilter() { Name = "FirstName", Operator = ListFilterOperator.NotEqual, Value = "Bob" }
                 }
             };
 
@@ -129,8 +129,8 @@ namespace Csg.ListQuery.Tests
             var expectedSql = "SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]>@p0);";
             var queryDef = new ListQueryDefinition()
             {
-                Filters = new List<ListQueryFilter>() {
-                    new ListQueryFilter() { Name = "FirstName", Operator = ListFilterOperator.GreaterThan, Value = "Bob" }
+                Filters = new List<ListFilter>() {
+                    new ListFilter() { Name = "FirstName", Operator = ListFilterOperator.GreaterThan, Value = "Bob" }
                 }
             };
 
@@ -150,8 +150,8 @@ namespace Csg.ListQuery.Tests
             var expectedSql = "SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]>=@p0);";
             var queryDef = new ListQueryDefinition()
             {
-                Filters = new List<ListQueryFilter>() {
-                    new ListQueryFilter() { Name = "FirstName", Operator = ListFilterOperator.GreaterThanOrEqual, Value = "Bob" }
+                Filters = new List<ListFilter>() {
+                    new ListFilter() { Name = "FirstName", Operator = ListFilterOperator.GreaterThanOrEqual, Value = "Bob" }
                 }
             };
 
@@ -171,8 +171,8 @@ namespace Csg.ListQuery.Tests
             var expectedSql = "SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]<@p0);";
             var queryDef = new ListQueryDefinition()
             {
-                Filters = new List<ListQueryFilter>() {
-                    new ListQueryFilter() { Name = "FirstName", Operator = ListFilterOperator.LessThan, Value = "Bob" }
+                Filters = new List<ListFilter>() {
+                    new ListFilter() { Name = "FirstName", Operator = ListFilterOperator.LessThan, Value = "Bob" }
                 }
             };
 
@@ -192,8 +192,8 @@ namespace Csg.ListQuery.Tests
             var expectedSql = "SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]<=@p0);";
             var queryDef = new ListQueryDefinition()
             {
-                Filters = new List<ListQueryFilter>() {
-                    new ListQueryFilter() { Name = "FirstName", Operator = ListFilterOperator.LessThanOrEqual, Value = "Bob" }
+                Filters = new List<ListFilter>() {
+                    new ListFilter() { Name = "FirstName", Operator = ListFilterOperator.LessThanOrEqual, Value = "Bob" }
                 }
             };
 
@@ -213,8 +213,8 @@ namespace Csg.ListQuery.Tests
             var expectedSql = "SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName] IS NULL);";
             var queryDef = new ListQueryDefinition()
             {
-                Filters = new List<ListQueryFilter>() {
-                    new ListQueryFilter() { Name = "FirstName", Operator = ListFilterOperator.IsNull, Value = true }
+                Filters = new List<ListFilter>() {
+                    new ListFilter() { Name = "FirstName", Operator = ListFilterOperator.IsNull, Value = true }
                 }
             };
 
@@ -233,8 +233,8 @@ namespace Csg.ListQuery.Tests
             var expectedSql = "SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName] IS NOT NULL);";
             var queryDef = new ListQueryDefinition()
             {
-                Filters = new List<ListQueryFilter>() {
-                    new ListQueryFilter() { Name = "FirstName", Operator = ListFilterOperator.IsNull, Value = false }
+                Filters = new List<ListFilter>() {
+                    new ListFilter() { Name = "FirstName", Operator = ListFilterOperator.IsNull, Value = false }
                 }
             };
 
@@ -253,8 +253,8 @@ namespace Csg.ListQuery.Tests
             var expectedSql = "SELECT * FROM [dbo].[Person] AS [t0] WHERE (([t0].[FirstName]>=@p0) AND ([t0].[FirstName]<=@p1));";
             var queryDef = new ListQueryDefinition()
             {
-                Filters = new List<ListQueryFilter>() {
-                    new ListQueryFilter() { Name = "FirstName", Operator = ListFilterOperator.Between, Value = new string[]{ "Bob", "Dole" } }
+                Filters = new List<ListFilter>() {
+                    new ListFilter() { Name = "FirstName", Operator = ListFilterOperator.Between, Value = new string[]{ "Bob", "Dole" } }
                 }
             };
 
@@ -274,8 +274,8 @@ namespace Csg.ListQuery.Tests
             var expectedSql = "SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName] LIKE @p0);";
             var queryDef = new ListQueryDefinition()
             {
-                Filters = new List<ListQueryFilter>() {
-                    new ListQueryFilter() { Name = "FirstName", Operator = ListFilterOperator.Like, Value = "Bob" }
+                Filters = new List<ListFilter>() {
+                    new ListFilter() { Name = "FirstName", Operator = ListFilterOperator.Like, Value = "Bob" }
                 }
             };
 
@@ -299,8 +299,8 @@ namespace Csg.ListQuery.Tests
             IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());            
             var queryDef = new ListQueryDefinition();
 
-            queryDef.Filters = new List<ListQueryFilter>(new ListQueryFilter[] {
-                new ListQueryFilter() { Name = "PhoneNumber", Operator = ListFilterOperator.Like, Value = "555" }
+            queryDef.Filters = new List<ListFilter>(new ListFilter[] {
+                new ListFilter() { Name = "PhoneNumber", Operator = ListFilterOperator.Like, Value = "555" }
             });
 
             var stmt = ListQueryBuilder.Create(query, queryDef)
@@ -321,8 +321,8 @@ namespace Csg.ListQuery.Tests
             IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
             var queryDef = new ListQueryDefinition();
 
-            queryDef.Filters = new List<ListQueryFilter>(new ListQueryFilter[] {
-                new ListQueryFilter() { Name = "PhoneNumber", Operator = ListFilterOperator.Like, Value = "555" }
+            queryDef.Filters = new List<ListFilter>(new ListFilter[] {
+                new ListFilter() { Name = "PhoneNumber", Operator = ListFilterOperator.Like, Value = "555" }
             });
 
             var stmt = ListQueryBuilder.Create(query, queryDef)
@@ -343,14 +343,14 @@ namespace Csg.ListQuery.Tests
 
             var queryDef = new ListQueryDefinition();
 
-            queryDef.Sort = new List<ListQuerySort>()
+            queryDef.Order = new List<SortField>()
             {
-               new ListQuerySort(){ Name = "FirstName" }
+               new SortField(){ Name = "FirstName" }
             };
 
-            queryDef.Filters = new List<ListQueryFilter>()
+            queryDef.Filters = new List<ListFilter>()
             {
-                new ListQueryFilter(){ Name = "FirstName", Operator = ListFilterOperator.Equal, Value = "Bob"}
+                new ListFilter(){ Name = "FirstName", Operator = ListFilterOperator.Equal, Value = "Bob"}
             };
 
             queryDef.Limit = 25;
@@ -370,9 +370,9 @@ namespace Csg.ListQuery.Tests
 
             var queryDef = new ListQueryDefinition();
 
-            queryDef.Sort = new List<ListQuerySort>()
+            queryDef.Order = new List<SortField>()
             {
-               new ListQuerySort(){ Name = "FirstName" }
+               new SortField(){ Name = "FirstName" }
             };
 
             queryDef.Offset = 0;
@@ -393,9 +393,9 @@ namespace Csg.ListQuery.Tests
 
             var queryDef = new ListQueryDefinition();
 
-            queryDef.Sort = new List<ListQuerySort>()
+            queryDef.Order = new List<SortField>()
             {
-               new ListQuerySort(){ Name = "FirstName" }
+               new SortField(){ Name = "FirstName" }
             };
 
             queryDef.Offset = 0;
@@ -418,9 +418,9 @@ namespace Csg.ListQuery.Tests
             bool beforeInvoked = false;
             bool afterInvoked = false;
 
-            queryDef.Sort = new List<ListQuerySort>()
+            queryDef.Order = new List<SortField>()
             {
-               new ListQuerySort(){ Name = "FirstName" }
+               new SortField(){ Name = "FirstName" }
             };
 
             var qb = ListQueryBuilder.Create(query, queryDef)
@@ -481,7 +481,7 @@ namespace Csg.ListQuery.Tests
         [TestMethod] 
         public void ReflectionHelper_GetListPropertyInfo_DbTypeMappingsCorrect()
         {
-            var properties = Csg.ListQuery.Internal.ReflectionHelper.GetListPropertyInfo(typeof(Mock.TypeCheckModel));
+            var properties = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(typeof(Mock.TypeCheckModel));
 
             Assert.AreEqual(DbType.Byte, properties[nameof(Mock.TypeCheckModel.Byte)].DataType);
             Assert.AreEqual(DbType.Int16, properties[nameof(Mock.TypeCheckModel.Int16)].DataType);

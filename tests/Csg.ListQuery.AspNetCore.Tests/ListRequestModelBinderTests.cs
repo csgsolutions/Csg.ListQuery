@@ -3,7 +3,6 @@ using Csg.ListQuery.AspNetCore;
 using System.Linq;
 using System;
 using Csg.ListQuery.Server;
-using Csg.ListQuery.Server;
 
 namespace Csg.ListQuery.AspNetCore.Tests
 {
@@ -27,10 +26,10 @@ namespace Csg.ListQuery.AspNetCore.Tests
             Assert.AreEqual("bob", request.Filters.First().Value);
             Assert.AreEqual(Csg.ListQuery.ListFilterOperator.Equal, request.Filters.First().Operator.Value);
 
-            Assert.AreEqual(2, request.Sort.Count());
-            Assert.AreEqual("LastName", request.Sort.First().Name, true);
-            Assert.AreEqual("FirstName", request.Sort.Last().Name, true);
-            Assert.AreEqual(true, request.Sort.Last().SortDescending);
+            Assert.AreEqual(2, request.Order.Count());
+            Assert.AreEqual("LastName", request.Order.First().Name, true);
+            Assert.AreEqual("FirstName", request.Order.Last().Name, true);
+            Assert.AreEqual(true, request.Order.Last().SortDescending);
         }
 
         [TestMethod]
@@ -85,10 +84,10 @@ namespace Csg.ListQuery.AspNetCore.Tests
             Assert.AreEqual("bob", request.Filters.First().Value);
             Assert.AreEqual(Csg.ListQuery.ListFilterOperator.Equal, request.Filters.First().Operator.Value);
 
-            Assert.AreEqual(2, request.Sort.Count());
-            Assert.AreEqual("LastName", request.Sort.First().Name, true);
-            Assert.AreEqual("FirstName", request.Sort.Last().Name, true);
-            Assert.AreEqual(true, request.Sort.Last().SortDescending);
+            Assert.AreEqual(2, request.Order.Count());
+            Assert.AreEqual("LastName", request.Order.First().Name, true);
+            Assert.AreEqual("FirstName", request.Order.Last().Name, true);
+            Assert.AreEqual(true, request.Order.Last().SortDescending);
 
             Assert.AreEqual(10, request.Limit);
             Assert.AreEqual(50, request.Offset);

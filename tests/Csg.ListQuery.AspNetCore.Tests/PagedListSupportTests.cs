@@ -1,6 +1,4 @@
 ﻿using Csg.ListQuery.Server;
-using Csg.ListQuery.Server;
-using Csg.ListQuery.Server;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -11,7 +9,7 @@ using System.Threading.Tasks;
 namespace Csg.ListQuery.AspNetCore.Tests
 {
     [TestClass]
-    public class AspNetCoreClientTests
+    public class PagedListSupportTests
     {
         [TestMethod]
         public async Task Test_GetAllPagesAsync()

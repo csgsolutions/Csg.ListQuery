@@ -10,7 +10,7 @@ namespace Csg.ListQuery.Internal
     public static class ValueHelpers
     {
         /// <summary>
-        /// Gets a value that indicates if <see cref="ListQueryFilter.Value"/> is a type derived from <see cref="System.Collections.IEnumerable"/>, and therefore contains multiple values.
+        /// Gets a value that indicates if <see cref="ListFilter.Value"/> is a type derived from <see cref="System.Collections.IEnumerable"/>, and therefore contains multiple values.
         /// </summary>
         /// <returns></returns>
         internal static bool IsEnumerable(object value)

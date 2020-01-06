@@ -5,7 +5,7 @@ namespace Csg.ListQuery.Tests.Mock
 {
     public class PersonFilters
     {
-        public static void PhoneNumber(IDbQueryWhereClause where, ListQueryFilter filter, ListPropertyInfo config)
+        public static void PhoneNumber(IDbQueryWhereClause where, ListFilter filter, ListFieldMetadata config)
         {
             var sqf = new Csg.Data.Sql.SqlSubQueryFilter(where.Root, "dbo.PersonPhoneNumber");
             sqf.ColumnName = "PersonID";

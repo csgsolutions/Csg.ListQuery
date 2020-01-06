@@ -77,7 +77,7 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
             }
 
             var listRequest = (IListRequest)Activator.CreateInstance(modelType);
-            var filterList = new List<Csg.ListQuery.ListQueryFilter>();
+            var filterList = new List<Csg.ListQuery.ListFilter>();
             //var validationProperties = listRequest.GetValidationType()
             //    .GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
             //    .ToDictionary(s => s.Name, StringComparer.OrdinalIgnoreCase);
@@ -122,7 +122,7 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
                         //    throw new FormatException($"The sort field '{sortField}' is not recognized.");
                         //}
 
-                        return new Csg.ListQuery.ListQuerySort()
+                        return new Csg.ListQuery.SortField()
                         {
                             Name = sortField.TrimStart('-'), //propInfo.Name,
                             SortDescending = sortField.StartsWith("-")
@@ -152,14 +152,14 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
         /// <param name="filters"></param>
         /// <param name="key"></param>
         /// <param name="values"></param>
-        public virtual IEnumerable<Csg.ListQuery.ListQueryFilter> ParseFilters(string key, StringValues values)
+        public virtual IEnumerable<Csg.ListQuery.ListFilter> ParseFilters(string key, StringValues values)
         {
             var nameMatches = s_filterNameRegex.Match(key);
             var name = nameMatches.Groups[1].Value;
 
             foreach (var value in values)
             {
-                var dto = new Csg.ListQuery.ListQueryFilter()
+                var dto = new Csg.ListQuery.ListFilter()
                 {
                     Name = name,
                     Operator = Csg.ListQuery.ListFilterOperator.Equal

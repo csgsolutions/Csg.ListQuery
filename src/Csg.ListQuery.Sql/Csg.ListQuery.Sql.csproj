@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Csg.Data" Version="3.3.0-preview-00024" />
-    <PackageReference Include="Csg.Data.Dapper" Version="2.0.0-rc1-00806" />
+    <PackageReference Include="Csg.Data" Version="3.3.3-rc1" />
+    <PackageReference Include="Csg.Data.Dapper" Version="2.0.2-rc3" />
     <PackageReference Include="Dapper" Version="1.60.6" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.4.1" />
   </ItemGroup>

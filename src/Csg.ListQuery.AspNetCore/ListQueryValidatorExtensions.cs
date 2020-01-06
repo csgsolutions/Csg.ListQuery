@@ -7,7 +7,10 @@ using Csg.ListQuery.Server;
 
 namespace Csg.ListQuery.AspNetCore
 {
-    public static class ListRequestExtensions
+    /// <summary>
+    /// Provides extension methods for list validator.
+    /// </summary>
+    public static class ListQueryValidatorExtensions
     {
         /// <summary>
         /// Transforms a list request into a repository query
@@ -15,7 +18,7 @@ namespace Csg.ListQuery.AspNetCore
         /// <typeparam name="TValidationModel">A type that defines the selections, filters, and sortable fields allowed.</typeparam>
         /// <param name="validator"></param>
         /// <returns></returns>
-        public static ListRequestValidationResult Validate<TValidationModel>(this IListQueryValidator validator, IListRequest request)
+        public static ListRequestValidationResult Validate<TValidationModel>(this IListRequestValidator validator, IListRequest request)
         {
             var properties = PropertyHelper.GetProperties(typeof(TValidationModel));
 
@@ -29,7 +32,7 @@ namespace Csg.ListQuery.AspNetCore
         /// <typeparam name="TFilterValidationModel">A type that defines the filters allowed.</typeparam>
         /// <param name="validator"></param>
         /// <returns></returns>
-        public static ListRequestValidationResult Validate<TFieldValidationModel, TFilterValidationModel>(this IListQueryValidator validator, IListRequest request)
+        public static ListRequestValidationResult Validate<TFieldValidationModel, TFilterValidationModel>(this IListRequestValidator validator, IListRequest request)
         {
             var fieldProperties = PropertyHelper.GetProperties(typeof(TFieldValidationModel));
             var filterPropreties = PropertyHelper.GetProperties(typeof(TFilterValidationModel));
@@ -44,7 +47,7 @@ namespace Csg.ListQuery.AspNetCore
         /// <typeparam name="TSortableProperties">A type that defines the filters allowed.</typeparam>
         /// <param name="validator"></param>
         /// <returns></returns>
-        public static ListRequestValidationResult Validate<TSelectableProperties, TFilterableProperties, TSortableProperties>(this IListQueryValidator validator, IListRequest request)
+        public static ListRequestValidationResult Validate<TSelectableProperties, TFilterableProperties, TSortableProperties>(this IListRequestValidator validator, IListRequest request)
         {
             var selectProperties = PropertyHelper.GetProperties(typeof(TSelectableProperties));
             var filterProperties = PropertyHelper.GetProperties(typeof(TFilterableProperties));

@@ -34,19 +34,21 @@ namespace Csg.ListQuery.AspNetCore.Tests
 
             var properties = PropertyHelper.GetProperties(typeof(TData));
 
-            var resultData = dataSource.Skip(request.Offset).Take(request.Limit);
+            var resultData = dataSource.Skip(request.Offset.Value).Take(request.Limit.Value);
             var queryResult = new Csg.ListQuery.ListQueryResult<TData>(
                 resultData,
                 resultData.Count(),
                 dataSource.Count(),
                 true,
-                dataSource.Count() > request.Offset + request.Limit
+                request.Limit,
+                (request.Offset + resultData.Count()) < dataSource.Count() ? request.Offset + request.Limit : (int?)null,
+                request.Offset > 0 ? Math.Max(request.Offset.Value - request.Limit.Value, 0) : (int?)null
             );
 
             var currentUri = new System.Uri(url);
 
             return Task.FromResult<IListResponse<TData>>(
-                Csg.ListQuery.AspNetCore.ListResponseExtensions.ToListResponse<TData, TData>(queryResult, request, properties, x=>x, currentUri)
+                Csg.ListQuery.AspNetCore.ListQueryResultExtensions.ToListResponse<TData, TData>(queryResult, request, properties, x=>x, currentUri)
             );
         }
 
@@ -64,18 +66,20 @@ namespace Csg.ListQuery.AspNetCore.Tests
 
             var properties = PropertyHelper.GetProperties(typeof(TData));
 
-            var resultData = dataSource.Skip(request.Offset).Take(request.Limit);
+            var resultData = dataSource.Skip(request.Offset.Value).Take(request.Limit.Value);
 
             var queryResult = new Csg.ListQuery.ListQueryResult<TData>(
                 resultData,
                 resultData.Count(),
                 dataSource.Count(),
                 true,
-                dataSource.Count() > request.Offset + request.Limit
+                request.Limit,
+                (request.Offset + resultData.Count()) < dataSource.Count() ? request.Offset + request.Limit : (int?)null,
+                request.Offset > 0 ? Math.Max(request.Offset.Value - request.Limit.Value, 0) :(int?)null
             );
 
             return Task.FromResult<IListResponse<TData>>(
-                Csg.ListQuery.AspNetCore.ListResponseExtensions.ToListResponse<TData, TData>(queryResult, request, properties, x => x)
+                Csg.ListQuery.AspNetCore.ListQueryResultExtensions.ToListResponse<TData, TData>(queryResult, request, properties, x => x)
             );
         }
     }

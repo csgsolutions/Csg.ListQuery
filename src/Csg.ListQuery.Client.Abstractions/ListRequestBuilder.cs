@@ -13,9 +13,9 @@ namespace Csg.ListQuery.Client
         {
             Request = new ListRequest()
             {
-                Filters = new List<ListQuery.ListQueryFilter>(),
+                Filters = new List<ListQuery.ListFilter>(),
                 Fields = new List<string>(),
-                Sort = new List<ListQuery.ListQuerySort>()
+                Order = new List<ListQuery.SortField>()
             };
         }
 

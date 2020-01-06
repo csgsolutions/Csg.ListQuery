@@ -8,7 +8,7 @@ using System.Data;
 namespace Csg.ListQuery.AspNetCore.Tests
 {
     [TestClass]
-    public partial class RequestBuilderTests
+    public partial class ListRequestBuilderExtensionsTests
     {
         [TestMethod]
         public void Test_BuildRequest()

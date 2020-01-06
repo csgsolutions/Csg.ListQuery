@@ -9,8 +9,4 @@
     <ProjectReference Include="..\Csg.ListQuery\Csg.ListQuery.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Abstractions\" />
-  </ItemGroup>
-
 </Project>
