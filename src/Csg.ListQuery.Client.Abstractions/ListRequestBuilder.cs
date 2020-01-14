@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Csg.ListQuery.Client
 {
-    public abstract class ListRequestBuilder
+    public abstract class ListRequestBuilder<T>
     {
         public ListRequestBuilder()
         {
@@ -21,6 +21,6 @@ namespace Csg.ListQuery.Client
 
         public Csg.ListQuery.Server.ListRequest Request { get; set; }
 
-        public abstract System.Threading.Tasks.Task<Csg.ListQuery.Server.IListResponse<T>> GetResponseAsync<T>(Csg.ListQuery.Server.ListRequest request);
+        public abstract System.Threading.Tasks.Task<Csg.ListQuery.Server.IListResponse<T>> GetResponseAsync(Csg.ListQuery.Server.ListRequest request);
     }
 }

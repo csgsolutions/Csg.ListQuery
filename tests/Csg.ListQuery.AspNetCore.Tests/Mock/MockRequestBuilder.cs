@@ -6,9 +6,9 @@ using Csg.ListQuery.Server;
 
 namespace Csg.ListQuery.AspNetCore.Tests.Mock
 {
-    public class MockRequestBuilder : Csg.ListQuery.Client.ListRequestBuilder
+    public class MockRequestBuilder<T> : Csg.ListQuery.Client.ListRequestBuilder<T>
     {
-        public override Task<IListResponse<T>> GetResponseAsync<T>(ListRequest request)
+        public override Task<IListResponse<T>> GetResponseAsync(ListRequest request)
         {
             throw new NotImplementedException();
         }

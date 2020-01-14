@@ -19,7 +19,7 @@ namespace Csg.ListQuery.Client
         /// <param name="builder"></param>
         /// <param name="fields"></param>
         /// <returns></returns>
-        public static ListRequestBuilder Select(this ListRequestBuilder builder, IEnumerable<string> fields)
+        public static ListRequestBuilder<T> Select<T>(this ListRequestBuilder<T> builder, IEnumerable<string> fields)
         {
             builder.Request.Fields = fields.ToList();
             return builder;
@@ -31,7 +31,7 @@ namespace Csg.ListQuery.Client
         /// <param name="builder"></param>
         /// <param name="fields"></param>
         /// <returns></returns>
-        public static ListRequestBuilder Select(this ListRequestBuilder builder, params string[] fields)
+        public static ListRequestBuilder<T> Select<T>(this ListRequestBuilder<T> builder, params string[] fields)
         {
             return Select(builder, (IEnumerable<string>)fields);
         }
@@ -44,7 +44,7 @@ namespace Csg.ListQuery.Client
         /// <param name="fieldName"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static ListRequestBuilder Where<TValue>(this ListRequestBuilder builder, string fieldName, TValue value)
+        public static ListRequestBuilder<T> Where<T, TValue>(this ListRequestBuilder<T> builder, string fieldName, TValue value)
         {
             builder.Request.Filters.Add(new ListQuery.ListFilter()
             {
@@ -64,7 +64,7 @@ namespace Csg.ListQuery.Client
         /// <param name="operator"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static ListRequestBuilder Where<TValue>(this ListRequestBuilder builder, string fieldName, ListFilterOperator @operator, TValue value)
+        public static ListRequestBuilder<T> Where<T, TValue>(this ListRequestBuilder<T> builder, string fieldName, ListFilterOperator @operator, TValue value)
         {
             builder.Request.Filters.Add(new ListQuery.ListFilter()
             {
@@ -81,7 +81,7 @@ namespace Csg.ListQuery.Client
         /// <param name="builder"></param>
         /// <param name="fields"></param>
         /// <returns></returns>
-        public static ListRequestBuilder Order(this ListRequestBuilder builder, IEnumerable<string> fields)
+        public static ListRequestBuilder<T> Order<T>(this ListRequestBuilder<T> builder, IEnumerable<string> fields)
         {
             builder.Request.Order = fields.Select(s => new SortField()
             {
@@ -98,7 +98,7 @@ namespace Csg.ListQuery.Client
         /// <param name="builder"></param>
         /// <param name="fields"></param>
         /// <returns></returns>
-        public static ListRequestBuilder Order(this ListRequestBuilder builder, params string[] fields)
+        public static ListRequestBuilder<T> Order<T>(this ListRequestBuilder<T> builder, params string[] fields)
         {
             return Order(builder, (IEnumerable<string>)fields);
         }
@@ -109,7 +109,7 @@ namespace Csg.ListQuery.Client
         /// <param name="builder"></param>
         /// <param name="limit"></param>
         /// <returns></returns>
-        public static ListRequestBuilder Limit(this ListRequestBuilder builder, int limit)
+        public static ListRequestBuilder<T> Limit<T>(this ListRequestBuilder<T> builder, int limit)
         {
             builder.Request.Limit = limit;
             return builder;
@@ -121,7 +121,7 @@ namespace Csg.ListQuery.Client
         /// <param name="builder"></param>
         /// <param name="offset"></param>
         /// <returns></returns>
-        public static ListRequestBuilder Offset(this ListRequestBuilder builder, int offset)
+        public static ListRequestBuilder<T> Offset<T>(this ListRequestBuilder<T> builder, int offset)
         {
             builder.Request.Offset = offset;
             return builder;
@@ -132,7 +132,7 @@ namespace Csg.ListQuery.Client
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static string ToQueryString(this ListRequestBuilder builder)
+        public static string ToQueryString<T>(this ListRequestBuilder<T> builder)
         {
             return builder.Request.ToQueryString();
         }
@@ -142,7 +142,7 @@ namespace Csg.ListQuery.Client
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static IListRequest ToRequest(this ListRequestBuilder builder)
+        public static IListRequest ToRequest<T>(this ListRequestBuilder<T> builder)
         {
             return builder.Request;
         }
@@ -153,7 +153,7 @@ namespace Csg.ListQuery.Client
         /// <param name="builder"></param>
         /// <param name="baseUrl"></param>
         /// <returns></returns>
-        public static System.Uri ToUri(this ListRequestBuilder builder, string baseUrl)
+        public static System.Uri ToUri<T>(this ListRequestBuilder<T> builder, string baseUrl)
         {
             return new System.Uri(string.Concat(baseUrl, ToQueryString(builder)));
         }

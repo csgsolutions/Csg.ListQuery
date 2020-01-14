@@ -52,7 +52,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
             );
         }
 
-        public Task<IListResponse<TData>> PostAsync<TData>(IListRequest request)
+        public Task<IListResponse<TData>> PostAsync<TData>(string url, IListRequest request)
         {
             IEnumerable<TData> dataSource = null;
             if (typeof(TData) == typeof(Person))

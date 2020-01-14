@@ -57,7 +57,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
                 Limit = 10
             };
 
-            var result = await Csg.ListQuery.Client.ListResponseExtensions.PostAllPagesAsync<Person>(client, response).ConfigureAwait(false);
+            var result = await Csg.ListQuery.Client.ListResponseExtensions.PostAllPagesAsync<Person>(client, "https://example.com/api/people/filter", response).ConfigureAwait(false);
 
             Assert.AreEqual(105, result.DataCount);
             Assert.AreEqual(105, result.Data.Count());
