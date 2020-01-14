@@ -8,7 +8,7 @@ namespace Csg.ListQuery.AspNetCore.Tests.Mock
 {
     public class MockRequestBuilder<T> : Csg.ListQuery.Client.ListRequestBuilder<T>
     {
-        public override Task<IListResponse<T>> GetResponseAsync(ListRequest request)
+        public override Task<IListResponse<T>> GetResponseAsync()
         {
             throw new NotImplementedException();
         }

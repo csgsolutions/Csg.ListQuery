@@ -13,7 +13,11 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
         private static readonly System.Text.RegularExpressions.Regex s_filterNameRegex = new System.Text.RegularExpressions.Regex(@"where\[(.*)\]");
         private const string c_where = "where";
         private const string c_fields = "fields";
+        
+        // sort is standardish, order is acceptable
         private const string c_order = "order";
+        private const string c_sort = "sort";
+
         private const string c_start = "offset";
         private const string c_limit = "limit";
         private const string op_eq = "eq";
@@ -113,9 +117,10 @@ namespace Csg.ListQuery.AspNetCore.ModelBinding
                         return fieldName.Trim(); //propInfo.Name;
                     }).ToList();
                 }
-                else if (pair.Key.Equals(c_order, StringComparison.OrdinalIgnoreCase))
+                // support order or sort
+                else if (pair.Key.Equals(c_order, StringComparison.OrdinalIgnoreCase) || pair.Key.Equals(c_sort, StringComparison.OrdinalIgnoreCase))
                 {
-                    listRequest.Sort = pair.Value.Select(sortField =>
+                    listRequest.Order = pair.Value.Select(sortField =>
                     {
                         //if (!validationProperties.TryGetValue(sortField.TrimStart('-'), out System.Reflection.PropertyInfo propInfo))
                         //{

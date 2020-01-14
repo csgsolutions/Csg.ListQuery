@@ -109,9 +109,9 @@ namespace Csg.ListQuery.AspNetCore
                 .ToList();
             }
 
-            if (request.Sort != null)
+            if (request.Order != null)
             {
-                queryDef.Order = request.Sort.Select(s => new
+                queryDef.Order = request.Order.Select(s => new
                 {
                     Raw = s,
                     Exists = sortableProperties.TryGetValue(s.Name, out ListItemPropertyInfo domainProp),
