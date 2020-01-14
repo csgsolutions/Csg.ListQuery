@@ -21,7 +21,7 @@ namespace Csg.ListQuery.Server
         /// <summary>
         /// When implemented in a derived class, gets or sets a list of sort actions to apply.
         /// </summary>
-        IList<Csg.ListQuery.SortField> Sort { get; set; }
+        IList<Csg.ListQuery.SortField> Order { get; set; }
 
         /// <summary>
         /// When implemented in a derived class, gets or sets the zero-based index of the first record in the result set that will be returned.

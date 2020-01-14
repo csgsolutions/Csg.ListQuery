@@ -143,7 +143,8 @@ namespace Csg.ListQuery.Server
 
         ICollection<ListFilter> IListRequest.Filters { get => this.Filters; set => this.Filters = value; }
 
-        IList<SortField> IListRequest.Sort { get => this.Order; set => this.Order = value; }
+        
+        IList<SortField> IListRequest.Order { get => this.Order; set => this.Order = value; }
 
         #endregion
     }
