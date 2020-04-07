@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Csg.ListQuery.Server;
 
 namespace Csg.ListQuery.Server
 {
+    [DataContract]
     public class ListResponse<T> : IListResponse<T>
     {
         public ListResponse()
@@ -18,10 +20,13 @@ namespace Csg.ListQuery.Server
             this.Meta.Fields = request.Fields;
         }
 
+        [DataMember]
         public virtual IEnumerable<T> Data { get; set; }
 
+        [DataMember]
         public virtual ListResponseMeta Meta { get; set; }
 
+        [DataMember]
         public virtual ListResponseLinks Links { get; set; }
     }
 }

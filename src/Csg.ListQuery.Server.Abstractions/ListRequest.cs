@@ -5,17 +5,20 @@ using Csg.ListQuery;
 using System.Linq;
 using System.Text;
 using Csg.ListQuery.Server.Internal;
+using System.Runtime.Serialization;
 
 namespace Csg.ListQuery.Server
 {
     /// <summary>
     /// Represents a query for a list of objects that optionally specifies a set of fields to return, filters, and sort order.
     /// </summary>
+    [DataContract]
     public class ListRequest : IListRequest
     {
         /// <summary>
         /// Gets or sets a collection of field names to return.
         /// </summary>
+        [DataMember]
         public virtual IList<string> Fields
         {
             get
@@ -33,6 +36,7 @@ namespace Csg.ListQuery.Server
         /// <summary>
         /// Gets or sets a collection of filters to apply.
         /// </summary>
+        [DataMember]
         public virtual ICollection<Csg.ListQuery.ListFilter> Filters
         {
             get
@@ -50,6 +54,7 @@ namespace Csg.ListQuery.Server
         /// <summary>
         /// Gets or sets a list of sort actions to apply.
         /// </summary>
+        [DataMember]
         public virtual IList<Csg.ListQuery.SortField> Order
         {
             get
@@ -67,17 +72,19 @@ namespace Csg.ListQuery.Server
         /// <summary>
         /// Gets or sets the zero-based index of the first record in the result set that will be returned.
         /// </summary>
+        [DataMember]
         public virtual int? Offset { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of records that will be returned in the result set.
         /// </summary>
+        [DataMember]
         public virtual int? Limit { get; set; }
         
         /// <summary>
         /// Gets a querystring representation of the request
         /// </summary>
-        /// <returns></returns>
+        /// <returns></returns>        
         public virtual string ToQueryString()
         {
             var query = new StringBuilder("?");

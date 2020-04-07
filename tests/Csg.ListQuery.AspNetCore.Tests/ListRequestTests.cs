@@ -117,7 +117,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
             var result = validator.Validate<Person, PersonFilters>(request);
 
             Assert.IsFalse(result.IsValid);
-            Assert.AreEqual(result.Errors.Count, 2);
+            Assert.AreEqual(2, result.Errors.Count);
             Assert.AreEqual(4, result.ListQuery.Fields.Count());
             Assert.AreEqual(2, result.ListQuery.Filters.Count());
             Assert.AreEqual(4, result.ListQuery.Order.Count());
@@ -148,7 +148,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
             var result = validator.Validate<Person, PersonFilters, PersonSorts>(request);
 
             Assert.IsFalse(result.IsValid);
-            Assert.AreEqual(result.Errors.Count, 4);
+            Assert.AreEqual(4, result.Errors.Count);
             Assert.AreEqual(4, result.ListQuery.Fields.Count());
             Assert.AreEqual(2, result.ListQuery.Filters.Count());
             Assert.AreEqual(2, result.ListQuery.Order.Count());
@@ -207,6 +207,26 @@ namespace Csg.ListQuery.AspNetCore.Tests
             var result = request.ToQueryString();
 
             Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
+        public void Test_DefaultValidator_Validate_RequestWithEmptyCollections_IsValid()
+        {
+            var options = new MockOptionsMonitor<ListRequestOptions>(new ListRequestOptions());
+            var validator = new DefaultListQueryValidator(options);
+            var selectProps = PropertyHelper.GetProperties(typeof(Person));
+            var filterProps = PropertyHelper.GetProperties(typeof(PersonFilters), x => x.IsFilterable);
+            var sortProps = PropertyHelper.GetProperties(typeof(PersonSorts), x => x.IsSortable);
+
+            var request = new ListRequest();
+            request.Fields = new string[] {};
+            request.Filters = new List<ListFilter>();
+            request.Order = new List<SortField>();
+
+            var result = validator.Validate(request, selectProps, filterProps, sortProps);
+
+            Assert.IsTrue(result.IsValid);
+            Assert.AreEqual(0, result.Errors.Count);
         }
     }
 }
