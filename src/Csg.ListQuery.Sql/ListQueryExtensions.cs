@@ -11,16 +11,16 @@ namespace Csg.ListQuery.Sql
 {
     public static class ListQueryExtensions
     {
-        public static IListQueryBuilder ValidateWith<TValidation>(this IListQueryBuilder listQuery) where TValidation : class, new()
+        public static IListQueryBuilder ValidateWith<TValidation>(this IListQueryBuilder listQuery, bool recursive = false) where TValidation : class, new()
         {
-            return ValidateWith(listQuery, typeof(TValidation));
+            return ValidateWith(listQuery, typeof(TValidation), recursive: recursive);
         }
 
-        public static IListQueryBuilder ValidateWith(this IListQueryBuilder listQuery, Type validationType)
+        public static IListQueryBuilder ValidateWith(this IListQueryBuilder listQuery, Type validationType, bool recursive = false)
         {
             listQuery.Configuration.UseValidation = true;
 
-            var properties = ListQuery.Internal.ReflectionHelper.GetFieldsFromType(validationType);
+            var properties = ListQuery.Internal.ReflectionHelper.GetFieldsFromType(validationType, recursive: recursive);
 
             foreach (var property in properties)
             {
