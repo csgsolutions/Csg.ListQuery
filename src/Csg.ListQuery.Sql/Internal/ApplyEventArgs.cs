@@ -29,7 +29,7 @@ namespace Csg.ListQuery.Sql.Internal
         /// </summary>
         /// <param name="config"></param>
         /// <param name="queryBuilder"></param>
-        public ApplyEventArgs(ListQueryBuilderConfiguration config, IDbQueryBuilder queryBuilder)
+        public ApplyEventArgs(ListQueryBuilderConfiguration config, Csg.Data.Abstractions.ISelectQueryBuilder queryBuilder)
         {
             this.Configuration = config;
             this.QueryBuilder = queryBuilder;
@@ -43,6 +43,6 @@ namespace Csg.ListQuery.Sql.Internal
         /// <summary>
         /// Gets or sets the querybuilder associated with this event.
         /// </summary>
-        public IDbQueryBuilder QueryBuilder { get; set; }
+        public Csg.Data.Abstractions.ISelectQueryBuilder QueryBuilder { get; set; }
     }
 }

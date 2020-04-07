@@ -1,11 +1,12 @@
 ﻿using Csg.ListQuery;
 using Csg.Data;
+using Csg.Data.Abstractions;
 
 namespace Csg.ListQuery.Tests.Mock
 {
     public class PersonFilters
     {
-        public static void PhoneNumber(IDbQueryWhereClause where, ListFilter filter, ListFieldMetadata config)
+        public static void PhoneNumber(IWhereClause where, ListFilter filter, ListFieldMetadata config)
         {
             var sqf = new Csg.Data.Sql.SqlSubQueryFilter(where.Root, "dbo.PersonPhoneNumber");
             sqf.ColumnName = "PersonID";

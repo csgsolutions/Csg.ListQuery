@@ -100,11 +100,11 @@ namespace Csg.ListQuery.Sql
         {
             builder.AfterApply((config, query) =>
             {
-                if (query.OrderBy.Count == 0)
+                if (query.Configuration.OrderBy.Count == 0)
                 {
                     foreach (var sortField in sortFields)
                     {
-                        query.OrderBy.Add(sortField);
+                        query.Configuration.OrderBy.Add(sortField);
                     }
                 }
             });
@@ -145,7 +145,7 @@ namespace Csg.ListQuery.Sql
             return builder;
         }
 
-        public static IListQueryBuilder AfterApply(this IListQueryBuilder builder, Action<ListQueryBuilderConfiguration, IDbQueryBuilder> action)
+        public static IListQueryBuilder AfterApply(this IListQueryBuilder builder, Action<ListQueryBuilderConfiguration, Csg.Data.Abstractions.ISelectQueryBuilder> action)
         {
             builder.Configuration.AfterApply += (sender, e) =>
             {
@@ -155,11 +155,11 @@ namespace Csg.ListQuery.Sql
             return builder;
         }
 
-        public static void ApplyFilters(IListQueryBuilder listQuery, IDbQueryBuilder queryBuilder)
+        public static void ApplyFilters(IListQueryBuilder listQuery, Csg.Data.Abstractions.ISelectQueryBuilder queryBuilder)
         {
             if (listQuery.Configuration.QueryDefinition.Filters != null)
             {
-                var where = new DbQueryWhereClause(queryBuilder.Root, Csg.Data.Sql.SqlLogic.And);
+                var where = new WhereClause(queryBuilder.Root, Csg.Data.Sql.SqlLogic.And);
 
                 //tODO: IsFilterable is not being enforced. Shoult it be?
 
@@ -188,7 +188,7 @@ namespace Csg.ListQuery.Sql
             }
         }
 
-        public static void ApplySelections(IListQueryBuilder listQuery, IDbQueryBuilder queryBuilder)
+        public static void ApplySelections(IListQueryBuilder listQuery, Csg.Data.Abstractions.ISelectQueryBuilder queryBuilder)
         {
             if (listQuery.Configuration.QueryDefinition.Fields != null)
             {
@@ -196,7 +196,7 @@ namespace Csg.ListQuery.Sql
                 {
                     if (listQuery.Configuration.Validations.TryGetValue(column, out ListFieldMetadata config))
                     {
-                        queryBuilder.SelectColumns.Add(new Csg.Data.Sql.SqlColumn(queryBuilder.Root, config.Name));
+                        queryBuilder.Configuration.SelectColumns.Add(new Csg.Data.Sql.SqlColumn(queryBuilder.Root, config.Name));
                     }
                     else if (listQuery.Configuration.UseValidation)
                     {
@@ -204,13 +204,13 @@ namespace Csg.ListQuery.Sql
                     }
                     else
                     {
-                        queryBuilder.SelectColumns.Add(new Csg.Data.Sql.SqlColumn(queryBuilder.Root, column));
+                        queryBuilder.Configuration.SelectColumns.Add(new Csg.Data.Sql.SqlColumn(queryBuilder.Root, column));
                     }
                 }
             }
         }
 
-        public static void ApplySort(IListQueryBuilder listQuery, IDbQueryBuilder queryBuilder)
+        public static void ApplySort(IListQueryBuilder listQuery, Csg.Data.Abstractions.ISelectQueryBuilder queryBuilder)
         {
             if (listQuery.Configuration.QueryDefinition.Order != null)
             {
@@ -218,7 +218,7 @@ namespace Csg.ListQuery.Sql
                 {
                     if (listQuery.Configuration.Validations.TryGetValue(column.Name, out ListFieldMetadata config) && config.IsSortable == true)
                     {
-                        queryBuilder.OrderBy.Add(new Csg.Data.Sql.SqlOrderColumn()
+                        queryBuilder.Configuration.OrderBy.Add(new Csg.Data.Sql.SqlOrderColumn()
                         {
                             ColumnName = config.Name,
                             SortDirection = column.SortDescending ? Csg.Data.Sql.DbSortDirection.Descending : Csg.Data.Sql.DbSortDirection.Ascending
@@ -230,7 +230,7 @@ namespace Csg.ListQuery.Sql
                     }
                     else
                     {
-                        queryBuilder.OrderBy.Add(new Csg.Data.Sql.SqlOrderColumn()
+                        queryBuilder.Configuration.OrderBy.Add(new Csg.Data.Sql.SqlOrderColumn()
                         {
                             ColumnName = column.Name,
                             SortDirection = column.SortDescending ? Csg.Data.Sql.DbSortDirection.Descending : Csg.Data.Sql.DbSortDirection.Ascending
@@ -240,11 +240,11 @@ namespace Csg.ListQuery.Sql
             }
         }
 
-        public static void ApplyLimit(IListQueryBuilder listQuery, IDbQueryBuilder queryBuilder)
+        public static void ApplyLimit(IListQueryBuilder listQuery, Csg.Data.Abstractions.ISelectQueryBuilder queryBuilder)
         {
             if (listQuery.Configuration.QueryDefinition.Limit > 0)
             {
-                queryBuilder.PagingOptions = new Csg.Data.Sql.SqlPagingOptions()
+                queryBuilder.Configuration.PagingOptions = new Csg.Data.Sql.SqlPagingOptions()
                 {
                     Limit = listQuery.Configuration.UseLimitOracle && !listQuery.Configuration.UseStreamingResult ? listQuery.Configuration.QueryDefinition.Limit + 1 : listQuery.Configuration.QueryDefinition.Limit,
                     Offset = listQuery.Configuration.QueryDefinition.Offset
@@ -257,7 +257,7 @@ namespace Csg.ListQuery.Sql
         /// </summary>
         /// <param name="listQuery"></param>
         /// <returns></returns>
-        public static IDbQueryBuilder Apply(this IListQueryBuilder listQuery)
+        public static Csg.Data.Abstractions.ISelectQueryBuilder Apply(this IListQueryBuilder listQuery)
         {
             listQuery.Configuration.OnBeforeApply();
 
@@ -273,12 +273,12 @@ namespace Csg.ListQuery.Sql
             return query;
         }
 
-        public static IDbQueryBuilder GetCountQuery(IListQueryBuilder query)
+        public static Csg.Data.Abstractions.ISelectQueryBuilder GetCountQuery(IListQueryBuilder query)
         {
             var countQuery = query.Apply().SelectOnly(new SqlRawColumn("COUNT(1)"));
 
-            countQuery.PagingOptions = null;
-            countQuery.OrderBy.Clear();
+            countQuery.Configuration.PagingOptions = null;
+            countQuery.Configuration.OrderBy.Clear();
 
             return countQuery;           
         }
@@ -287,11 +287,12 @@ namespace Csg.ListQuery.Sql
         {
             var appiedQuery = builder.Apply();
 
-            if (getTotalWhenLimiting && appiedQuery.PagingOptions?.Limit > 0 && appiedQuery.PagingOptions?.Offset == 0)
+            if (getTotalWhenLimiting && appiedQuery.Configuration.PagingOptions?.Limit > 0 && appiedQuery.Configuration.PagingOptions?.Offset == 0)
             {
                 var countQuery = GetCountQuery(builder);
-                return new DbQueryBuilder[] { (DbQueryBuilder)countQuery, (DbQueryBuilder)appiedQuery }
-                    .RenderBatch();
+
+                //TODO: Get ISqlStatementElement onto ISelectQueryBuilder???
+                return new ISqlStatementElement[] { countQuery, appiedQuery }.RenderBatch(appiedQuery.Provider);
             }
             else
             {
@@ -313,12 +314,12 @@ namespace Csg.ListQuery.Sql
 
             if (stmt.Count == 1)
             {
-                data = await builder.Configuration.DataAdapter.GetResultsAsync<T>(stmt, builder.Configuration.UseStreamingResult, builder.Configuration.QueryBuilder.CommandTimeout);
+                data = await builder.Configuration.DataAdapter.GetResultsAsync<T>(stmt, builder.Configuration.UseStreamingResult, builder.Configuration.QueryBuilder.Configuration.CommandTimeout);
 
             }
             else if (stmt.Count == 2)
             {
-                var batchResult = await builder.Configuration.DataAdapter.GetTotalCountAndResultsAsync<T>(stmt, builder.Configuration.UseStreamingResult, builder.Configuration.QueryBuilder.CommandTimeout);
+                var batchResult = await builder.Configuration.DataAdapter.GetTotalCountAndResultsAsync<T>(stmt, builder.Configuration.UseStreamingResult, builder.Configuration.QueryBuilder.Configuration.CommandTimeout);
             }
             else
             {

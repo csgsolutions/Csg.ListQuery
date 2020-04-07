@@ -15,7 +15,7 @@ namespace Csg.ListQuery.Sql
         /// <summary>
         /// Gets or sets the query builder used to generate the SQL command that will be executed.
         /// </summary>
-        public virtual IDbQueryBuilder QueryBuilder { get; set; }
+        public virtual Csg.Data.Abstractions.ISelectQueryBuilder QueryBuilder { get; set; }
 
         public virtual IListQueryDataAdapter DataAdapter { get; set; }
 
@@ -74,7 +74,7 @@ namespace Csg.ListQuery.Sql
         /// <summary>
         /// Invokes callbacks registered for the <see cref="AfterApply"/> event
         /// </summary>
-        internal protected void OnAfterApply(IDbQueryBuilder queryBuilder)
+        internal protected void OnAfterApply(Csg.Data.Abstractions.ISelectQueryBuilder queryBuilder)
         {
             if (this.AfterApply != null)
             {

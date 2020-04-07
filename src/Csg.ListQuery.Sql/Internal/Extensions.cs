@@ -46,7 +46,7 @@ namespace Csg.ListQuery.Sql.Internal
         /// <param name="stringMatchType"></param>
         /// <param name="performDataTypeConversion"></param>
         /// <param name="valueConverter"></param>
-        public static void AddFilter(this Csg.Data.IDbQueryWhereClause where, string columnName, ListFilterOperator @operator, object value, System.Data.DbType valueType, int? valueTypeSize = null, SqlWildcardDecoration stringMatchType = SqlWildcardDecoration.BeginsWith, bool performDataTypeConversion = true, Func<object, object> valueConverter = null)
+        public static void AddFilter(this Csg.Data.Abstractions.IWhereClause where, string columnName, ListFilterOperator @operator, object value, System.Data.DbType valueType, int? valueTypeSize = null, SqlWildcardDecoration stringMatchType = SqlWildcardDecoration.BeginsWith, bool performDataTypeConversion = true, Func<object, object> valueConverter = null)
         {
             var root = where.Root;
             IEnumerable<object> values = ValueHelpers.GetFilterValues(value, valueType, shouldPerformDataTypeConversion: performDataTypeConversion, valueConverter: valueConverter);

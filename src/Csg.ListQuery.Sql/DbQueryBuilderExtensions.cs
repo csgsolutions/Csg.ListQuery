@@ -18,7 +18,7 @@ namespace Csg.Data
     /// </summary>
     public static class DbQueryBuilderExtensions
     {
-        public static IListQueryBuilder ListQuery(this IDbQueryBuilder queryBuilder, ListQueryDefinition queryDef)
+        public static IListQueryBuilder ListQuery(this Csg.Data.Common.IDbQueryBuilder queryBuilder, ListQueryDefinition queryDef)
         {
             return Csg.ListQuery.Sql.ListQueryBuilder.Create(queryBuilder, queryDef);
         }
@@ -30,15 +30,15 @@ namespace Csg.Data
         /// <param name="columns"></param>
         /// <remarks>This method replaces any existing selected columns on the query builder.</remarks>
         /// <returns></returns>
-        public static IDbQueryBuilder SelectOnly(this IDbQueryBuilder queryBuilder, params ISqlColumn[] columns)
+        public static Csg.Data.Abstractions.ISelectQueryBuilder SelectOnly(this Csg.Data.Abstractions.ISelectQueryBuilder queryBuilder, params ISqlColumn[] columns)
         {
             var query = queryBuilder.Fork();
 
-            query.SelectColumns.Clear();
+            query.Configuration.SelectColumns.Clear();
 
             foreach (var col in columns)
             {
-                query.SelectColumns.Add(col);
+                query.Configuration.SelectColumns.Add(col);
             }
 
             return query;
@@ -51,7 +51,7 @@ namespace Csg.Data
         /// <param name="columns"></param>
         /// <remarks>This method replaces any existing selected columns on the query builder.</remarks>
         /// <returns></returns>
-        public static IDbQueryBuilder SelectOnly(this IDbQueryBuilder queryBuilder, params string[] columns)
+        public static Csg.Data.Abstractions.ISelectQueryBuilder SelectOnly(this Csg.Data.Abstractions.ISelectQueryBuilder queryBuilder, params string[] columns)
         {
             return SelectOnly(queryBuilder, queryBuilder.Root.Columns(columns).ToArray());
         }
@@ -62,9 +62,9 @@ namespace Csg.Data
         /// <param name="where"></param>
         /// <param name="whereClause"></param>
         /// <returns></returns>
-        public static IDbQueryWhereClause Any(this Csg.Data.IDbQueryWhereClause where, Action<IDbQueryWhereClause> whereClause)
+        public static Csg.Data.Abstractions.IWhereClause Any(this Csg.Data.Abstractions.IWhereClause where, Action<Csg.Data.Abstractions.IWhereClause> whereClause)
         {
-            var orWhere = new Csg.Data.DbQueryWhereClause(where.Root, SqlLogic.Or);
+            var orWhere = new Csg.Data.WhereClause(where.Root, SqlLogic.Or);
 
             whereClause(orWhere);
             where.AddFilter(orWhere.Filters);
@@ -83,7 +83,7 @@ namespace Csg.Data
         /// <param name="performDataTypeConversion"></param>
         /// <param name="valueConverter"></param>
         /// <returns></returns>
-        public static IDbQueryWhereClause AddFilter(this Csg.Data.IDbQueryWhereClause where, ListFilter filter, System.Data.DbType valueType, int? valueTypeSize = null, SqlWildcardDecoration stringMatchType = SqlWildcardDecoration.BeginsWith, bool performDataTypeConversion = true, Func<object, object> valueConverter = null)
+        public static Csg.Data.Abstractions.IWhereClause AddFilter(this Csg.Data.Abstractions.IWhereClause where, ListFilter filter, System.Data.DbType valueType, int? valueTypeSize = null, SqlWildcardDecoration stringMatchType = SqlWildcardDecoration.BeginsWith, bool performDataTypeConversion = true, Func<object, object> valueConverter = null)
         {
             Csg.ListQuery.Sql.Internal.Extensions.AddFilter(where, filter.Name, filter.Operator ?? ListFilterOperator.Equal, filter.Value, valueType: valueType, valueTypeSize: valueTypeSize, stringMatchType: stringMatchType, performDataTypeConversion: performDataTypeConversion, valueConverter: valueConverter);
             return where;

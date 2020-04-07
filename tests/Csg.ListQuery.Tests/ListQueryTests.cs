@@ -14,13 +14,13 @@ namespace Csg.ListQuery.Tests
     {
         static ListQueryTests()
         {
-            Csg.Data.DbQueryBuilder.GenerateFormattedSql = false;
+            Csg.Data.Common.DbQueryBuilder.DefaultGenerateFormattedSql = false;
         }
 
         [TestMethod]
         public void Test_ListQuery_BuildThrowsExceptionWhenNoConfig()
         {
-            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("Person", new Mock.MockConnection());
+            var query = new Mock.MockConnection().QueryBuilder("Person");
             var request = new ListQueryDefinition();
 
             request.Filters = new List<ListFilter>(new ListFilter[] {
@@ -38,7 +38,7 @@ namespace Csg.ListQuery.Tests
         public void Test_ListQuery_BuildWithNoValidation()
         {
             var expectedSql = "SELECT [t0].[FirstName],[t0].[LastName] FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]=@p0);";
-            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
+            var query = new Mock.MockConnection().QueryBuilder("dbo.Person");
             var queryDef = new ListQueryDefinition();
 
             queryDef.Fields = new string[] { "FirstName", "LastName" };
@@ -60,7 +60,7 @@ namespace Csg.ListQuery.Tests
         public void Test_ListQuery_DefaultHandler()
         {
             var expectedSql = "SELECT [t0].[FirstName],[t0].[LastName] FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]=@p0);";
-            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
+            var query = new Mock.MockConnection().QueryBuilder("dbo.Person");
             var queryDef = new ListQueryDefinition();
 
             queryDef.Fields = new string[] { "FirstName", "LastName" };
@@ -296,7 +296,7 @@ namespace Csg.ListQuery.Tests
         {
             var expectedSql = "SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[PersonID] IN (SELECT [t1].[PersonID] FROM [dbo].[PersonPhoneNumber] AS [t1] WHERE ([t1].[PhoneNumber] LIKE @p0) AND ([t1].[PersonID]=[t0].[PersonID])));";
             //                 SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[PersonID] IN (SELECT [t1].[PersonID] FROM [dbo].[PersonPhoneNumber] AS [t1] WHERE ([t1].[PhoneNumber] LIKE @p0) AND ([t1].[PersonID]=[t0].[PersonID])));
-            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());            
+            var query = new Mock.MockConnection().QueryBuilder("dbo.Person");            
             var queryDef = new ListQueryDefinition();
 
             queryDef.Filters = new List<ListFilter>(new ListFilter[] {
@@ -318,7 +318,7 @@ namespace Csg.ListQuery.Tests
         {
             var expectedSql = "SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[PersonID] IN (SELECT [t1].[PersonID] FROM [dbo].[PersonPhoneNumber] AS [t1] WHERE ([t1].[PhoneNumber] LIKE @p0) AND ([t1].[PersonID]=[t0].[PersonID])));";
             //                 SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[PersonID] IN (SELECT [t1].[PersonID] FROM [dbo].[PersonPhoneNumber] AS [t1] WHERE ([t1].[PhoneNumber] LIKE @p0) AND ([t1].[PersonID]=[t0].[PersonID])));
-            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
+            var query = new Mock.MockConnection().QueryBuilder("dbo.Person");
             var queryDef = new ListQueryDefinition();
 
             queryDef.Filters = new List<ListFilter>(new ListFilter[] {
@@ -338,8 +338,8 @@ namespace Csg.ListQuery.Tests
         [TestMethod]
         public void Test_ListQuery_Paging()
         {
-            var expectedSql = "SELECT COUNT(1) FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]=@p0);\r\nSELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]=@p1) ORDER BY [FirstName] ASC OFFSET 0 ROWS FETCH NEXT 26 ROWS ONLY;";
-            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
+            var expectedSql = "SELECT COUNT(1) FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]=@p0);SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]=@p1) ORDER BY [FirstName] ASC OFFSET 0 ROWS FETCH NEXT 26 ROWS ONLY;";
+            var query = new Mock.MockConnection().QueryBuilder("dbo.Person");
 
             var queryDef = new ListQueryDefinition();
 
@@ -366,7 +366,7 @@ namespace Csg.ListQuery.Tests
         [TestMethod]
         public void Test_ListQuery_Buffered_ApplyAddsLimitOracle()
         {
-            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
+            var query = new Mock.MockConnection().QueryBuilder("dbo.Person");
 
             var queryDef = new ListQueryDefinition();
 
@@ -382,14 +382,14 @@ namespace Csg.ListQuery.Tests
                 .NoValidation()
                 .Apply();
 
-            Assert.AreEqual(0, qb.PagingOptions.Value.Offset);
-            Assert.AreEqual(51, qb.PagingOptions.Value.Limit);
+            Assert.AreEqual(0, qb.Configuration.PagingOptions.Value.Offset);
+            Assert.AreEqual(51, qb.Configuration.PagingOptions.Value.Limit);
         }
 
         [TestMethod]
         public void Test_ListQuery_Streamed_Apply()
         {
-            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
+            var query = new Mock.MockConnection().QueryBuilder("dbo.Person");
 
             var queryDef = new ListQueryDefinition();
 
@@ -406,14 +406,14 @@ namespace Csg.ListQuery.Tests
                 .UseStreamingResult()
                 .Apply();
 
-            Assert.AreEqual(0, qb.PagingOptions.Value.Offset);
-            Assert.AreEqual(50, qb.PagingOptions.Value.Limit);
+            Assert.AreEqual(0, qb.Configuration.PagingOptions.Value.Offset);
+            Assert.AreEqual(50, qb.Configuration.PagingOptions.Value.Limit);
         }
 
         [TestMethod]
         public void Test_ListQuery_ApplyEventHandlers()
         {
-            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
+            var query = new Mock.MockConnection().QueryBuilder("dbo.Person");
             var queryDef = new ListQueryDefinition();
             bool beforeInvoked = false;
             bool afterInvoked = false;
@@ -429,28 +429,28 @@ namespace Csg.ListQuery.Tests
                 {
                     beforeInvoked = true;
                     Assert.IsNotNull(config);
-                    Assert.AreEqual(0, config.QueryBuilder.OrderBy.Count);
-                    config.QueryBuilder.OrderBy.Add("LastName");
+                    Assert.AreEqual(0, config.QueryBuilder.Configuration.OrderBy.Count);
+                    config.QueryBuilder.Configuration.OrderBy.Add("LastName");
                 })
                 .AfterApply((config, appliedQuery) =>
                 {
                     afterInvoked = true;
                     Assert.IsNotNull(config);
                     Assert.IsNotNull(appliedQuery);
-                    Assert.AreEqual(2, appliedQuery.OrderBy.Count);
-                    Assert.IsTrue(appliedQuery.OrderBy.Any(x => x.ColumnName == "LastName"));
+                    Assert.AreEqual(2, appliedQuery.Configuration.OrderBy.Count);
+                    Assert.IsTrue(appliedQuery.Configuration.OrderBy.Any(x => x.ColumnName == "LastName"));
                 })
                 .Apply();
 
             Assert.IsTrue(beforeInvoked);
             Assert.IsTrue(afterInvoked);
-            Assert.AreEqual(2, qb.OrderBy.Count);
+            Assert.AreEqual(2, qb.Configuration.OrderBy.Count);
         }
 
         [TestMethod]
         public void Test_ListQuery_DefaultSort()
         {
-            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
+            var query = new Mock.MockConnection().QueryBuilder("dbo.Person");
             var queryDef = new ListQueryDefinition();
 
             var qb = ListQueryBuilder.Create(query, queryDef)
@@ -458,14 +458,14 @@ namespace Csg.ListQuery.Tests
                 .DefaultSort("FirstName")
                 .Apply();
 
-            Assert.AreEqual(1, qb.OrderBy.Count);
-            Assert.AreEqual("FirstName", qb.OrderBy.First().ColumnName);
+            Assert.AreEqual(1, qb.Configuration.OrderBy.Count);
+            Assert.AreEqual("FirstName", qb.Configuration.OrderBy.First().ColumnName);
         }
 
         [TestMethod]
         public void Test_ListQuery_DefaultLimit()
         {
-            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
+            var query = new Mock.MockConnection().QueryBuilder("dbo.Person");
             var queryDef = new ListQueryDefinition();
 
             var qb = ListQueryBuilder.Create(query, queryDef)
@@ -474,7 +474,7 @@ namespace Csg.ListQuery.Tests
                 .DefaultLimit(150)
                 .Apply();
 
-            Assert.AreEqual(150, qb.PagingOptions.Value.Limit);
+            Assert.AreEqual(150, qb.Configuration.PagingOptions.Value.Limit);
         }
 
 
