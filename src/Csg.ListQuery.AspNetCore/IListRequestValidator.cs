@@ -11,7 +11,7 @@ namespace Csg.ListQuery.AspNetCore
     public interface IListRequestValidator
     {
         /// <summary>
-        /// Validates the given request and produces a <see cref="ListQueryDefinition"/> query.
+        /// When implemented in a derived class, validates the given request and produces a <see cref="ListQueryDefinition"/> query.
         /// </summary>
         /// <param name="request"></param>
         /// <param name="selectableProperties">A dictionary of the fields that are allowed to be selected.</param>
@@ -24,5 +24,13 @@ namespace Csg.ListQuery.AspNetCore
             IDictionary<string, ListItemPropertyInfo> filerableProperties,
             IDictionary<string, ListItemPropertyInfo> sortableProperties
         );
+
+        /// <summary>
+        /// When implemented in a derived class, gets a list of properties on the given type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="predicate"></param>
+        /// <param name="maxRecursionDepth"></param>
+        IDictionary<string, ListItemPropertyInfo> GetProperties(Type type, Func<ListItemPropertyInfo, bool> predicate = null, int? maxRecursionDepth = null);
     }
 }

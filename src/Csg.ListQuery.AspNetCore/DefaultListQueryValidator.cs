@@ -38,6 +38,11 @@ namespace Csg.ListQuery.AspNetCore
             return new Csg.ListQuery.ListQueryDefinition();
         }
 
+        public virtual IDictionary<string, ListItemPropertyInfo> GetProperties(Type type, Func<ListItemPropertyInfo, bool> predicate = null, int? maxRecursionDepth = null)
+        {
+            return PropertyHelper.GetProperties(type, predicate, maxRecursionDepth ?? _options.MaximumRecursionDepth);
+        }
+
         /// <summary>
         /// Transforms a list request into a list query
         /// </summary>

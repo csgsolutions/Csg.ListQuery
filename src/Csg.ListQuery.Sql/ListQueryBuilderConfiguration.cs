@@ -3,6 +3,7 @@ using Csg.ListQuery;
 using Csg.Data;
 using System;
 using Csg.ListQuery.Sql.Internal;
+using Csg.Data.Sql;
 
 namespace Csg.ListQuery.Sql
 {
@@ -15,6 +16,8 @@ namespace Csg.ListQuery.Sql
         /// Gets or sets the query builder used to generate the SQL command that will be executed.
         /// </summary>
         public virtual IDbQueryBuilder QueryBuilder { get; set; }
+
+        public virtual IListQueryDataAdapter DataAdapter { get; set; }
 
         /// <summary>
         /// Gets or sets a dictionary of functions used to handle applying filters to the query builder. If a handler is specified in this dictionary, any default handler will not be used for a given property name.
@@ -79,6 +82,4 @@ namespace Csg.ListQuery.Sql
             }
         }
     }
-
-
 }

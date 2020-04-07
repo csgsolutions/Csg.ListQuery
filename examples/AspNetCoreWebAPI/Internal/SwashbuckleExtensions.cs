@@ -29,7 +29,7 @@ namespace AspNetCoreWebAPI.Internal
                 var validationType = parameters[0].GetCustomAttribute<SwashbuckleValidationHintAttribute>()?.ValidationType;
 
                 // set recursive true if you want to include navigation properties, such as WeatherForecast.Author
-                operation.Parameters = TypeHelper.GetParametersForHttpGetRequest(parameters[0].ParameterType, validationType, recursive: true);
+                operation.Parameters = TypeHelper.GetParametersForHttpGetRequest(parameters[0].ParameterType, validationType, maxRecusionDepth: 3);
             }
         }
     }

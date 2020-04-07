@@ -32,6 +32,7 @@ namespace Csg.ListQuery.Sql
                 Configuration = new ListQueryBuilderConfiguration()
                 {
                     QueryBuilder = queryBuilder,
+                    DataAdapter = new DapperListDataAdapter(queryBuilder.Connection, queryBuilder.Transaction),
                     QueryDefinition = queryDefinition,
                     Validations = new Dictionary<string, ListFieldMetadata>(StringComparer.OrdinalIgnoreCase),
                     Handlers = new Dictionary<string, ListQueryFilterHandler>(StringComparer.OrdinalIgnoreCase)

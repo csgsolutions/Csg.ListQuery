@@ -505,7 +505,7 @@ namespace Csg.ListQuery.Tests
         [TestMethod]
         public void ReflectionHelper_GetListPropertyInfo_Recursion()
         {
-            var properties = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(typeof(Mock.TypeCheckModel), fromCache: false, recursive: true)
+            var properties = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(typeof(Mock.TypeCheckModel), fromCache: false, maxRecursionDepth: 2)
                 .ToDictionary(s => s.Name);
 
             Assert.IsTrue(properties["Person.PersonID"].IsFilterable.GetValueOrDefault());
@@ -518,7 +518,7 @@ namespace Csg.ListQuery.Tests
         [TestMethod]
         public void ReflectionHelper_GetListPropertyInfo_NoRecursion()
         {
-            var properties = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(typeof(Mock.TypeCheckModel), fromCache: false, recursive: false)
+            var properties = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(typeof(Mock.TypeCheckModel), fromCache: false, maxRecursionDepth: 1)
                 .ToDictionary(s => s.Name);
 
             Assert.IsFalse(properties.ContainsKey("Person.PersonID"));

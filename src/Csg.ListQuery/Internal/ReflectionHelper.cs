@@ -16,7 +16,9 @@ namespace Csg.ListQuery.Internal
         private static System.Collections.Concurrent.ConcurrentDictionary<Type, ICollection<ReflectedFieldMetadata>> s_typeCache 
             = new System.Collections.Concurrent.ConcurrentDictionary<Type, ICollection<ReflectedFieldMetadata>>();
 
-        private static void PopulateFieldCollection(Type type, ICollection<ReflectedFieldMetadata> schema, string prefix = null, bool recursive = false, bool? defaultSortable = null, bool? defaultFilterable = null)
+        public static int DefaultMaxRecursionDepth = 1;
+
+        private static void PopulateFieldCollection(Type type, ICollection<ReflectedFieldMetadata> schema, int maxDepth, string prefix = null, bool? defaultSortable = null, bool? defaultFilterable = null, int depth = 1)
         {
             if (!defaultFilterable.HasValue && type.TryGetAttribute(out FilterableAttribute filterableAttr))
             {
@@ -73,9 +75,9 @@ namespace Csg.ListQuery.Internal
 
                 schema.Add(ci);
 
-                if (recursive && IsNavigatableType(property.PropertyType))
+                if (depth < maxDepth && IsNavigatableType(property.PropertyType))
                 {
-                    PopulateFieldCollection(property.PropertyType, schema, ci.Name, recursive: true, defaultSortable: ci.IsSortable, defaultFilterable: ci.IsFilterable);
+                    PopulateFieldCollection(property.PropertyType, schema, maxDepth, prefix: ci.Name, defaultSortable: ci.IsSortable, defaultFilterable: ci.IsFilterable, depth: depth+1);
                 }
             }          
         }
@@ -85,12 +87,11 @@ namespace Csg.ListQuery.Internal
             return !type.IsValueType && !type.IsArray && type != typeof(string);
         }
 
-        private static ICollection<ReflectedFieldMetadata> GetListPropertyInfoInternal(Type type, bool recursive = false)
+        private static ICollection<ReflectedFieldMetadata> GetListPropertyInfoInternal(Type type, int? maxRecusionDepth = null)
         {
             var schema = new List<ReflectedFieldMetadata>();
 
-
-            PopulateFieldCollection(type, schema, recursive: recursive);
+            PopulateFieldCollection(type, schema, maxRecusionDepth ?? DefaultMaxRecursionDepth);
 
             return schema;
         }
@@ -100,17 +101,18 @@ namespace Csg.ListQuery.Internal
         /// </summary>
         /// <param name="type"></param>
         /// <param name="fromCache"></param>
+        /// <param name="maxRecusionDepth">The maximum number of levels to recurse down the object's child properties. The default value is 1 (no recursion).</param>
         /// <returns></returns>
-        public static IEnumerable<ReflectedFieldMetadata> GetFieldsFromType(Type type, bool fromCache = true, bool recursive = false)
+        public static IEnumerable<ReflectedFieldMetadata> GetFieldsFromType(Type type, bool fromCache = true, int? maxRecursionDepth = null)
         {
             if (!fromCache)
             {
-                return GetListPropertyInfoInternal(type, recursive);
+                return GetListPropertyInfoInternal(type, maxRecursionDepth);
             }
 
             return s_typeCache.GetOrAdd(type, (t) =>
             {
-                return GetListPropertyInfoInternal(t, recursive);
+                return GetListPropertyInfoInternal(t, maxRecursionDepth);
             });
         }
 

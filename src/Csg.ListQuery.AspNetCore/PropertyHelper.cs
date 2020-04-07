@@ -17,9 +17,9 @@ namespace Csg.ListQuery.AspNetCore
         /// <param name="type"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public static Dictionary<string, ListItemPropertyInfo> GetProperties(Type type, Func<ListItemPropertyInfo, bool> predicate = null, bool recursive = false)
+        public static Dictionary<string, ListItemPropertyInfo> GetProperties(Type type, Func<ListItemPropertyInfo, bool> predicate = null, int? maxRecursionDepth = null)
         {
-            var listConfigs = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(type, fromCache: true, recursive: recursive);
+            var listConfigs = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(type, fromCache: true, maxRecursionDepth: maxRecursionDepth);
            
             return listConfigs
                 .Select(prop =>

@@ -17,10 +17,10 @@ namespace Csg.ListQuery.AspNetCore.OpenApi
         /// <param name="requestType"></param>
         /// <param name="validationType"></param>
         /// <returns></returns>
-        public static IList<Microsoft.OpenApi.Models.OpenApiParameter> GetParametersForHttpGetRequest(Type requestType, Type validationType, bool recursive = false)
+        public static IList<Microsoft.OpenApi.Models.OpenApiParameter> GetParametersForHttpGetRequest(Type requestType, Type validationType, int? maxRecusionDepth)
         {
             var result = new List<Microsoft.OpenApi.Models.OpenApiParameter>();
-            var fields = Csg.ListQuery.AspNetCore.PropertyHelper.GetProperties(validationType, recursive: recursive);
+            var fields = Csg.ListQuery.AspNetCore.PropertyHelper.GetProperties(validationType, maxRecursionDepth: maxRecusionDepth);
             bool sortable = false;
 
             result.Add(new OpenApiParameter()

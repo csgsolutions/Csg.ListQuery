@@ -11,16 +11,16 @@ namespace Csg.ListQuery.Sql
 {
     public static class ListQueryExtensions
     {
-        public static IListQueryBuilder ValidateWith<TValidation>(this IListQueryBuilder listQuery, bool recursive = false) where TValidation : class, new()
+        public static IListQueryBuilder ValidateWith<TValidation>(this IListQueryBuilder listQuery, int? maxRecursionDepth = null) where TValidation : class, new()
         {
-            return ValidateWith(listQuery, typeof(TValidation), recursive: recursive);
+            return ValidateWith(listQuery, typeof(TValidation), maxRecursionDepth: maxRecursionDepth);
         }
 
-        public static IListQueryBuilder ValidateWith(this IListQueryBuilder listQuery, Type validationType, bool recursive = false)
+        public static IListQueryBuilder ValidateWith(this IListQueryBuilder listQuery, Type validationType, int? maxRecursionDepth = null)
         {
             listQuery.Configuration.UseValidation = true;
 
-            var properties = ListQuery.Internal.ReflectionHelper.GetFieldsFromType(validationType, recursive: recursive);
+            var properties = ListQuery.Internal.ReflectionHelper.GetFieldsFromType(validationType, maxRecursionDepth: maxRecursionDepth);
 
             foreach (var property in properties)
             {
@@ -303,8 +303,6 @@ namespace Csg.ListQuery.Sql
         public async static System.Threading.Tasks.Task<ListQueryResult<T>> GetResultAsync<T>(this Csg.ListQuery.Sql.IListQueryBuilder builder, bool getTotalWhenLimiting = true)
         {
             var stmt = builder.Render(getTotalWhenLimiting);
-            var cmdFlags = builder.Configuration.UseStreamingResult ? Dapper.CommandFlags.Pipelined : Dapper.CommandFlags.Buffered;
-            var cmd = stmt.ToDapperCommand(builder.Configuration.QueryBuilder.Transaction, builder.Configuration.QueryBuilder.CommandTimeout, commandFlags: cmdFlags);
             int? totalCount = null;
             IEnumerable<T> data = null;
             bool isBuffered = !builder.Configuration.UseStreamingResult;
@@ -315,15 +313,12 @@ namespace Csg.ListQuery.Sql
 
             if (stmt.Count == 1)
             {
-                data = await Dapper.SqlMapper.QueryAsync<T>(builder.Configuration.QueryBuilder.Connection, cmd);
+                data = await builder.Configuration.DataAdapter.GetResultsAsync<T>(stmt, builder.Configuration.UseStreamingResult, builder.Configuration.QueryBuilder.CommandTimeout);
+
             }
             else if (stmt.Count == 2)
             {
-                using (var batchReader = await Dapper.SqlMapper.QueryMultipleAsync(builder.Configuration.QueryBuilder.Connection, cmd))
-                {
-                    totalCount = await batchReader.ReadFirstAsync<int>();
-                    data = await batchReader.ReadAsync<T>();
-                }
+                var batchResult = await builder.Configuration.DataAdapter.GetTotalCountAndResultsAsync<T>(stmt, builder.Configuration.UseStreamingResult, builder.Configuration.QueryBuilder.CommandTimeout);
             }
             else
             {
