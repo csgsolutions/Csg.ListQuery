@@ -34,7 +34,7 @@ namespace AspNetCoreWebAPI.Controllers
         [ProducesResponseType(200)]
         public Task<ActionResult<ListResponse<WeatherForecast>>> GetListOfWeather(
             [ModelBinder(typeof(ListRequestQueryStringModelBinder))]
-            [SwashbuckleValidationHint(typeof(WeatherForecast))]
+            [SwashbuckleValidationHint(typeof(WeatherForecast), MaxRecursionDepth = 1)]
             ListRequest requestModel
         )
         {

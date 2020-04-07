@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace Csg.ListQuery.Internal
 {
@@ -13,8 +14,8 @@ namespace Csg.ListQuery.Internal
     /// </summary>
     public static class ReflectionHelper
     {
-        private static System.Collections.Concurrent.ConcurrentDictionary<Type, ICollection<ReflectedFieldMetadata>> s_typeCache 
-            = new System.Collections.Concurrent.ConcurrentDictionary<Type, ICollection<ReflectedFieldMetadata>>();
+        private static System.Collections.Concurrent.ConcurrentDictionary<string, ICollection<ReflectedFieldMetadata>> s_typeCache 
+            = new System.Collections.Concurrent.ConcurrentDictionary<string, ICollection<ReflectedFieldMetadata>>();
 
         public static int DefaultMaxRecursionDepth = 1;
 
@@ -30,7 +31,25 @@ namespace Csg.ListQuery.Internal
                 defaultSortable = sortableAttr.IsSortable;
             }
 
-            foreach (var property in type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+            IEnumerable<PropertyInfo> properties;
+
+
+            if (type.GetCustomAttributes<System.Runtime.Serialization.DataContractAttribute>().Any())
+            {
+                // If data contract attribute, then we only want things marked as DataMember, or explicity as filterable, sortable
+                properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                    .Where(p =>
+                        p.GetCustomAttribute<System.Runtime.Serialization.DataMemberAttribute>() != null
+                        || p.GetCustomAttribute<SortableAttribute>() != null
+                        || p.GetCustomAttribute<FilterableAttribute>() != null
+                    );
+            }
+            else
+            {
+                properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            }
+
+            foreach (var property in properties)
             {
                 var ci = new ReflectedFieldMetadata();
 
@@ -105,24 +124,17 @@ namespace Csg.ListQuery.Internal
         /// <returns></returns>
         public static IEnumerable<ReflectedFieldMetadata> GetFieldsFromType(Type type, bool fromCache = true, int? maxRecursionDepth = null)
         {
+            string cacheKey = $"{type.AssemblyQualifiedName}:{(fromCache ? 1 : 0)}:{maxRecursionDepth ?? DefaultMaxRecursionDepth}";
+            
             if (!fromCache)
             {
                 return GetListPropertyInfoInternal(type, maxRecursionDepth);
             }
 
-            return s_typeCache.GetOrAdd(type, (t) =>
+            return s_typeCache.GetOrAdd(cacheKey, (key) =>
             {
-                return GetListPropertyInfoInternal(t, maxRecursionDepth);
+                return GetListPropertyInfoInternal(type, maxRecursionDepth);
             });
-        }
-
-        /// <summary>
-        /// Removes all cached metadata for the given type.
-        /// </summary>
-        /// <param name="type"></param>
-        public static void RemoveCachedType(Type type)
-        {
-            s_typeCache.TryRemove(type, out _);
         }
 
         /// <summary>

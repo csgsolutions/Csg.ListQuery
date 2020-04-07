@@ -16,6 +16,8 @@ namespace AspNetCoreWebAPI.Internal
         }
 
         public Type ValidationType { get; set; }
+
+        public int MaxRecursionDepth { get; set; } = 1;
     }
 
     public class ListRequestQueryStringOperationFilter : Swashbuckle.AspNetCore.SwaggerGen.IOperationFilter
@@ -26,10 +28,10 @@ namespace AspNetCoreWebAPI.Internal
            
             if (parameters.Length == 1 && typeof(IListRequest).IsAssignableFrom(parameters[0].ParameterType) && context.ApiDescription.HttpMethod == "GET")
             {
-                var validationType = parameters[0].GetCustomAttribute<SwashbuckleValidationHintAttribute>()?.ValidationType;
+                var validationOptions = parameters[0].GetCustomAttribute<SwashbuckleValidationHintAttribute>();
 
                 // set recursive true if you want to include navigation properties, such as WeatherForecast.Author
-                operation.Parameters = TypeHelper.GetParametersForHttpGetRequest(parameters[0].ParameterType, validationType, maxRecusionDepth: 3);
+                operation.Parameters = TypeHelper.GetParametersForHttpGetRequest(parameters[0].ParameterType, validationOptions.ValidationType, maxRecusionDepth: validationOptions.MaxRecursionDepth);
             }
         }
     }

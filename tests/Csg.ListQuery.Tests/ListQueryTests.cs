@@ -524,5 +524,17 @@ namespace Csg.ListQuery.Tests
             Assert.IsFalse(properties.ContainsKey("Person.PersonID"));
         }
 
+        [TestMethod]
+        public void ReflectionHelper_GetListPropertyInfo_TestDataContract()
+        {
+            var properties = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(typeof(Mock.DataContractTestModel), fromCache: false, maxRecursionDepth: 1)
+                .ToDictionary(s => s.Name);
+
+            Assert.IsTrue(properties.ContainsKey("DataMember1"));
+            Assert.IsFalse(properties.ContainsKey("NonDataMember1"));
+            Assert.IsTrue(properties.ContainsKey("NonDataMember2"));
+            Assert.IsTrue(properties.ContainsKey("NonDataMember3"));
+        }
+
     }
 }

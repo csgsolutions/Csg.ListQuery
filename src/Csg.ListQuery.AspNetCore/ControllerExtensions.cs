@@ -32,7 +32,7 @@ namespace Csg.ListQuery.AspNetCore.Mvc
          ) where TDomain : new()
         {
             var validator = controller.HttpContext.RequestServices.GetRequiredService<IListRequestValidator>();
-            var domainProperties = PropertyHelper.GetProperties(typeof(TDomain));
+            var domainProperties = validator.GetProperties(typeof(TDomain));
             var validationResult = validator.Validate<TValidation>(request);
 
             if (!validationResult.IsValid)
