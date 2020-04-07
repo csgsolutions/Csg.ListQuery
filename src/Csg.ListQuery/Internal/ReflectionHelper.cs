@@ -13,21 +13,17 @@ namespace Csg.ListQuery.Internal
     /// </summary>
     public static class ReflectionHelper
     {
-        private static System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, ReflectedFieldMetadata>> s_typeCache 
-            = new System.Collections.Concurrent.ConcurrentDictionary<Type, IDictionary<string, ReflectedFieldMetadata>>();
+        private static System.Collections.Concurrent.ConcurrentDictionary<Type, ICollection<ReflectedFieldMetadata>> s_typeCache 
+            = new System.Collections.Concurrent.ConcurrentDictionary<Type, ICollection<ReflectedFieldMetadata>>();
 
-        private static IDictionary<string, ReflectedFieldMetadata> GetListPropertyInfoInternal(Type type)
+        private static void PopulateFieldCollection(Type type, ICollection<ReflectedFieldMetadata> schema, string prefix = null, bool recursive = false, bool? defaultSortable = null, bool? defaultFilterable = null)
         {
-            var schema = new Dictionary<string, ReflectedFieldMetadata>(StringComparer.OrdinalIgnoreCase);
-            bool defaultFilterable = false;
-            bool defaultSortable = false;
-
-            if (type.TryGetAttribute(out FilterableAttribute filterableAttr))
+            if (!defaultFilterable.HasValue && type.TryGetAttribute(out FilterableAttribute filterableAttr))
             {
                 defaultFilterable = filterableAttr.IsFilterable;
             }
 
-            if (type.TryGetAttribute(out SortableAttribute sortableAttr))
+            if (!defaultSortable.HasValue && type.TryGetAttribute(out SortableAttribute sortableAttr))
             {
                 defaultSortable = sortableAttr.IsSortable;
             }
@@ -36,7 +32,7 @@ namespace Csg.ListQuery.Internal
             {
                 var ci = new ReflectedFieldMetadata();
 
-                ci.Name = property.Name;
+                ci.Name = prefix == null ? property.Name : string.Concat(prefix, ".", property.Name);
                 ci.Description = property.TryGetAttribute<System.ComponentModel.DataAnnotations.DisplayAttribute>(out System.ComponentModel.DataAnnotations.DisplayAttribute displayAttr)
                     ? displayAttr.GetDescription()
                     : (string)null;
@@ -62,7 +58,7 @@ namespace Csg.ListQuery.Internal
                     ci.DataTypeSize = maxLengthAttr.Length;
                 }
 
-                if (property.TryGetAttribute(out filterableAttr)) 
+                if (property.TryGetAttribute(out filterableAttr))
                 {
                     ci.IsFilterable = filterableAttr.IsFilterable;
                     ci.Description = filterableAttr.Description ?? ci.Description;
@@ -71,13 +67,30 @@ namespace Csg.ListQuery.Internal
                 {
                     ci.IsFilterable = defaultFilterable;
                 }
-                
-                ci.IsSortable = property.TryGetAttribute(out sortableAttr) ? sortableAttr.IsSortable : defaultSortable;
 
+                ci.IsSortable = property.TryGetAttribute(out sortableAttr) ? sortableAttr.IsSortable : defaultSortable;
                 ci.PropertyInfo = property;
 
-                schema.Add(property.Name, ci);
-            }
+                schema.Add(ci);
+
+                if (recursive && IsNavigatableType(property.PropertyType))
+                {
+                    PopulateFieldCollection(property.PropertyType, schema, ci.Name, recursive: true, defaultSortable: ci.IsSortable, defaultFilterable: ci.IsFilterable);
+                }
+            }          
+        }
+
+        private static bool IsNavigatableType(Type type)
+        {
+            return !type.IsValueType && !type.IsArray && type != typeof(string);
+        }
+
+        private static ICollection<ReflectedFieldMetadata> GetListPropertyInfoInternal(Type type, bool recursive = false)
+        {
+            var schema = new List<ReflectedFieldMetadata>();
+
+
+            PopulateFieldCollection(type, schema, recursive: recursive);
 
             return schema;
         }
@@ -88,14 +101,17 @@ namespace Csg.ListQuery.Internal
         /// <param name="type"></param>
         /// <param name="fromCache"></param>
         /// <returns></returns>
-        public static IDictionary<string, ReflectedFieldMetadata> GetFieldsFromType(Type type, bool fromCache = true)
+        public static IEnumerable<ReflectedFieldMetadata> GetFieldsFromType(Type type, bool fromCache = true, bool recursive = false)
         {
             if (!fromCache)
             {
-                return GetListPropertyInfoInternal(type);
+                return GetListPropertyInfoInternal(type, recursive);
             }
 
-            return s_typeCache.GetOrAdd(type, GetListPropertyInfoInternal);
+            return s_typeCache.GetOrAdd(type, (t) =>
+            {
+                return GetListPropertyInfoInternal(t, recursive);
+            });
         }
 
         /// <summary>

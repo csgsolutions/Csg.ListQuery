@@ -22,5 +22,8 @@ namespace Csg.ListQuery.Tests.Mock
         public decimal Decimal { get; set; }
         public float Float { get; set; }
         public double Double { get; set; }        
+
+        [Filterable]
+        public Person Person { get; set;}
     }
 }

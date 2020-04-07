@@ -17,5 +17,7 @@ namespace AspNetCoreWebAPI
 
         [Sortable(false)]
         public string Summary { get; set; }
+
+        public Person Author { get; set; }
     }
 }

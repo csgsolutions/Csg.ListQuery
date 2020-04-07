@@ -17,11 +17,11 @@ namespace Csg.ListQuery.AspNetCore
         /// <param name="type"></param>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public static Dictionary<string, ListItemPropertyInfo> GetProperties(Type type, Func<ListItemPropertyInfo, bool> predicate = null)
+        public static Dictionary<string, ListItemPropertyInfo> GetProperties(Type type, Func<ListItemPropertyInfo, bool> predicate = null, bool recursive = false)
         {
-            var listConfigs = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(type, fromCache: true);
+            var listConfigs = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(type, fromCache: true, recursive: recursive);
            
-            return listConfigs.Values
+            return listConfigs
                 .Select(prop =>
                 {
                     var propInfo = new ListItemPropertyInfo();

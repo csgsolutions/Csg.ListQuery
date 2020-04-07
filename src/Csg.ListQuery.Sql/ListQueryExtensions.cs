@@ -24,7 +24,7 @@ namespace Csg.ListQuery.Sql
 
             foreach (var property in properties)
             {
-                listQuery.Configuration.Validations.Add(property.Key, property.Value);
+                listQuery.Configuration.Validations.Add(property.Name, property);
             }
 
             return listQuery;

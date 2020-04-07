@@ -58,7 +58,7 @@ namespace Csg.ListQuery.AspNetCore.Tests
             var result = validator.Validate(request, selectProps, filterProps, sortProps);
 
             Assert.IsFalse(result.IsValid);
-            Assert.AreEqual(result.Errors.Count, 4);
+            Assert.AreEqual(4, result.Errors.Count);
 
         }
 

@@ -476,12 +476,13 @@ namespace Csg.ListQuery.Tests
 
             Assert.AreEqual(150, qb.PagingOptions.Value.Limit);
         }
-        
 
-        [TestMethod] 
+
+        [TestMethod]
         public void ReflectionHelper_GetListPropertyInfo_DbTypeMappingsCorrect()
         {
-            var properties = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(typeof(Mock.TypeCheckModel));
+            var properties = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(typeof(Mock.TypeCheckModel))
+                .ToDictionary(s => s.Name);
 
             Assert.AreEqual(DbType.Byte, properties[nameof(Mock.TypeCheckModel.Byte)].DataType);
             Assert.AreEqual(DbType.Int16, properties[nameof(Mock.TypeCheckModel.Int16)].DataType);
@@ -500,5 +501,28 @@ namespace Csg.ListQuery.Tests
             Assert.AreEqual(DbType.Single, properties[nameof(Mock.TypeCheckModel.Float)].DataType);
             Assert.AreEqual(DbType.Double, properties[nameof(Mock.TypeCheckModel.Double)].DataType);
         }
+
+        [TestMethod]
+        public void ReflectionHelper_GetListPropertyInfo_Recursion()
+        {
+            var properties = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(typeof(Mock.TypeCheckModel), fromCache: false, recursive: true)
+                .ToDictionary(s => s.Name);
+
+            Assert.IsTrue(properties["Person.PersonID"].IsFilterable.GetValueOrDefault());
+            Assert.IsTrue(properties["Person.FirstName"].IsFilterable.GetValueOrDefault());
+            Assert.IsTrue(properties["Person.LastName"].IsFilterable.GetValueOrDefault());
+            Assert.IsTrue(properties["Person.FirstName"].IsSortable.GetValueOrDefault());
+            Assert.IsTrue(properties["Person.LastName"].IsSortable.GetValueOrDefault());
+        }
+
+        [TestMethod]
+        public void ReflectionHelper_GetListPropertyInfo_NoRecursion()
+        {
+            var properties = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(typeof(Mock.TypeCheckModel), fromCache: false, recursive: false)
+                .ToDictionary(s => s.Name);
+
+            Assert.IsFalse(properties.ContainsKey("Person.PersonID"));
+        }
+
     }
 }
