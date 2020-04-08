@@ -303,7 +303,6 @@ namespace Csg.ListQuery.Sql
 
         public async static System.Threading.Tasks.Task<ListQueryResult<T>> GetResultAsync<T>(this Csg.ListQuery.Sql.IListQueryBuilder builder, bool getTotalWhenLimiting = true)
         {
-            var stmt = builder.Render(getTotalWhenLimiting);
             int? totalCount = null;
             IEnumerable<T> data = null;
             bool isBuffered = !builder.Configuration.UseStreamingResult;
@@ -312,19 +311,21 @@ namespace Csg.ListQuery.Sql
             int? nextOffset = null;
             int? prevOffset = null;
 
-            if (stmt.Count == 1)
-            {
-                data = await builder.Configuration.DataAdapter.GetResultsAsync<T>(stmt, builder.Configuration.UseStreamingResult, builder.Configuration.QueryBuilder.Configuration.CommandTimeout);
+            var appiedQuery = builder.Apply();
 
-            }
-            else if (stmt.Count == 2)
+            if (getTotalWhenLimiting && appiedQuery.Configuration.PagingOptions?.Limit > 0 && appiedQuery.Configuration.PagingOptions?.Offset == 0)
             {
-                var batchResult = await builder.Configuration.DataAdapter.GetTotalCountAndResultsAsync<T>(stmt, builder.Configuration.UseStreamingResult, builder.Configuration.QueryBuilder.Configuration.CommandTimeout);
+                var batchResult = await builder.Configuration.DataAdapter.GetTotalCountAndResultsAsync<T>(appiedQuery, builder.Configuration.UseStreamingResult, builder.Configuration.QueryBuilder.Configuration.CommandTimeout);
+
+                data = batchResult.Items;
+                totalCount = batchResult.TotalCount;
             }
             else
             {
-                throw new NotSupportedException("A statement with more than 2 queries is not supported.");
-            }
+                var stmt = appiedQuery.Render();
+
+                data = await builder.Configuration.DataAdapter.GetResultsAsync<T>(appiedQuery, builder.Configuration.UseStreamingResult, builder.Configuration.QueryBuilder.Configuration.CommandTimeout);
+            }           
 
             //TODO: Can we still use .Take() here with a limit oracle when streaming?
             // if the data is streamed, we can't provide a total count, and we can't use the next page oracle

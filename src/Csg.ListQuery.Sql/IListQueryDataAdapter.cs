@@ -1,4 +1,5 @@
 ﻿using Csg.Data;
+using Csg.Data.Abstractions;
 using Csg.Data.Sql;
 using System;
 using System.Collections.Generic;
@@ -10,9 +11,9 @@ namespace Csg.ListQuery.Sql
 {
     public interface IListQueryDataAdapter
     {
-        Task<IEnumerable<T>> GetResultsAsync<T>(SqlStatementBatch batch, bool stream, int? commandTimeout);
+        Task<IEnumerable<T>> GetResultsAsync<T>(ISelectQueryBuilder query, bool stream, int? commandTimeout);
 
-        Task<BatchResult<T>> GetTotalCountAndResultsAsync<T>(SqlStatementBatch batch, bool stream, int? commandTimeout);
+        Task<BatchResult<T>> GetTotalCountAndResultsAsync<T>(ISelectQueryBuilder query, bool stream, int? commandTimeout);
     }
 
     public class BatchResult<T>

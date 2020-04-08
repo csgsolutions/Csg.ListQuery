@@ -1,4 +1,5 @@
 ﻿using Csg.Data;
+using Csg.Data.Abstractions;
 using Csg.Data.Sql;
 using System;
 using System.Collections.Generic;
@@ -18,24 +19,31 @@ namespace Csg.ListQuery.Sql
             _originalQueryBuilder = queryBuilder;
         }
 
-        public async Task<IEnumerable<T>> GetResultsAsync<T>(SqlStatementBatch batch, bool stream, int? commandTimeout)
+        public async Task<IEnumerable<T>> GetResultsAsync<T>(ISelectQueryBuilder query, bool stream, int? commandTimeout)
         {
             var connection = _originalQueryBuilder.Features.Get<IDbConnection>(_originalQueryBuilder);
             var transaction = _originalQueryBuilder.Features.Get<IDbTransaction>(_originalQueryBuilder);
-            var cmd = batch.ToDapperCommand(transaction, commandTimeout: commandTimeout);
+            var cmd = query.Render().ToDapperCommand(transaction, commandTimeout: commandTimeout);
 
             return await Dapper.SqlMapper.QueryAsync<T>(connection, cmd);
         }
 
-        public async Task<BatchResult<T>> GetTotalCountAndResultsAsync<T>(SqlStatementBatch batch, bool stream, int? commandTimeout)
+        public async Task<BatchResult<T>> GetTotalCountAndResultsAsync<T>(ISelectQueryBuilder query, bool stream, int? commandTimeout)
         {
+            var countQuery = query.SelectOnly(new SqlRawColumn("COUNT(1)"));
+
+            countQuery.Configuration.PagingOptions = null;
+            countQuery.Configuration.OrderBy.Clear();
+
             var connection = _originalQueryBuilder.Features.Get<IDbConnection>(_originalQueryBuilder);
             var transaction = _originalQueryBuilder.Features.Get<IDbTransaction>(_originalQueryBuilder);
-            var cmd = batch.ToDapperCommand(transaction, commandTimeout: commandTimeout);
 
+            var batchCmd = new ISqlStatementElement[] { countQuery, query }.RenderBatch(_originalQueryBuilder.Provider)
+                .ToDapperCommand(transaction, commandTimeout: commandTimeout);
+            
             var result = new BatchResult<T>();
 
-            using (var batchReader = await Dapper.SqlMapper.QueryMultipleAsync(connection, cmd))
+            using (var batchReader = await Dapper.SqlMapper.QueryMultipleAsync(connection, batchCmd))
             {
                 result.TotalCount = await batchReader.ReadFirstAsync<int>();
                 result.Items = await batchReader.ReadAsync<T>();
