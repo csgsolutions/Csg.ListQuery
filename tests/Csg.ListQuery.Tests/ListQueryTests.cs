@@ -516,6 +516,9 @@ namespace Csg.ListQuery.Tests
             Assert.IsTrue(properties["Person.LastName"].IsFilterable.GetValueOrDefault());
             Assert.IsTrue(properties["Person.FirstName"].IsSortable.GetValueOrDefault());
             Assert.IsTrue(properties["Person.LastName"].IsSortable.GetValueOrDefault());
+
+            Assert.IsNotNull(properties["Person.FirstName"].Parent);
+            Assert.AreEqual("Person", properties["Person.FirstName"].Parent.Name);
         }
 
         [TestMethod]
