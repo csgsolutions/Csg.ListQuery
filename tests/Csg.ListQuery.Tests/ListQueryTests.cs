@@ -501,7 +501,7 @@ namespace Csg.ListQuery.Tests
             Assert.AreEqual(DbType.Single, properties[nameof(Mock.TypeCheckModel.Float)].DataType);
             Assert.AreEqual(DbType.Double, properties[nameof(Mock.TypeCheckModel.Double)].DataType);
 
-            Assert.IsNull("DataMember1", properties[nameof(Mock.TypeCheckModel.DataMember1)].DataMemberName);
+            Assert.IsNull(properties[nameof(Mock.TypeCheckModel.DataMember1)].DataMemberName);
             Assert.AreEqual("DataMember2", properties[nameof(Mock.TypeCheckModel.DataMember2)].DataMemberName);
         }
 
@@ -565,7 +565,7 @@ namespace Csg.ListQuery.Tests
                 .Render();
 
             Assert.AreEqual(expectedSql, stmt.CommandText);
-            Assert.AreEqual(1, stmt.Parameters.Count);
+            Assert.AreEqual(2, stmt.Parameters.Count);
         }
 
     }
