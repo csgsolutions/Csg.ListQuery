@@ -54,6 +54,22 @@ namespace Csg.ListQuery.Sql
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="metaData"></param>
+        /// <returns></returns>
+        protected virtual string GetDataFieldName(string name, ListFieldMetadata metaData)
+        {
+            return metaData?.DataMemberName ?? metaData?.Name ?? name;
+        }
+
+        string IListQueryBuilder.GetDataFieldName(string name, ListFieldMetadata metaData)
+        {
+            return GetDataFieldName(name, metaData);
+        }
+
+        /// <summary>
         /// Gets or sets the list builder configuration.
         /// </summary>
         protected virtual ListQueryBuilderConfiguration Configuration { get; set; }

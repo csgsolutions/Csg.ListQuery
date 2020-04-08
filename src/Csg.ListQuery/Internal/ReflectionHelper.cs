@@ -33,7 +33,6 @@ namespace Csg.ListQuery.Internal
 
             IEnumerable<PropertyInfo> properties;
 
-
             if (type.GetCustomAttributes<System.Runtime.Serialization.DataContractAttribute>().Any())
             {
                 // If data contract attribute, then we only want things marked as DataMember, or explicity as filterable, sortable
@@ -57,6 +56,11 @@ namespace Csg.ListQuery.Internal
                 ci.Description = property.TryGetAttribute<System.ComponentModel.DataAnnotations.DisplayAttribute>(out System.ComponentModel.DataAnnotations.DisplayAttribute displayAttr)
                     ? displayAttr.GetDescription()
                     : (string)null;
+
+                if (property.TryGetAttribute<System.Runtime.Serialization.DataMemberAttribute>(out System.Runtime.Serialization.DataMemberAttribute attr))
+                {
+                    ci.DataMemberName = attr.Name;
+                }
 
                 // first see if the property has the DbType attribute, otherwise infer DbType from the property type
                 if (property.TryGetAttribute(out DbTypeAttribute dbTypeAttr))

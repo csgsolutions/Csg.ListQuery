@@ -7,6 +7,8 @@ namespace Csg.ListQuery.Tests.Mock
     public class DataContractTestModel
     {
         [DataMember]
+        [Sortable]
+        [Filterable]
         public int DataMember1 { get; set; }
 
         public string NonDataMember1 { get; set; }
@@ -16,5 +18,10 @@ namespace Csg.ListQuery.Tests.Mock
         
         [Sortable]
         public string NonDataMember3 { get; set; }
+
+        [DataMember(Name = "Member2")]
+        [Sortable]
+        [Filterable]
+        public string DataMember2 { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace Csg.ListQuery.Tests.Mock
@@ -25,5 +26,11 @@ namespace Csg.ListQuery.Tests.Mock
 
         [Filterable]
         public Person Person { get; set;}
+
+        [DataMember]
+        public string DataMember1 { get; set; }
+
+        [DataMember(Name = "DataMember2")]
+        public string DataMember2 { get; set; }
     }
 }

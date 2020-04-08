@@ -34,6 +34,11 @@
         /// Gets or sets a value describing this property
         /// </summary>
         public string Description { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the underlying data member that should be used when executing queries against a database.
+        /// </summary>
+        public string DataMemberName { get; set; }
     }
 
     /// <summary>

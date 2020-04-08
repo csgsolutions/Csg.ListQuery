@@ -161,7 +161,7 @@ namespace Csg.ListQuery.Sql
             {
                 var where = new WhereClause(queryBuilder.Root, Csg.Data.Sql.SqlLogic.And);
 
-                //tODO: IsFilterable is not being enforced. Shoult it be?
+                //TODO: IsFilterable is not being enforced. Shoult it be?
 
                 foreach (var filter in listQuery.Configuration.QueryDefinition.Filters)
                 {
@@ -173,7 +173,7 @@ namespace Csg.ListQuery.Sql
                     }
                     else if (hasConfig || !listQuery.Configuration.UseValidation)
                     {
-                        where.AddFilter(filter.Name, filter.Operator ?? ListFilterOperator.Equal, filter.Value, validationField?.DataType ?? System.Data.DbType.String, validationField?.DataTypeSize);
+                        where.AddFilter(listQuery.GetDataFieldName(filter.Name, validationField), filter.Operator ?? ListFilterOperator.Equal, filter.Value, validationField?.DataType ?? System.Data.DbType.String, validationField?.DataTypeSize);
                     }
                     else if (listQuery.Configuration.UseValidation)
                     {
@@ -196,7 +196,9 @@ namespace Csg.ListQuery.Sql
                 {
                     if (listQuery.Configuration.Validations.TryGetValue(column, out ListFieldMetadata config))
                     {
-                        queryBuilder.Configuration.SelectColumns.Add(new Csg.Data.Sql.SqlColumn(queryBuilder.Root, config.Name));
+                        queryBuilder.Configuration.SelectColumns.Add(
+                            new Csg.Data.Sql.SqlColumn(queryBuilder.Root, listQuery.GetDataFieldName(column, config)
+                        ));
                     }
                     else if (listQuery.Configuration.UseValidation)
                     {
@@ -204,7 +206,9 @@ namespace Csg.ListQuery.Sql
                     }
                     else
                     {
-                        queryBuilder.Configuration.SelectColumns.Add(new Csg.Data.Sql.SqlColumn(queryBuilder.Root, column));
+                        queryBuilder.Configuration.SelectColumns.Add(
+                            new Csg.Data.Sql.SqlColumn(queryBuilder.Root, listQuery.GetDataFieldName(column, null))
+                        );
                     }
                 }
             }
@@ -220,7 +224,7 @@ namespace Csg.ListQuery.Sql
                     {
                         queryBuilder.Configuration.OrderBy.Add(new Csg.Data.Sql.SqlOrderColumn()
                         {
-                            ColumnName = config.Name,
+                            ColumnName = listQuery.GetDataFieldName(column.Name, config),
                             SortDirection = column.SortDescending ? Csg.Data.Sql.DbSortDirection.Descending : Csg.Data.Sql.DbSortDirection.Ascending
                         });
                     }
@@ -232,7 +236,7 @@ namespace Csg.ListQuery.Sql
                     {
                         queryBuilder.Configuration.OrderBy.Add(new Csg.Data.Sql.SqlOrderColumn()
                         {
-                            ColumnName = column.Name,
+                            ColumnName = listQuery.GetDataFieldName(column.Name, null),
                             SortDirection = column.SortDescending ? Csg.Data.Sql.DbSortDirection.Descending : Csg.Data.Sql.DbSortDirection.Ascending
                         });
                     }

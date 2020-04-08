@@ -500,6 +500,9 @@ namespace Csg.ListQuery.Tests
             Assert.AreEqual(DbType.Decimal, properties[nameof(Mock.TypeCheckModel.Decimal)].DataType);
             Assert.AreEqual(DbType.Single, properties[nameof(Mock.TypeCheckModel.Float)].DataType);
             Assert.AreEqual(DbType.Double, properties[nameof(Mock.TypeCheckModel.Double)].DataType);
+
+            Assert.IsNull("DataMember1", properties[nameof(Mock.TypeCheckModel.DataMember1)].DataMemberName);
+            Assert.AreEqual("DataMember2", properties[nameof(Mock.TypeCheckModel.DataMember2)].DataMemberName);
         }
 
         [TestMethod]
@@ -534,6 +537,35 @@ namespace Csg.ListQuery.Tests
             Assert.IsFalse(properties.ContainsKey("NonDataMember1"));
             Assert.IsTrue(properties.ContainsKey("NonDataMember2"));
             Assert.IsTrue(properties.ContainsKey("NonDataMember3"));
+        }
+
+        [TestMethod]
+        public void Test_ListQuery_TypeDerivedDataMemberNames()
+        {
+            var expectedSql = "SELECT [t0].[DataMember1],[t0].[Member2] FROM [dbo].[Person] AS [t0] WHERE (([t0].[DataMember1]=@p0) AND ([t0].[Member2]=@p1)) ORDER BY [DataMember1] ASC,[Member2] ASC;";
+            var query = new Mock.MockConnection().QueryBuilder("dbo.Person");
+            var queryDef = new ListQueryDefinition();
+
+            queryDef.Filters = new List<ListFilter>(new ListFilter[] {
+                new ListFilter() { Name = "DataMember1", Operator = ListFilterOperator.Equal, Value = "1" },
+                new ListFilter() { Name = "DataMember2", Operator = ListFilterOperator.Equal, Value = "1" },
+            });
+
+            queryDef.Fields = new string[] { "DataMember1", "DataMember2" };
+
+            queryDef.Order = new List<SortField>()
+            {
+                new SortField() { Name="DataMember1"},
+                new SortField() { Name="DataMember2"}
+            };
+
+            var stmt = ListQueryBuilder.Create(query, queryDef)
+                .ValidateWith<Mock.DataContractTestModel>()
+                .Apply()
+                .Render();
+
+            Assert.AreEqual(expectedSql, stmt.CommandText);
+            Assert.AreEqual(1, stmt.Parameters.Count);
         }
 
     }
