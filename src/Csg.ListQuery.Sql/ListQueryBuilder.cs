@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Csg.ListQuery;
 using Csg.Data;
+using Csg.ListQuery.Internal;
 
 namespace Csg.ListQuery.Sql
 {
@@ -54,14 +55,19 @@ namespace Csg.ListQuery.Sql
         }
 
         /// <summary>
-        /// 
+        /// Gets the fully qualified data field name for the given field.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="metaData"></param>
         /// <returns></returns>
         protected virtual string GetDataFieldName(string name, ListFieldMetadata metaData)
         {
-            return metaData?.DataMemberName ?? metaData?.Name ?? name;
+            if (metaData == null)
+            {
+                return name;
+            }
+
+            return metaData.GetFullName(useDataMemberNames: true);
         }
 
         string IListQueryBuilder.GetDataFieldName(string name, ListFieldMetadata metaData)

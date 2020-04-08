@@ -19,7 +19,7 @@ namespace Csg.ListQuery.Internal
 
         public static int DefaultMaxRecursionDepth = 1;
 
-        private static void PopulateFieldCollection(Type type, ICollection<ReflectedFieldMetadata> schema, int maxDepth, string prefix = null, bool? defaultSortable = null, bool? defaultFilterable = null, int depth = 1)
+        private static void PopulateFieldCollection(Type type, ICollection<ReflectedFieldMetadata> schema, int maxDepth, string prefix = null, bool? defaultSortable = null, bool? defaultFilterable = null, int depth = 1, ListFieldMetadata parent = null)
         {
             if (!defaultFilterable.HasValue && type.TryGetAttribute(out FilterableAttribute filterableAttr))
             {
@@ -52,6 +52,7 @@ namespace Csg.ListQuery.Internal
             {
                 var ci = new ReflectedFieldMetadata();
 
+                ci.Parent = parent;
                 ci.Name = prefix == null ? property.Name : string.Concat(prefix, ".", property.Name);
                 ci.Description = property.TryGetAttribute<System.ComponentModel.DataAnnotations.DisplayAttribute>(out System.ComponentModel.DataAnnotations.DisplayAttribute displayAttr)
                     ? displayAttr.GetDescription()
@@ -96,11 +97,25 @@ namespace Csg.ListQuery.Internal
                 ci.IsSortable = property.TryGetAttribute(out sortableAttr) ? sortableAttr.IsSortable : defaultSortable;
                 ci.PropertyInfo = property;
 
+                if (ci.IsFilterable == true && property.TryGetAttribute<FilterValueConverterAttribute>(out FilterValueConverterAttribute valueAttr))
+                {
+                    ci.FilterValueConverter = valueAttr.CreateConverter();
+                }
+
                 schema.Add(ci);
 
                 if (depth < maxDepth && IsNavigatableType(property.PropertyType))
                 {
-                    PopulateFieldCollection(property.PropertyType, schema, maxDepth, prefix: ci.Name, defaultSortable: ci.IsSortable, defaultFilterable: ci.IsFilterable, depth: depth+1);
+                    PopulateFieldCollection(
+                        property.PropertyType, 
+                        schema, 
+                        maxDepth, 
+                        prefix: ci.Name, 
+                        defaultSortable: ci.IsSortable,
+                        defaultFilterable: ci.IsFilterable, 
+                        depth: depth+1,
+                        parent: ci
+                    );
                 }
             }          
         }

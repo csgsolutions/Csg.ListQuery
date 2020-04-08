@@ -39,6 +39,16 @@
         /// Gets or sets the name of the underlying data member that should be used when executing queries against a database.
         /// </summary>
         public string DataMemberName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value converter instance that will process values for this field.
+        /// </summary>
+        public IFilterValueConverter FilterValueConverter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the parent field if the field is a member of a hierarchy.
+        /// </summary>
+        public ListFieldMetadata Parent { get; set; }
     }
 
     /// <summary>
