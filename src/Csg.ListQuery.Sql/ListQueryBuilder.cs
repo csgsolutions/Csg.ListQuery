@@ -67,7 +67,7 @@ namespace Csg.ListQuery.Sql
                 return name;
             }
 
-            return metaData.GetFullName(useDataMemberNames: true);
+            return metaData.DataMemberName ?? metaData.Name;
         }
 
         string IListQueryBuilder.GetDataFieldName(string name, ListFieldMetadata metaData)

@@ -19,7 +19,7 @@ namespace Csg.ListQuery.Internal
 
         public static int DefaultMaxRecursionDepth = 1;
 
-        private static void PopulateFieldCollection(Type type, ICollection<ReflectedFieldMetadata> schema, int maxDepth, string prefix = null, bool? defaultSortable = null, bool? defaultFilterable = null, int depth = 1, ListFieldMetadata parent = null)
+        private static void PopulateFieldCollection(Type type, ICollection<ReflectedFieldMetadata> schema, int maxDepth, bool? defaultSortable = null, bool? defaultFilterable = null, int depth = 1, ListFieldMetadata parent = null)
         {
             if (!defaultFilterable.HasValue && type.TryGetAttribute(out FilterableAttribute filterableAttr))
             {
@@ -53,14 +53,17 @@ namespace Csg.ListQuery.Internal
                 var ci = new ReflectedFieldMetadata();
 
                 ci.Parent = parent;
-                ci.Name = prefix == null ? property.Name : string.Concat(prefix, ".", property.Name);
+                ci.Name = parent == null ? property.Name : string.Concat(parent.Name, ".", property.Name);
                 ci.Description = property.TryGetAttribute<System.ComponentModel.DataAnnotations.DisplayAttribute>(out System.ComponentModel.DataAnnotations.DisplayAttribute displayAttr)
                     ? displayAttr.GetDescription()
                     : (string)null;
 
                 if (property.TryGetAttribute<System.Runtime.Serialization.DataMemberAttribute>(out System.Runtime.Serialization.DataMemberAttribute attr))
                 {
-                    ci.DataMemberName = attr.Name;
+                    if (attr.Name != null)
+                    {
+                        ci.DataMemberName = parent == null ? attr.Name : string.Concat(parent.DataMemberName ?? parent.Name, ".", attr.Name);
+                    }
                 }
 
                 // first see if the property has the DbType attribute, otherwise infer DbType from the property type
@@ -110,7 +113,6 @@ namespace Csg.ListQuery.Internal
                         property.PropertyType, 
                         schema, 
                         maxDepth, 
-                        prefix: ci.Name, 
                         defaultSortable: ci.IsSortable,
                         defaultFilterable: ci.IsFilterable, 
                         depth: depth+1,

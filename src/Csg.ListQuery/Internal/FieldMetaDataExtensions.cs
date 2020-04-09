@@ -13,26 +13,26 @@ namespace Csg.ListQuery.Internal
         /// </summary>
         /// <param name="metaData"></param>
         /// <returns></returns>
-        public static string GetFullName(this ListFieldMetadata metaData, bool useDataMemberNames = false)
-        {
-            var nameBuilder = new StringBuilder();
-            var meta = metaData;
-            bool first = true;
+        //public static string GetFullName(this ListFieldMetadata metaData, bool useDataMemberNames = false)
+        //{
+        //    var nameBuilder = new StringBuilder();
+        //    var meta = metaData;
+        //    bool first = true;
 
-            while (meta != null)
-            {
-                if (!first)
-                {
-                    nameBuilder.Insert(0, ".");
-                }
+        //    while (meta != null)
+        //    {
+        //        if (!first)
+        //        {
+        //            nameBuilder.Insert(0, ".");
+        //        }
 
-                nameBuilder.Insert(0, useDataMemberNames ? meta.DataMemberName ?? meta.Name : meta.Name);
+        //        nameBuilder.Insert(0, useDataMemberNames ? meta.DataMemberName ?? meta.Name : meta.Name);
                 
-                first = false;
-                meta = meta.Parent;
-            }
+        //        first = false;
+        //        meta = meta.Parent;
+        //    }
 
-            return nameBuilder.ToString();
-        }
+        //    return nameBuilder.ToString();
+        //}
     }
 }

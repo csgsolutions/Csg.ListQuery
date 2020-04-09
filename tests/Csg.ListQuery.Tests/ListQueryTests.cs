@@ -533,13 +533,15 @@ namespace Csg.ListQuery.Tests
         [TestMethod]
         public void ReflectionHelper_GetListPropertyInfo_TestDataContract()
         {
-            var properties = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(typeof(Mock.DataContractTestModel), fromCache: false, maxRecursionDepth: 1)
+            var properties = Csg.ListQuery.Internal.ReflectionHelper.GetFieldsFromType(typeof(Mock.DataContractTestModel), fromCache: false, maxRecursionDepth: 2)
                 .ToDictionary(s => s.Name);
 
             Assert.IsTrue(properties.ContainsKey("DataMember1"));
             Assert.IsFalse(properties.ContainsKey("NonDataMember1"));
             Assert.IsTrue(properties.ContainsKey("NonDataMember2"));
             Assert.IsTrue(properties.ContainsKey("NonDataMember3"));
+
+            Assert.AreEqual("Person.ID", properties["Person.PersonID"].DataMemberName);
         }
 
         [TestMethod]
@@ -586,45 +588,42 @@ namespace Csg.ListQuery.Tests
             Assert.AreEqual("Arg1Value_foo", member2.FilterValueConverter.Convert("foo"));
         }
 
-        [TestMethod]
-        public void Test_Extensions_GetFullName()
-        {
-            var graph = new ListFieldMetadata()
-            {
-                Name = "UserID",
-                DataMemberName = "ID",
-                Parent = new ListFieldMetadata()
-                {
-                    Name = "Owner",
-                    DataMemberName = "CreateUser"
-                }
-            };
+        //[TestMethod]
+        //public void Test_Extensions_GetFullName()
+        //{
+        //    var graph = new ListFieldMetadata()
+        //    {
+        //        Name = "UserID",
+        //        DataMemberName = "ID",
+        //        Parent = new ListFieldMetadata()
+        //        {
+        //            Name = "Owner",
+        //            DataMemberName = "CreateUser"
+        //        }
+        //    };
 
-            var namePath = Csg.ListQuery.Internal.FieldMetaDataExtensions.GetFullName(graph);
+        //    var namePath = Csg.ListQuery.Internal.FieldMetaDataExtensions.GetFullName(graph);
 
-            Assert.AreEqual("Owner.UserID", namePath);
-        }
+        //    Assert.AreEqual("Owner.UserID", namePath);
+        //}
 
-        [TestMethod]
-        public void Test_Extensions_GetFullName_WithDataMember()
-        {
-            var graph = new ListFieldMetadata()
-            {
-                Name = "UserID",
-                DataMemberName = "ID",
-                Parent = new ListFieldMetadata()
-                {
-                    Name = "Owner",
-                    DataMemberName = "CreateUser"
-                }
-            };
+        //[TestMethod]
+        //public void Test_Extensions_GetFullName_WithDataMember()
+        //{
+        //    var graph = new ListFieldMetadata()
+        //    {
+        //        Name = "UserID",
+        //        DataMemberName = "ID",
+        //        Parent = new ListFieldMetadata()
+        //        {
+        //            Name = "Owner",
+        //            DataMemberName = "CreateUser"
+        //        }
+        //    };
 
-            var namePath = Csg.ListQuery.Internal.FieldMetaDataExtensions.GetFullName(graph, useDataMemberNames: true);
+        //    var namePath = Csg.ListQuery.Internal.FieldMetaDataExtensions.GetFullName(graph, useDataMemberNames: true);
 
-            Assert.AreEqual("CreateUser.ID", namePath);
-        }
-
-
-
+        //    Assert.AreEqual("CreateUser.ID", namePath);
+        //}
     }
 }
