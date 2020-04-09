@@ -1,5 +1,4 @@
 <Project>
-  <Import Project="../build/sources.props"/>
   <ItemGroup>
     <None Include="../../icon.png" Pack="true" PackagePath="\"/>
   </ItemGroup>
