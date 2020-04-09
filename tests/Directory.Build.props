@@ -1,4 +1,3 @@
 <Project>
   <Import Project="../build/repo.props"/>
-  <Import Project="../build/sources.props"/>
 </Project>
