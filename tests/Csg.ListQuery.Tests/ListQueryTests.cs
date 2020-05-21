@@ -6,6 +6,8 @@ using System.Linq;
 using Csg.Data;
 using Csg.ListQuery.Sql;
 using System.Data;
+using Csg.ListQuery.Tests.Mock;
+using Dapper;
 
 namespace Csg.ListQuery.Tests
 {
@@ -534,6 +536,25 @@ namespace Csg.ListQuery.Tests
             Assert.IsFalse(properties.ContainsKey("NonDataMember1"));
             Assert.IsTrue(properties.ContainsKey("NonDataMember2"));
             Assert.IsTrue(properties.ContainsKey("NonDataMember3"));
+        }
+
+        [TestMethod]
+        public void Test_ListQuery_FluentWithParametersFromQueryBuilder()
+        {
+            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection())
+                .AddParameter("@Foo", "Bar", DbType.String)
+                .AddParameter("@Bar", "Baz", DbType.String);
+
+            var queryDef = new ListQueryDefinition();
+
+            var dapperCmd = query.ListQuery(queryDef)
+                .NoValidation()
+                .DefaultSort("FirstName")
+                .Render()
+                .ToDapperCommand();
+
+            Assert.AreEqual(2, (dapperCmd.Parameters as DynamicParameters).ParameterNames.Count());
+                //.GetResultAsync<Person>().ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
     }
