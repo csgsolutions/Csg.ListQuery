@@ -547,6 +547,9 @@ namespace Csg.ListQuery.Tests
 
             var queryDef = new ListQueryDefinition();
 
+            queryDef.Limit = 10;
+            queryDef.Offset = 0;
+
             var dapperCmd = query.ListQuery(queryDef)
                 .NoValidation()
                 .DefaultSort("FirstName")
