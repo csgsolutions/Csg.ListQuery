@@ -6,6 +6,8 @@ using System.Linq;
 using Csg.Data;
 using Csg.ListQuery.Sql;
 using System.Data;
+using Csg.ListQuery.Tests.Mock;
+using Dapper;
 
 namespace Csg.ListQuery.Tests
 {
