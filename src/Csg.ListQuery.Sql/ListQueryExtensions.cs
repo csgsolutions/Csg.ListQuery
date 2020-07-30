@@ -314,6 +314,7 @@ namespace Csg.ListQuery.Sql
             if (stmt.Count == 1)
             {
                 data = await builder.Configuration.DataAdapter.GetResultsAsync<T>(stmt, builder.Configuration.UseStreamingResult, builder.Configuration.QueryBuilder.CommandTimeout).ConfigureAwait(false);
+                var batchResult = await builder.Configuration.DataAdapter.GetTotalCountAndResultsAsync<T>(appiedQuery, builder.Configuration.UseStreamingResult, builder.Configuration.QueryBuilder.Configuration.CommandTimeout).ConfigureAwait(false);
 
             }
             else if (stmt.Count == 2)
