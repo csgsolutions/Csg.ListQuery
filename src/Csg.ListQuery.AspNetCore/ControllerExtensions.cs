@@ -44,7 +44,7 @@ namespace Csg.ListQuery.AspNetCore.Mvc
                 return controller.ValidationProblem(controller.ModelState);
             }
 
-            var queryResult = await executeQueryMethod(validationResult.ListQuery);
+            var queryResult = await executeQueryMethod(validationResult.ListQuery).ConfigureAwait(false);
 
             return queryResult.ToListResponse<TInfrastructure, TDomain>(
                 request,

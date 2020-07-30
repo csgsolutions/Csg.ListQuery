@@ -24,7 +24,7 @@ namespace Csg.ListQuery.Sql
             var cmdFlags = stream ? Dapper.CommandFlags.Pipelined : Dapper.CommandFlags.Buffered;
             var cmd = batch.ToDapperCommand(_transaction, commandTimeout, commandFlags: cmdFlags);
 
-            return await Dapper.SqlMapper.QueryAsync<T>(_connection, cmd);
+            return await Dapper.SqlMapper.QueryAsync<T>(_connection, cmd).ConfigureAwait(false);
         }
 
         public async Task<BatchResult<T>> GetTotalCountAndResultsAsync<T>(SqlStatementBatch batch, bool stream, int commandTimeout)
@@ -34,10 +34,10 @@ namespace Csg.ListQuery.Sql
 
             var result = new BatchResult<T>();
 
-            using (var batchReader = await Dapper.SqlMapper.QueryMultipleAsync(_connection, cmd))
+            using (var batchReader = await Dapper.SqlMapper.QueryMultipleAsync(_connection, cmd).ConfigureAwait(false))
             {
-                result.TotalCount = await batchReader.ReadFirstAsync<int>();
-                result.Items = await batchReader.ReadAsync<T>();
+                result.TotalCount = await batchReader.ReadFirstAsync<int>().ConfigureAwait(false);
+                result.Items = await batchReader.ReadAsync<T>().ConfigureAwait(false);
             }
 
             return result;

@@ -30,8 +30,8 @@ namespace Csg.ListQuery.Client
 
             while (nextUrl != null && pageCount < (maxRequests ?? Int32.MaxValue))
             {
-                await Task.Delay(delayBetweenRequests);
-                var responseObject = await client.GetAsync<TData>(nextUrl);
+                await Task.Delay(delayBetweenRequests).ConfigureAwait(false);
+                var responseObject = await client.GetAsync<TData>(nextUrl).ConfigureAwait(false);
                 result = result.Concat(responseObject.Data);
                 nextUrl = responseObject.Links?.Next;
                 pageCount++;
@@ -63,9 +63,9 @@ namespace Csg.ListQuery.Client
 
             while (nextOffset != null && pageCount < (maxPagesToFetch ?? Int32.MaxValue))
             {
-                await Task.Delay(delayBetweenRequests);
+                await Task.Delay(delayBetweenRequests).ConfigureAwait(false);
                 request.Offset = nextOffset.Value;
-                var responseObject = await client.PostAsync<TData>(url, request);
+                var responseObject = await client.PostAsync<TData>(url, request).ConfigureAwait(false);
                 result = result.Concat(responseObject.Data);
                 nextOffset = responseObject.Meta?.Next?.Offset;
                 pageCount++;
