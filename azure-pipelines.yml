@@ -1,6 +1,6 @@
 name: $(Rev:rrrrr)
 pool:
-  name: CSG OnPrem VS2019
+  vmImage: 'windows-latest'
 trigger:
 - master
 - rel/*

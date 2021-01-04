@@ -57,6 +57,7 @@ namespace Csg.ListQuery.AspNetCore.OpenApi
                 {
                     result.Add(new OpenApiParameter()
                     {
+                        //TODO: Should this be field.JsonName???
                         Name = $"where[{field.Key}]",
                         In = ParameterLocation.Query,
                         Schema = new OpenApiSchema() { Type = "string" },
