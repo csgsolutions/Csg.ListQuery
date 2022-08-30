@@ -565,28 +565,59 @@ namespace Csg.ListQuery.Tests
         }
 
         [TestMethod]
-        public void Test_ListQuery_GetResultAsyncCancellationToken()
+        public async Task Test_ListQuery_GetResultAsyncCancellationToken()
         {
+            var cts = new CancellationTokenSource();
 
-            var mockRepo = new Mock<IListQueryDataAdapter>(MockBehavior.Strict);
+            CancellationToken token = cts.Token;
 
             var data = new List<Person>();
-            var batchResult = new BatchResult<Person>();
 
-            List<Person> breadList = new List<Person>();
+            var dataListQuery = new ListQueryResult<Person>(data);
 
-            mockRepo.Setup(repo => repo.GetResultsAsync<Person>(It.IsAny<SqlStatementBatch>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((SqlStatementBatch sqlStatementBatch, bool stream, int commandTimeout, CancellationToken cancellationToken) => data);
+            var mockBuilder = new Mock<Csg.ListQuery.Sql.IListQueryBuilder>(MockBehavior.Strict);
+            
+            
+            mockBuilder.Setup(repo => repo.GetResultAsync<Person>(It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((bool stream, CancellationToken cancellationToken) => dataListQuery);
 
-            mockRepo.Setup(repo => repo.GetTotalCountAndResultsAsync<Person>(It.IsAny<SqlStatementBatch>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((SqlStatementBatch sqlStatementBatch, bool stream, int commandTimeout, CancellationToken cancellationToken) => batchResult);
+            var taksAsync  = await mockBuilder.Object.GetResultAsync<Person>(false, token);
 
-            //mockRepo.VerifyAll();
+            mockBuilder.Verify(repo => repo.GetResultAsync<Person>(It.IsAny<bool>(), It.IsAny<CancellationToken>()), Times.Once);
 
           
-
         }
 
+
+        [TestMethod]
+        public void Test_ListQueryDataAdapter_GetResultAsyncCancellationToken()
+        {
+            var cts = new CancellationTokenSource();
+            CancellationToken token = cts.Token;
+    
+            var data = new List<Person>();
+            var mockListQueryDataAdapter = new Mock<IListQueryDataAdapter>(MockBehavior.Strict);
+
+
+            var batchResult = new BatchResult<Person>();
+            
+            mockListQueryDataAdapter.Setup(repo => repo.GetResultsAsync<Person>(It.IsAny<SqlStatementBatch>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((SqlStatementBatch sqlStatementBatch, bool stream, int commandTimeout, CancellationToken cancellationToken) => data);
+
+            mockListQueryDataAdapter.Setup(repo => repo.GetTotalCountAndResultsAsync<Person>(It.IsAny<SqlStatementBatch>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((SqlStatementBatch sqlStatementBatch, bool stream, int commandTimeout, CancellationToken cancellationToken) => batchResult);
+
+            
+            mockListQueryDataAdapter.Object.GetResultsAsync<Person>(new SqlStatementBatch(10, "", new List<DbParameterValue>()) { }, false, 10, token);
+            mockListQueryDataAdapter.Object.GetTotalCountAndResultsAsync<Person>(new SqlStatementBatch(10, "", new List<DbParameterValue>()) { }, false, 10, token);
+       
+
+            mockListQueryDataAdapter.Verify(da => da.GetResultsAsync<Person>(It.IsAny<SqlStatementBatch>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once());
+            mockListQueryDataAdapter.Verify(da => da.GetTotalCountAndResultsAsync<Person>(It.IsAny<SqlStatementBatch>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once());
+
+           
+
+        }
 
     }
 }
