@@ -6,6 +6,7 @@ using Csg.ListQuery;
 using Csg.Data;
 using Csg.Data.Sql;
 using Csg.ListQuery.Sql.Internal;
+using System.Threading;
 
 namespace Csg.ListQuery.Sql
 {
@@ -300,7 +301,7 @@ namespace Csg.ListQuery.Sql
             }
         }
 
-        public async static System.Threading.Tasks.Task<ListQueryResult<T>> GetResultAsync<T>(this Csg.ListQuery.Sql.IListQueryBuilder builder, bool getTotalWhenLimiting = true)
+        public async static System.Threading.Tasks.Task<ListQueryResult<T>> GetResultAsync<T>(this Csg.ListQuery.Sql.IListQueryBuilder builder, bool getTotalWhenLimiting = true, CancellationToken cancellationToken = default)
         {
             var stmt = builder.Render(getTotalWhenLimiting);
             int? totalCount = null;
@@ -313,11 +314,11 @@ namespace Csg.ListQuery.Sql
 
             if (stmt.Count == 1)
             {
-                data = await builder.Configuration.DataAdapter.GetResultsAsync<T>(stmt, builder.Configuration.UseStreamingResult, builder.Configuration.QueryBuilder.CommandTimeout).ConfigureAwait(false);
+                data = await builder.Configuration.DataAdapter.GetResultsAsync<T>(stmt, builder.Configuration.UseStreamingResult, builder.Configuration.QueryBuilder.CommandTimeout, cancellationToken).ConfigureAwait(false);
             }
             else if (stmt.Count == 2)
             {
-                var batchResult = await builder.Configuration.DataAdapter.GetTotalCountAndResultsAsync<T>(stmt, builder.Configuration.UseStreamingResult, builder.Configuration.QueryBuilder.CommandTimeout).ConfigureAwait(false);
+                var batchResult = await builder.Configuration.DataAdapter.GetTotalCountAndResultsAsync<T>(stmt, builder.Configuration.UseStreamingResult, builder.Configuration.QueryBuilder.CommandTimeout, cancellationToken).ConfigureAwait(false);
                 data = batchResult.Items;
                 totalCount = batchResult.TotalCount;
             }
