@@ -598,9 +598,32 @@ namespace Csg.ListQuery.Tests
             var data = new List<Person>();
             var mockListQueryDataAdapter = new Mock<IListQueryDataAdapter>(MockBehavior.Strict);
 
+            var mockIDb = new Mock<IDbConnection>(MockBehavior.Loose);
+            var mockIDbTrn = new Mock<IDbTransaction>(MockBehavior.Loose);
+
+
+            mockIDbTrn.SetupAllProperties();
+            mockIDbTrn.Setup(t => t.Connection).Returns(mockIDb.Object);
+
+             var dataListQuery = new DapperListDataAdapter(mockIDb.Object, mockIDbTrn.Object);
+
+
+
+           
 
             var batchResult = new BatchResult<Person>();
 
+
+            mockListQueryDataAdapter.Setup(repo => repo.GetResultsAsync<Person>(It.IsAny<SqlStatementBatch>(), It.IsAny<bool>(), It.IsAny<int>(), token))
+           .ReturnsAsync(data);
+
+
+
+            Assert.ThrowsException<System.Exception>(async () =>
+            {
+                cts.Cancel();
+                var stmt = await dataListQuery.GetResultsAsync<Person>(new SqlStatementBatch(10, "", new List<DbParameterValue>()) { }, false, 10, token);
+            });
 
 
             /*
@@ -608,13 +631,11 @@ namespace Csg.ListQuery.Tests
                 .Callback(() => {
                             cts.Cancel();
                 })
-                .ReturnsAsync((SqlStatementBatch sqlStatementBatch, bool stream, int commandTimeout, CancellationToken cancellationToken) => data);
+                .ReturnsAsync((SqlStatementBatch sqlStatementBatch, bool stream, int commandTimeout, CancellationToken cancellationToken) => data);*/
 
 
-            Assert.ThrowsException<System.Exception>(async () =>
-            {
-                var stmt = await mockListQueryDataAdapter.Object.GetResultsAsync<Person>(new SqlStatementBatch(10, "", new List<DbParameterValue>()) { }, false, 10, token);
-            });*/
+            mockListQueryDataAdapter.Setup(repo => repo.GetResultsAsync<Person>(It.IsAny<SqlStatementBatch>(), It.IsAny<bool>(), It.IsAny<int>(), token))
+            .ReturnsAsync(data);
 
             mockListQueryDataAdapter.Setup(repo => repo.GetResultsAsync<Person>(It.IsAny<SqlStatementBatch>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((SqlStatementBatch sqlStatementBatch, bool stream, int commandTimeout, CancellationToken cancellationToken) => data);
