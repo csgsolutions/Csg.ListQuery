@@ -153,7 +153,7 @@ namespace Csg.ListQuery.Sql
                 action(e.Configuration, e.QueryBuilder);
             };
 
-            return builder;
+            return builder;                                   
         }
 
         public static void ApplyFilters(IListQueryBuilder listQuery, IDbQueryBuilder queryBuilder)
