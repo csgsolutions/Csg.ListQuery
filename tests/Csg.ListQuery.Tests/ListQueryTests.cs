@@ -564,30 +564,7 @@ namespace Csg.ListQuery.Tests
             //.GetResultAsync<Person>().ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-        [TestMethod]
-        public async Task Test_ListQuery_GetResultAsyncCancellationToken()
-        {
-            var cts = new CancellationTokenSource();
-
-            CancellationToken token = cts.Token;
-
-            var data = new List<Person>();
-
-            var dataListQuery = new ListQueryResult<Person>(data);
-
-            var mockBuilder = new Mock<Csg.ListQuery.Sql.IListQueryBuilder>(MockBehavior.Strict);
-            
-            
-            mockBuilder.Setup(repo => repo.GetResultAsync<Person>(It.IsAny<bool>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync((bool stream, CancellationToken cancellationToken) => dataListQuery);
-
-            var taksAsync  = await mockBuilder.Object.GetResultAsync<Person>(false, token);
-
-            mockBuilder.Verify(repo => repo.GetResultAsync<Person>(It.IsAny<bool>(), It.IsAny<CancellationToken>()), Times.Once);
-
-          
-        }
-
+      
     }
 }
  
