@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Csg.ListQuery.Sql
@@ -19,18 +20,18 @@ namespace Csg.ListQuery.Sql
             _transaction = transaction;
         }
 
-        public async Task<IEnumerable<T>> GetResultsAsync<T>(SqlStatementBatch batch, bool stream, int commandTimeout)
+        public async Task<IEnumerable<T>> GetResultsAsync<T>(SqlStatementBatch batch, bool stream, int commandTimeout, CancellationToken cancellationToken = default)
         {
             var cmdFlags = stream ? Dapper.CommandFlags.Pipelined : Dapper.CommandFlags.Buffered;
-            var cmd = batch.ToDapperCommand(_transaction, commandTimeout, commandFlags: cmdFlags);
+            var cmd = batch.ToDapperCommand(_transaction, commandTimeout, commandFlags: cmdFlags, cancellationToken);
 
             return await Dapper.SqlMapper.QueryAsync<T>(_connection, cmd).ConfigureAwait(false);
         }
 
-        public async Task<BatchResult<T>> GetTotalCountAndResultsAsync<T>(SqlStatementBatch batch, bool stream, int commandTimeout)
+        public async Task<BatchResult<T>> GetTotalCountAndResultsAsync<T>(SqlStatementBatch batch, bool stream, int commandTimeout, CancellationToken cancellationToken = default)
         {
             var cmdFlags = stream ? Dapper.CommandFlags.Pipelined : Dapper.CommandFlags.Buffered;
-            var cmd = batch.ToDapperCommand(_transaction, commandTimeout, commandFlags: cmdFlags);
+            var cmd = batch.ToDapperCommand(_transaction, commandTimeout, commandFlags: cmdFlags, cancellationToken);
 
             var result = new BatchResult<T>();
 
