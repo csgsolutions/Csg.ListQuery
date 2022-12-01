@@ -8,6 +8,10 @@ using Csg.ListQuery.Sql;
 using System.Data;
 using Csg.ListQuery.Tests.Mock;
 using Dapper;
+using System.Threading;
+using System;
+using System.Threading.Tasks;
+using Moq;
 
 namespace Csg.ListQuery.Tests
 {
@@ -33,7 +37,7 @@ namespace Csg.ListQuery.Tests
             {
                 var stmt = ListQueryBuilder.Create(query, request)
                     .Apply();
-            });            
+            });
         }
 
         [TestMethod]
@@ -298,7 +302,7 @@ namespace Csg.ListQuery.Tests
         {
             var expectedSql = "SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[PersonID] IN (SELECT [t1].[PersonID] FROM [dbo].[PersonPhoneNumber] AS [t1] WHERE ([t1].[PhoneNumber] LIKE @p0) AND ([t1].[PersonID]=[t0].[PersonID])));";
             //                 SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[PersonID] IN (SELECT [t1].[PersonID] FROM [dbo].[PersonPhoneNumber] AS [t1] WHERE ([t1].[PhoneNumber] LIKE @p0) AND ([t1].[PersonID]=[t0].[PersonID])));
-            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());            
+            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
             var queryDef = new ListQueryDefinition();
 
             queryDef.Filters = new List<ListFilter>(new ListFilter[] {
@@ -557,8 +561,10 @@ namespace Csg.ListQuery.Tests
                 .ToDapperCommand();
 
             Assert.AreEqual(2, (dapperCmd.Parameters as DynamicParameters).ParameterNames.Count());
-                //.GetResultAsync<Person>().ConfigureAwait(false).GetAwaiter().GetResult();
+            //.GetResultAsync<Person>().ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
+      
     }
 }
+ 
