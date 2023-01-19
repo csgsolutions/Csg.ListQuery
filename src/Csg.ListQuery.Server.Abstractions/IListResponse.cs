@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Csg.ListQuery.Server
 {
@@ -23,5 +24,7 @@ namespace Csg.ListQuery.Server
         /// Gets the metadata set for this response.
         /// </summary>
         ListResponseMeta Meta { get; }
+
+        CancellationToken Token { get; set; }
     }
 }

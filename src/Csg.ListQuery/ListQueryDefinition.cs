@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace Csg.ListQuery
 {
@@ -48,5 +49,7 @@ namespace Csg.ListQuery
         /// Gets or sets the maximum number of records that will be returned in the result set.
         /// </summary>
         public int Limit { get; set; }
+
+        public virtual CancellationToken Token { get; set; }
     }
 }

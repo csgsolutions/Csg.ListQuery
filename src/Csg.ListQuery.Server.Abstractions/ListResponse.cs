@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Threading;
 using Csg.ListQuery.Server;
 
 namespace Csg.ListQuery.Server
@@ -28,5 +29,7 @@ namespace Csg.ListQuery.Server
 
         [DataMember]
         public virtual ListResponseLinks Links { get; set; }
+
+        public virtual CancellationToken Token { get; set; }
     }
 }

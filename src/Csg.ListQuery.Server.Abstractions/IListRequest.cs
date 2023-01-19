@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Csg.ListQuery.Server
 {
@@ -32,6 +33,8 @@ namespace Csg.ListQuery.Server
         /// When implemented in a derived class, gets or sets the maximum number of records that will be returned in the result set.
         /// </summary>
         int? Limit { get; set; }
+
+        CancellationToken Token { get; set; }
 
         //TODO: Consider implementing cursor based pagination?
         // https://jsonapi.org/profiles/ethanresnick/cursor-pagination/

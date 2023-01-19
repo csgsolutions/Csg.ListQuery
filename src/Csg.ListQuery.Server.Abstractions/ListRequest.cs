@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using Csg.ListQuery.Server.Internal;
 using System.Runtime.Serialization;
+using System.Threading;
 
 namespace Csg.ListQuery.Server
 {
@@ -80,7 +81,9 @@ namespace Csg.ListQuery.Server
         /// </summary>
         [DataMember]
         public virtual int? Limit { get; set; }
-        
+
+        public virtual CancellationToken Token { get; set; }
+
         /// <summary>
         /// Gets a querystring representation of the request
         /// </summary>
