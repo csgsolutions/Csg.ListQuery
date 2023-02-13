@@ -276,18 +276,15 @@ namespace Csg.ListQuery.Sql
 
         public static IDbQueryBuilder GetCountQuery(IListQueryBuilder query)
         {
-
             var fullQuery = query.Apply().Fork();
+            fullQuery.PagingOptions = null;
+            fullQuery.OrderBy.Clear();
+           
             var sqlString = fullQuery.ToString();
 
             fullQuery = new DbQueryBuilder(sqlString, fullQuery.Connection);
 
-            var countQuery = fullQuery.SelectOnly(new SqlRawColumn("COUNT(1)"));
-
-            countQuery.PagingOptions = null;
-            countQuery.OrderBy.Clear();
-
-            return countQuery;
+            return fullQuery.SelectOnly(new SqlRawColumn("COUNT(1)"));
         }
 
         public static SqlStatementBatch Render(this Csg.ListQuery.Sql.IListQueryBuilder builder, bool getTotalWhenLimiting = true)
