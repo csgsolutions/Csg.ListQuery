@@ -279,11 +279,13 @@ namespace Csg.ListQuery.Sql
             var fullQuery = query.Apply().Fork();
             fullQuery.PagingOptions = null;
             fullQuery.OrderBy.Clear();
-           
+            var tempPrefix = fullQuery.Prefix;
+            fullQuery.Prefix = "";
+            
             var sqlString = fullQuery.ToString();
 
             fullQuery = new DbQueryBuilder(sqlString, fullQuery.Connection);
-
+            fullQuery.Prefix = tempPrefix;
             return fullQuery.SelectOnly(new SqlRawColumn("COUNT(1)"));
         }
 

@@ -344,7 +344,7 @@ namespace Csg.ListQuery.Tests
         [TestMethod]
         public void Test_ListQuery_Paging()
         {
-            var expectedSql = "SELECT COUNT(1) FROM (SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]=@p0)) AS [t0];\r\nSELECT * FROM [dbo].[Person] AS [t1] WHERE ([t1].[FirstName]=@p0) ORDER BY [FirstName] ASC OFFSET 0 ROWS FETCH NEXT 26 ROWS ONLY;";
+            var expectedSql = "select 1 from test; SELECT COUNT(1) FROM (SELECT * FROM [dbo].[Person] AS [t0] WHERE ([t0].[FirstName]=@p0)) AS [t0];\r\nSELECT * FROM [dbo].[Person] AS [t1] WHERE ([t1].[FirstName]=@p0) ORDER BY [FirstName] ASC OFFSET 0 ROWS FETCH NEXT 26 ROWS ONLY;";
             IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection());
 
             var queryDef = new ListQueryDefinition();
@@ -359,8 +359,10 @@ namespace Csg.ListQuery.Tests
                 new ListFilter(){ Name = "FirstName", Operator = ListFilterOperator.Equal, Value = "Bob"}
             };
 
+            query.Prefix("select 1 from test");
+
             queryDef.Limit = 25;
-            queryDef.Offset = 0;
+            queryDef.Offset = 0; 
 
             var stmt = ListQueryBuilder.Create(query, queryDef)
                 .NoValidation()
@@ -415,7 +417,7 @@ namespace Csg.ListQuery.Tests
             Assert.AreEqual(0, qb.PagingOptions.Value.Offset);
             Assert.AreEqual(50, qb.PagingOptions.Value.Limit);
         }
-
+         
         [TestMethod]
         public void Test_ListQuery_ApplyEventHandlers()
         {
