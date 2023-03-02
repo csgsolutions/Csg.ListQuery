@@ -287,12 +287,16 @@ namespace Csg.ListQuery.Sql
         public static SqlStatementBatch Render(this Csg.ListQuery.Sql.IListQueryBuilder builder, bool getTotalWhenLimiting = true)
         {
             var appiedQuery = builder.Apply();
-
             if (getTotalWhenLimiting && appiedQuery.PagingOptions?.Limit > 0 && appiedQuery.PagingOptions?.Offset == 0)
             {
+                var prefix = appiedQuery.Prefix;
+                var Suffix = appiedQuery.Suffix;
                 var countQuery = GetCountQuery(builder);
-                return new DbQueryBuilder[] { (DbQueryBuilder)countQuery, (DbQueryBuilder)appiedQuery }
+                  
+                var buildertest = new DbQueryBuilder[] { (DbQueryBuilder)countQuery, (DbQueryBuilder)appiedQuery }
                     .RenderBatch();
+
+                return new SqlStatementBatch(2, (prefix!=null ? prefix + ";" :"")+ buildertest.CommandText + (Suffix != null ? Suffix + ";" : "") , buildertest.Parameters);
             }
             else
             {
