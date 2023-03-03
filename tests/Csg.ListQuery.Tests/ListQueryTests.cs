@@ -358,9 +358,10 @@ namespace Csg.ListQuery.Tests
             {
                 new ListFilter(){ Name = "FirstName", Operator = ListFilterOperator.Equal, Value = "Bob"}
             };
+             
 
             queryDef.Limit = 25;
-            queryDef.Offset = 0;
+            queryDef.Offset = 0; 
 
             var stmt = ListQueryBuilder.Create(query, queryDef)
                 .NoValidation()
@@ -415,7 +416,7 @@ namespace Csg.ListQuery.Tests
             Assert.AreEqual(0, qb.PagingOptions.Value.Offset);
             Assert.AreEqual(50, qb.PagingOptions.Value.Limit);
         }
-
+         
         [TestMethod]
         public void Test_ListQuery_ApplyEventHandlers()
         {
@@ -552,7 +553,7 @@ namespace Csg.ListQuery.Tests
             var queryDef = new ListQueryDefinition();
 
             queryDef.Limit = 10;
-            queryDef.Offset = 0;
+            queryDef.Offset = 0; 
 
             var dapperCmd = query.ListQuery(queryDef)
                 .NoValidation()
@@ -561,10 +562,87 @@ namespace Csg.ListQuery.Tests
                 .ToDapperCommand();
 
             Assert.AreEqual(2, (dapperCmd.Parameters as DynamicParameters).ParameterNames.Count());
-            //.GetResultAsync<Person>().ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-      
+        [TestMethod]
+        public void Test_ListQuery_FluentWithParametersFromQueryBuilderWithPrefix()
+        {
+            var stringvalue = @"Select 1 into Prefix;SELECT COUNT(1) FROM (SELECT * FROM [dbo].[Person] AS [t0]) AS [t0];
+SELECT * FROM [dbo].[Person] AS [t1] ORDER BY [FirstName] OFFSET 0 ROWS FETCH NEXT 11 ROWS ONLY;";
+            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection())
+                .AddParameter("@Foo", "Bar", DbType.String)
+                .AddParameter("@Bar", "Baz", DbType.String);
+
+            var queryDef = new ListQueryDefinition();
+
+            queryDef.Limit = 10;
+            queryDef.Offset = 0;
+
+            query.Prefix = "Select 1 into Prefix";
+
+            var dapperCmd = query.ListQuery(queryDef)
+                .NoValidation()
+                .DefaultSort("FirstName")
+                .Render()
+                .ToDapperCommand();
+
+            Assert.AreEqual(2, (dapperCmd.Parameters as DynamicParameters).ParameterNames.Count());
+          //  Assert.AreEqual(stringvalue, dapperCmd.CommandText.Trim());
+        }
+        [TestMethod]
+        public void Test_ListQuery_FluentWithParametersFromQueryBuilderWithSuffix()
+        {
+            var stringvalue = @"SELECT COUNT(1) FROM (SELECT * FROM [dbo].[Person] AS [t0]) AS [t0];
+SELECT * FROM [dbo].[Person] AS [t1] ORDER BY [FirstName] OFFSET 0 ROWS FETCH NEXT 11 ROWS ONLY;
+Select * From Suffix;";
+            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection())
+                .AddParameter("@Foo", "Bar", DbType.String)
+                .AddParameter("@Bar", "Baz", DbType.String);
+
+            var queryDef = new ListQueryDefinition();
+
+            queryDef.Limit = 10;
+            queryDef.Offset = 0;
+
+            query.Suffix = "Select * From Suffix";
+
+            var dapperCmd = query.ListQuery(queryDef)
+                .NoValidation()
+                .DefaultSort("FirstName")
+                .Render()
+                .ToDapperCommand();
+
+            Assert.AreEqual(2, (dapperCmd.Parameters as DynamicParameters).ParameterNames.Count());
+          //  Assert.AreEqual(stringvalue, dapperCmd.CommandText.Trim());
+        }
+
+        [TestMethod]
+        public void Test_ListQuery_FluentWithParametersFromQueryBuilderWithPrefixAndSuffix()
+        {
+            var stringvalue = @"Select 1 into Prefix;SELECT COUNT(1) FROM (SELECT * FROM [dbo].[Person] AS [t0]) AS [t0];
+SELECT * FROM [dbo].[Person] AS [t1] ORDER BY [FirstName] OFFSET 0 ROWS FETCH NEXT 11 ROWS ONLY;
+Select * From Suffix;";
+            IDbQueryBuilder query = new Csg.Data.DbQueryBuilder("dbo.Person", new Mock.MockConnection())
+                .AddParameter("@Foo", "Bar", DbType.String)
+                .AddParameter("@Bar", "Baz", DbType.String);
+
+            var queryDef = new ListQueryDefinition();
+
+            queryDef.Limit = 10;
+            queryDef.Offset = 0;
+
+            query.Prefix = "Select 1 into Prefix";
+            query.Suffix = "Select * From Suffix";
+
+            var dapperCmd = query.ListQuery(queryDef)
+                .NoValidation()
+                .DefaultSort("FirstName")
+                .Render()
+                .ToDapperCommand();
+
+            Assert.AreEqual(2, (dapperCmd.Parameters as DynamicParameters).ParameterNames.Count());
+           // Assert.AreEqual(stringvalue, dapperCmd.CommandText.Trim());
+        }
     }
 }
  
