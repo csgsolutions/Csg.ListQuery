@@ -276,9 +276,12 @@ namespace Csg.ListQuery.Sql
 
         public static IDbQueryBuilder GetCountQuery(IListQueryBuilder query)
         {
+            
             var fullQuery = query.Apply().Fork();
             fullQuery.PagingOptions = null;
-            fullQuery.OrderBy.Clear(); 
+            fullQuery.OrderBy.Clear();
+            fullQuery.Prefix = null;
+            fullQuery.Suffix = null;
             
             var sqlString = fullQuery.ToString();
 
