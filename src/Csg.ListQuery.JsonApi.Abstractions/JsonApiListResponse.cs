@@ -1,18 +1,18 @@
 ﻿using Csg.ListQuery.Server;
-using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Csg.ListQuery.JsonApi.Abstractions
 {
     public class JsonApiListResponse<TAttributes> : ListResponse<JsonApiRecord<TAttributes>>
     {
-        [JsonProperty("data")]
+        [JsonPropertyName("data")]
         public override IEnumerable<JsonApiRecord<TAttributes>> Data { get => base.Data; set => base.Data = value; }
         
-        [JsonProperty("links")]
+        [JsonPropertyName("links")]
         public override ListResponseLinks Links { get => base.Links; set => base.Links = value; }
 
-        [JsonProperty("meta")]
+        [JsonPropertyName("meta")]
         public override ListResponseMeta Meta { get => base.Meta; set => base.Meta = value; }
     }
 }
