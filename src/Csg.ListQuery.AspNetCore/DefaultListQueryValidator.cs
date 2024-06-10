@@ -16,6 +16,8 @@ namespace Csg.ListQuery.AspNetCore
     {
         private ListRequestOptions _options;
         private IDisposable _onChangeSubscription;
+        public int? DefaultLimit { get { return _options.DefaultLimit; } }
+        public int? MaxLimit { get { return _options.MaxLimit; } }
 
         /// <summary>
         /// Initializes a new instance
