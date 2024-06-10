@@ -10,6 +10,9 @@ namespace Csg.ListQuery.AspNetCore
     /// </summary>
     public interface IListRequestValidator
     {
+        int? DefaultLimit { get; }
+        int? MaxLimit { get; }
+
         /// <summary>
         /// When implemented in a derived class, validates the given request and produces a <see cref="ListQueryDefinition"/> query.
         /// </summary>
