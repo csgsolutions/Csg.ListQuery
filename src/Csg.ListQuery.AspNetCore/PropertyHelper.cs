@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Csg.ListQuery.AspNetCore
 {
@@ -25,11 +25,11 @@ namespace Csg.ListQuery.AspNetCore
                 .Select(prop =>
                 {
                     var propInfo = new ListItemPropertyInfo();
-                    var jsonPropertyAttribute = prop.PropertyInfo.GetCustomAttributes(typeof(Newtonsoft.Json.JsonPropertyAttribute), false).FirstOrDefault();
+                    var jsonPropertyAttribute = prop.PropertyInfo.GetCustomAttributes(typeof(JsonPropertyNameAttribute), false).FirstOrDefault();
 
                     propInfo.Property = prop.PropertyInfo;
                     propInfo.PropertyName = prop.Name;                    
-                    propInfo.JsonName = ((Newtonsoft.Json.JsonPropertyAttribute)jsonPropertyAttribute)?.PropertyName ?? prop.Name;
+                    propInfo.JsonName = ((JsonPropertyNameAttribute)jsonPropertyAttribute)?.Name ?? prop.Name;
                     propInfo.IsFilterable = prop.IsFilterable == true;
                     propInfo.IsSortable = prop.IsSortable == true;
                     propInfo.Description = prop.Description;

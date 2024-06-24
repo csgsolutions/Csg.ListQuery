@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Csg.ListQuery.JsonApi.Abstractions
 {
@@ -21,13 +21,13 @@ namespace Csg.ListQuery.JsonApi.Abstractions
             this.Attributes = attributes;
         }
                
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public string Type { get; set; }
 
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public string ID { get; set; }
 
-        [JsonProperty("attributes")]
+        [JsonPropertyName("attributes")]
         public TAttributes Attributes { get; set; }
     }
 }
